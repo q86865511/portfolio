@@ -148,6 +148,7 @@ runs-on: [self-hosted, linux, ARM64]   # 排到這台主機
 - [ ] 建好 `/srv/main` 並把 `/srv` owner 設給 `deploy`、`chmod 755`(讓 runner 可寫、Caddy 可讀)(§3.2)。
 - [ ] Caddy 的主站 vhost `root` 指向 `/srv/main`(見 [`infra/caddy/Caddyfile`](../infra/caddy/Caddyfile) 與 [`12`](./12-caddy-origin.md));cloudflared 的 ingress 已把你的網域指向 `127.0.0.1:8080`(見 [`infra/cloudflared/config.yml`](../infra/cloudflared/config.yml))。
 - [ ] 在 repo 設 **variable `DOMAIN`** = 你的真實網域(健康檢查用)(§4)。
-- [ ] 主機有 Node 20+ / pnpm(corepack)、`rsync`、`curl`;Chrome 由 workflow 自動裝。
+- [ ] 在 repo 設 **variable `DEPLOY_ENABLED`** = `true`(部署閘門;未設時 `deploy-main` 的 job 會安全跳過而非失敗)。
+- [ ] 主機有 **Node 22+**(pnpm 11 需要 Node ≥ 22.13)/ pnpm(corepack)、`rsync`、`curl`;Chrome 由 workflow 自動裝。
 - [ ] (公開 repo 才需要)在 Settings → Actions 設定 fork PR 需核准,避免不可信程式碼進 runner(§3.3)。
 - [ ] (僅選 SSH 替代方案時)才需要設定 §5 那組 `CF_ACCESS_*` / `SSH_*` secrets;self-hosted 路線不需要。

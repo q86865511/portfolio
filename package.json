@@ -5,7 +5,7 @@
   "description": "Terry (周暐倫) 的履歷入口網站 — Monorepo:主站門面 + 多個專案子站,Cloudflare Tunnel + 獨立 CI/CD",
   "packageManager": "pnpm@11.1.2",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "build": "turbo run build",

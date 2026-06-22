@@ -80,13 +80,13 @@ jobs:
       - name: Enable Corepack (pin pnpm to packageManager field)
         run: corepack enable
 
-      # 3) 安裝 Node。指定 20(對齊 package.json engines: node >=20),
-      #    並開啟 pnpm 的相依快取——快取 key 由 lockfile 算出,lockfile 沒變就直接命中,
-      #    install 會快很多。
+      # 3) 安裝 Node。指定 22:pnpm 11.1.2 需要 Node >= 22.13,Node 20 會因缺少
+      #    node:sqlite 內建模組而讓 pnpm 一啟動就崩潰。開啟 pnpm 相依快取
+      #    (快取 key 由 lockfile 算出,lockfile 沒變就命中,install 更快)。
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "pnpm"
 
       # 4) 安裝相依。--frozen-lockfile = 嚴格依照 pnpm-lock.yaml 安裝,
