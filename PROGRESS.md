@@ -18,7 +18,7 @@
 
 ## 待辦
 - Phase 4 實作(與使用者一起):買網域接 Cloudflare、主機裝 `cloudflared` 建 tunnel、Caddy 改聽 `127.0.0.1:8080`、建 `/srv/main`。
-- Phase 5 實作:在 Oracle A1 註冊 self-hosted ARM runner、設 repo variable `DOMAIN`、啟用 workflow。
+- Phase 5 實作:在 Oracle A1 註冊 self-hosted ARM runner、設 repo variables `DOMAIN` 與 `DEPLOY_ENABLED=true`(部署閘門,預設 skip 以免 runner 未就緒前失敗)、啟用 workflow。
 - Phase 7:上線驗證(DNS/Tunnel/HTTPS/各子站可訪問/health check)、面試講稿 `docs/30`;之後改自動 commit + PR(merge 等使用者)。
 
 ## 已知問題

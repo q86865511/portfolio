@@ -30,6 +30,8 @@ name: CI
 #   改 docs/ 或 infra/ 這類「不影響網站產物」的東西,不需要浪費一輪 CI。
 #   (這正是 monorepo + paths 過濾的精神,詳見 docs/21。)
 on:
+  # 允許在 Actions 頁面手動觸發,方便單獨驗證這條 workflow 本身。
+  workflow_dispatch:
   pull_request:
     paths:
       - "apps/**"
