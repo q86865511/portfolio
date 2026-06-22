@@ -54,6 +54,8 @@ name: Deploy main
 #   或別的子站(apps/soulshard/**)時,「不會」觸發主站部署。每個子站各有自己
 #   paths 過濾的 workflow,彼此獨立 build / deploy(monorepo 解耦,見 docs/21)。
 on:
+  # 手動觸發:runner 與網域就緒後,可在 Actions 頁面手動跑一次驗證部署。
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -75,6 +77,14 @@ concurrency:
 jobs:
   deploy:
     name: Build + Deploy main to /srv/main
+    # 部署閘門:預設「跳過」(skipped),而非失敗。
+    #   在 self-hosted ARM runner 尚未註冊、網域尚未接好之前,若直接讓本 job 排程,
+    #   會因為「找不到符合 labels 的 runner」而讓整次 push 顯示失敗(startup_failure)。
+    #   因此用 job-level if 當開關:vars.DEPLOY_ENABLED 未設(預設)→ 條件為 false → job 直接 skipped,
+    #   完全不需要 runner、不會失敗。
+    #   啟用方式(Phase 5 完成後):repo Settings → Secrets and variables → Actions → Variables
+    #   新增 DEPLOY_ENABLED=true,之後 push 到 main 才會真正部署(詳見 docs/22)。
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     # self-hosted ARM runner,三個 label 全中才會排到主機這台(理由見檔頭)。
     runs-on: [self-hosted, linux, ARM64]
 
