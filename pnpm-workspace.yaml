@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# 依賴的 build script(postinstall)核可:原生套件允許建置,puppeteer 不在安裝期下載 Chromium(改由需要時/CI 取得)
+allowBuilds:
+  puppeteer: false
+  sharp: true
+  unrs-resolver: true
+# 不在每次 run script 前重新驗證相依(避免 ignored-builds 警告造成非 0 結束)
+verifyDepsBeforeRun: false

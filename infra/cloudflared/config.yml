@@ -1,0 +1,59 @@
+# ============================================================================
+# Cloudflare Tunnel 設定檔(cloudflared）
+# ----------------------------------------------------------------------------
+# 角色:這支設定檔告訴主機上的 cloudflared「收到某個 hostname 的請求時,
+#       要把它轉發到本機哪個位址」。對外的 HTTPS 在 Cloudflare 邊緣就終結,
+#       Tunnel 內部已是加密通道,所以這裡一律轉給本機 Caddy 的 http://127.0.0.1:8080。
+#
+# 資料流:使用者 → Cloudflare 邊緣 → Tunnel → (本檔 ingress) → 本機 Caddy(:8080)
+#
+# ⚠️ 佔位符說明(使用者稍後以實際值替換):
+#   - YOUR_DOMAIN  : 你購買 / 託管在 Cloudflare 上的網域,例如 example.com
+#   - TUNNEL_ID    : 建立 tunnel 後得到的 UUID(見本目錄 README「建立 tunnel」)
+#
+# ⚠️ 真實憑證(*.json）絕不入庫;credentials-file 指向主機本地路徑即可。
+# ============================================================================
+
+# tunnel 的識別碼(UUID)。可用 tunnel 名稱或 UUID,建議用 UUID 較不會誤指。
+# 使用者稍後以實際 tunnel UUID 替換 TUNNEL_ID。
+tunnel: TUNNEL_ID
+
+# tunnel 的憑證檔(內含 tunnel 的 secret,用來向 Cloudflare 證明身分)。
+# 由 `cloudflared tunnel create` 產生,放在主機本地、不入庫。
+# 使用者稍後以實際路徑替換(若用 root 安裝 systemd,慣例放 /etc/cloudflared/)。
+credentials-file: /etc/cloudflared/TUNNEL_ID.json
+
+# --- 連線品質/穩定性的保守預設(可選,但建議保留)-------------------------
+# 對單機 Always Free 來說這些預設足夠;有需要再調整。
+loglevel: info
+# 同時保持的連線數(到 Cloudflare 邊緣)。預設 4,單機維持預設即可。
+# protocol 留空走自動協商(quic 優先,失敗回落 http2)。
+
+# ============================================================================
+# ingress:由上而下逐條比對 hostname,第一條符合的就生效。
+#          因此「最具體的規則放上面,catch-all(無 hostname)放最後」。
+# ============================================================================
+ingress:
+  # --- 主站:履歷門面 ---------------------------------------------------------
+  # YOUR_DOMAIN(裸網域)→ 本機 Caddy。Caddy 再依 Host 分流到 /srv/main。
+  - hostname: YOUR_DOMAIN
+    service: http://127.0.0.1:8080
+
+  # 若希望 www 也可用,取消下行註解(同時要在 Cloudflare 加一筆 www 的 CNAME)。
+  # - hostname: www.YOUR_DOMAIN
+  #   service: http://127.0.0.1:8080
+
+  # --- live demo:Soulshard-Hunter -------------------------------------------
+  # soulshard.YOUR_DOMAIN → 本機 Caddy → /srv/soulshard 靜態檔。
+  - hostname: soulshard.YOUR_DOMAIN
+    service: http://127.0.0.1:8080
+
+  # --- 預留:cyclepact(未來,Godot 專案完成後啟用)-------------------------
+  # 目前先放著當範例;真正啟用前請一併在 Cloudflare 加上 DNS CNAME(見 README)。
+  - hostname: cyclepact.YOUR_DOMAIN
+    service: http://127.0.0.1:8080
+
+  # --- catch-all(必須是最後一條,且不帶 hostname)---------------------------
+  # 任何沒對上上面規則的 hostname,直接回 404,不往本機轉發。
+  # 這條是 cloudflared 的硬性要求:ingress 最後一定要有一條無 hostname 的規則。
+  - service: http_status:404

@@ -1,0 +1,69 @@
+"use client";
+
+import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { type ReactNode } from "react";
+import { useLang } from "../providers/LangProvider";
+import { LangToggle } from "./LangToggle";
+
+export interface LiveDemoShellProps {
+  /** 子站專案名稱(顯示於頂條中央)。 */
+  projectName: string;
+  /** 返回主站作品集的連結。 */
+  homeUrl: string;
+  githubUrl: string;
+  /** 主站對應的 showcase 詳情頁。 */
+  showcaseUrl?: string;
+  children: ReactNode;
+}
+
+/**
+ * Live demo 子站頂部薄外殼(48px),把獨立 app 包進統一品牌,
+ * 並提供清楚的「返回作品集」逃生路徑。
+ */
+export function LiveDemoShell({
+  projectName,
+  homeUrl,
+  githubUrl,
+  showcaseUrl,
+  children,
+}: LiveDemoShellProps) {
+  const { t } = useLang();
+
+  return (
+    <div className="flex flex-col h-screen">
+      <header className="h-12 shrink-0 bg-elevated border-b border-border flex items-center justify-between px-4 gap-3">
+        <a
+          href={homeUrl}
+          className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {t("返回作品集", "Back to portfolio")}
+        </a>
+        <span className="font-medium text-sm truncate">{projectName}</span>
+        <div className="flex items-center gap-2">
+          {showcaseUrl && (
+            <a
+              href={showcaseUrl}
+              className="hidden sm:inline text-sm text-text-muted hover:text-brand transition-colors"
+            >
+              {t("看 showcase", "Showcase")}
+            </a>
+          )}
+          <a
+            href={githubUrl}
+            aria-label="GitHub"
+            rel="noopener noreferrer"
+            target="_blank"
+            className="text-text-muted hover:text-text transition-colors"
+          >
+            <Github className="h-[18px] w-[18px]" aria-hidden="true" />
+          </a>
+          <LangToggle />
+        </div>
+      </header>
+      <main className="flex-1 min-h-0 overflow-hidden">{children}</main>
+    </div>
+  );
+}
+
+export { ExternalLink };

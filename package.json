@@ -1,0 +1,29 @@
+{
+  "name": "resume-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Terry (周暐倫) 的履歷入口網站 — Monorepo:主站門面 + 多個專案子站,Cloudflare Tunnel + 獨立 CI/CD",
+  "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json,css}\"",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.6.3",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["sharp", "unrs-resolver"],
+    "ignoredBuiltDependencies": ["puppeteer"],
+    "verifyDepsBeforeRun": false
+  }
+}

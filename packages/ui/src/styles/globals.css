@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   設計 token(來源:docs/01-design-system.md)
+   深色為預設(:root),淺色掛 [data-theme="light"]。
+   ============================================================ */
+:root {
+  /* ── 表面 / 背景(明度階)──────────────────── */
+  --color-bg: #0b0f14;
+  --color-surface: #121821;
+  --color-surface-2: #1a222d;
+  --color-elevated: #212c39;
+  --color-overlay: rgba(5, 8, 12, 0.72);
+
+  /* ── 文字 ──────────────────────────────── */
+  --color-text: #e8edf2;
+  --color-text-muted: #9fb0c0;
+  --color-text-subtle: #6b7c8c;
+  --color-text-onbrand: #04201f;
+
+  /* ── 邊框 ──────────────────────────────── */
+  --color-border: rgba(159, 176, 192, 0.14);
+  --color-border-strong: rgba(159, 176, 192, 0.28);
+  --color-focus: #5ee6d0;
+
+  /* ── 品牌 / 強調 ────────────────────────── */
+  --color-brand: #2dd4bf;
+  --color-brand-hover: #5eead4;
+  --color-brand-dim: rgba(45, 212, 191, 0.12);
+  --color-accent: #a78bfa;
+  --color-accent-dim: rgba(167, 139, 250, 0.14);
+
+  /* ── 語意色 ──────────────────────────────── */
+  --color-success: #34d399;
+  --color-success-dim: rgba(52, 211, 153, 0.14);
+  --color-warning: #fbbf24;
+  --color-warning-dim: rgba(251, 191, 36, 0.14);
+  --color-danger: #f87171;
+  --color-danger-dim: rgba(248, 113, 113, 0.14);
+  --color-info: #60a5fa;
+  --color-info-dim: rgba(96, 165, 250, 0.14);
+
+  /* ── 字體 ──────────────────────────────── */
+  --font-sans: "Inter", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
+    "Noto Sans Mono CJK TC", monospace;
+
+  /* ── 尺度 ──────────────────────────────── */
+  --container: 1120px;
+  --measure: 68ch;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --ring: 0 0 0 3px var(--color-brand-dim), 0 0 0 1.5px var(--color-focus);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+}
+
+[data-theme="light"] {
+  --color-bg: #f7f9fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #eff3f7;
+  --color-elevated: #ffffff;
+  --color-overlay: rgba(15, 23, 32, 0.45);
+
+  --color-text: #0e1620;
+  --color-text-muted: #475565;
+  --color-text-subtle: #6b7888;
+  --color-text-onbrand: #04201f;
+
+  --color-border: rgba(14, 22, 32, 0.12);
+  --color-border-strong: rgba(14, 22, 32, 0.22);
+  --color-focus: #0d9488;
+
+  --color-brand: #0d9488;
+  --color-brand-hover: #0f766e;
+  --color-brand-dim: rgba(13, 148, 136, 0.1);
+  --color-accent: #7c3aed;
+  --color-accent-dim: rgba(124, 58, 237, 0.1);
+
+  --color-success: #059669;
+  --color-success-dim: rgba(5, 150, 105, 0.12);
+  --color-warning: #b45309;
+  --color-warning-dim: rgba(180, 83, 9, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-dim: rgba(220, 38, 38, 0.12);
+  --color-info: #2563eb;
+  --color-info-dim: rgba(37, 99, 235, 0.12);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* focus-visible:鍵盤操作才顯示焦點環 */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+    border-radius: var(--radius-sm);
+  }
+}
+
+@layer components {
+  /* skip-link:鍵盤使用者跳過導覽直達內容 */
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    background: var(--color-brand);
+    color: var(--color-text-onbrand);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    z-index: 100;
+    transition: top var(--dur) var(--ease);
+  }
+  .skip-link:focus {
+    top: 16px;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  .container {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* 尊重使用者的減少動效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 列印:強制淺色、移除多餘裝飾 */
+@media print {
+  :root {
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-text: #0e1620;
+    --color-text-muted: #333a45;
+  }
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

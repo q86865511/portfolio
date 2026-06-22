@@ -1,0 +1,112 @@
+# ============================================================================
+# ci.yml — PR / push 的「驗證關卡」(typecheck → lint → build)
+# ----------------------------------------------------------------------------
+# 角色:在「程式碼合進 main 之前」就把問題擋下來。任何對 apps / packages /
+#       content / 根設定的改動,送 PR 或 push 時都先跑一輪靜態驗證,綠燈才放行。
+#       這條 workflow「不部署任何東西」,只負責「確認 build 得起來、型別與 lint
+#       都過」。部署是另一條 deploy-main.yml 的事(關注點分離)。
+#
+# 為什麼用 GitHub-hosted 的 ubuntu-latest(而非 self-hosted ARM)?
+#   驗證階段只是「在乾淨環境把專案 build 一遍」,與最終要跑的主機架構(ARM)
+#   無關——靜態匯出的產物是純 HTML/JS/CSS,x86 build 出來的內容和 ARM 一模一樣。
+#   而且 PR 常來自外部 / 分支,讓不可信的程式碼跑在我們的 prod 主機上有安全風險;
+#   用 GitHub 免費的拋棄式 hosted runner 最安全、零維護。真正要寫入主機 /srv 的
+#   部署才用 self-hosted ARM(見 deploy-main.yml 與 docs/22)。
+#
+# 教學交叉連結:
+#   - GitHub Actions 基本概念(workflow / job / step / trigger / runner / secrets):
+#     docs/20-cicd-github-actions.md
+#   - 為什麼用 paths 過濾、monorepo 如何解耦:docs/21-path-filtered-pipelines.md
+# ============================================================================
+
+name: CI
+
+# --- 觸發條件(trigger)------------------------------------------------------
+# 兩種事件都跑:
+#   - pull_request:PR 開啟 / 更新時驗證,當作合併前的關卡(branch protection 可要求它綠燈)。
+#   - push:推上 main 後再跑一次,確認「合進去之後」整體仍是綠的。
+#
+# paths 過濾:只有「真的會影響 build 結果」的路徑變動才觸發。
+#   改 docs/ 或 infra/ 這類「不影響網站產物」的東西,不需要浪費一輪 CI。
+#   (這正是 monorepo + paths 過濾的精神,詳見 docs/21。)
+on:
+  pull_request:
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "content/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "content/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/ci.yml"
+
+# --- concurrency:同一分支只保留最新一次 -----------------------------------
+# 同一個 PR / 分支連續推好幾個 commit 時,舊的 CI 還在跑就沒意義了。
+# 用 ref 當 group key,cancel-in-progress: true → 新的一來就取消舊的,省 runner 分鐘數、
+# 也讓「最新狀態」更快得到結果。(部署 workflow 則相反,不可互相取消,見 deploy-main.yml。)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck / Lint / Build
+    # hosted x86 runner:乾淨、拋棄式、免維護(理由見檔頭)。
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 取出原始碼。actions/checkout 把這次 commit 的檔案 clone 到 runner。
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) 啟用 corepack 並鎖定 pnpm 版本。
+      #    corepack 是 Node 內建的「套件管理器版本管理」工具;package.json 的
+      #    "packageManager": "pnpm@11.1.2" 是 single source of truth,corepack 會據此
+      #    準備出「完全相同版本」的 pnpm,避免本機 / CI 版本不一致導致的詭異問題。
+      - name: Enable Corepack (pin pnpm to packageManager field)
+        run: corepack enable
+
+      # 3) 安裝 Node。指定 20(對齊 package.json engines: node >=20),
+      #    並開啟 pnpm 的相依快取——快取 key 由 lockfile 算出,lockfile 沒變就直接命中,
+      #    install 會快很多。
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      # 4) 安裝相依。--frozen-lockfile = 嚴格依照 pnpm-lock.yaml 安裝,
+      #    若 lockfile 與 package.json 不同步就直接失敗。這保證 CI 裝到的東西
+      #    和 commit 進來的 lockfile「逐位元組一致」,杜絕「我這邊可以跑」。
+      #    注意:puppeteer 的瀏覽器在此「不會」下載(workspace 設定 allowBuilds.puppeteer=false),
+      #    CI 驗證階段也用不到瀏覽器——產 PDF 是部署 workflow 的事。
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5) 型別檢查。只跑 main 這個 filter(本檔聚焦主站驗證);
+      #    Turborepo 會先 build main 的 workspace 相依(packages/ui),再 tsc --noEmit。
+      #    型別錯誤在這裡就現形,不必等到 build。
+      - name: Typecheck (main)
+        run: pnpm --filter main run typecheck
+
+      # 6) Lint。抓出風格 / 潛在錯誤(next lint = ESLint)。
+      - name: Lint (main)
+        run: pnpm --filter main run lint
+
+      # 7) Build。實際把 Next.js 以 output:'export' 匯出成靜態檔到 apps/main/out。
+      #    這是最有代表性的關卡:build 過 = 這份程式碼真的能產出可部署的網站。
+      #    (此處刻意「不」產 PDF——PDF 需要瀏覽器,放在部署 workflow 做,讓 CI 保持輕快。)
+      - name: Build (main)
+        run: pnpm --filter main run build

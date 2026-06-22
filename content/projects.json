@@ -1,0 +1,672 @@
+{
+  "count": 17,
+  "projects": [
+    {
+      "slug": "ai-deployment-pipeline",
+      "repoName": "AI-Deployment-Pipeline",
+      "titleZh": "AI 模型部署與監控平台",
+      "titleEn": "AI Model Deployment & Monitoring Platform",
+      "oneLinerZh": "為 YOLOv8 系列模型打造的端到端部署平台:自動化 PT→ONNX→TensorRT 優化、多批次多精度效能評測,並以 Triton 推論服務與 Prometheus/Grafana 即時監控串起完整生命週期。",
+      "oneLinerEn": "An end-to-end deployment platform for YOLOv8 models: automated PT→ONNX→TensorRT optimization, multi-batch/multi-precision benchmarking, and a full lifecycle wired to Triton inference serving with real-time Prometheus/Grafana monitoring.",
+      "descZh": "本專案是一套針對 YOLOv8 系列模型的 AI 部署與效能監控平台,涵蓋模型上傳、格式轉換、自動化評測到生產級推論服務的完整流程。後端以 FastAPI 非同步服務組織,透過 ultralytics 與 trtexec 把 PyTorch 模型自動轉為 ONNX 與 TensorRT 引擎(支援 FP32/FP16),並交由 NVIDIA Triton Inference Server 以 explicit 模式動態掛載/卸載部署。自動化管線會針對多種批次大小(1–32)與精度組合反覆推論測量,同時記錄 mAP50/mAP50-95 準確度與延遲、FPS、GPU 使用率、VRAM 等效能指標。前端為 React + Ant Design 介面,提供互動式圖表與 PDF/Excel 報告匯出;系統層則以 Prometheus + node/GPU exporter 蒐集指標、Grafana 視覺化,全部以 Docker Compose 編排為單一可啟動的 GPU 容器堆疊。",
+      "descEn": "An AI deployment and performance-monitoring platform built around the YOLOv8 model family, spanning the full path from model upload and format conversion through automated benchmarking to production inference serving. The FastAPI async backend uses ultralytics and trtexec to convert PyTorch models into ONNX and TensorRT engines (FP32/FP16), then deploys them on NVIDIA Triton Inference Server in explicit mode with dynamic load/unload. An automated pipeline runs repeated inference across batch sizes (1–32) and precision combinations, capturing both accuracy (mAP50 / mAP50-95) and performance metrics (latency, FPS, GPU utilization, VRAM). The React + Ant Design frontend offers interactive charts and PDF/Excel report export, while a Prometheus + node/GPU-exporter + Grafana stack provides real-time system observability — all orchestrated as a single GPU-enabled Docker Compose stack.",
+      "techStack": [
+        "Python",
+        "FastAPI",
+        "asyncio",
+        "React",
+        "Ant Design",
+        "YOLOv8",
+        "ONNX",
+        "TensorRT",
+        "Triton",
+        "OpenCV",
+        "Docker",
+        "Prometheus",
+        "Grafana"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/AI-Deployment-Pipeline",
+      "highlights": [
+        {
+          "zh": "設計清晰分層的服務架構:FastAPI 非同步後端(轉換/推論/評測/Triton 各自獨立 service 與 router)+ React/Ant Design 前端 + NVIDIA 推論堆疊,職責邊界明確,易於擴充與除錯。",
+          "en": "A cleanly layered service architecture: an async FastAPI backend (separate services and routers for conversion, inference, benchmarking, and Triton) plus a React/Ant Design frontend and the NVIDIA inference stack, with clear responsibility boundaries that keep it extensible and debuggable."
+        },
+        {
+          "zh": "自動化模型優化管線:以 ultralytics 與 trtexec 完成 PT→ONNX→TensorRT 轉換,並對批次大小 1–32 × FP32/FP16 組合各做 100 次重複推論,同時量測 mAP50/mAP50-95 準確度與延遲、FPS、GPU 使用率、VRAM,並輸出平均值與標準差以評估穩定性。",
+          "en": "An automated optimization pipeline that converts PT→ONNX→TensorRT via ultralytics and trtexec, then runs 100 repeated inferences for each batch-size (1–32) × precision (FP32/FP16) combination, measuring both mAP50/mAP50-95 accuracy and latency, FPS, GPU utilization, and VRAM — reporting mean and standard deviation to gauge stability."
+        },
+        {
+          "zh": "以 NVIDIA Triton Inference Server(explicit model-control 模式)提供生產級推論,支援模型動態掛載/卸載與即時推論統計;結果分析頁可多維度比較不同精度與批次配置,並匯出 PDF/Excel 報告作為選型與硬體規劃依據。",
+          "en": "Production-grade serving on NVIDIA Triton Inference Server (explicit model-control mode) with dynamic model load/unload and live inference stats; the analysis page compares precision and batch configurations across multiple dimensions and exports PDF/Excel reports to inform model selection and hardware planning."
+        },
+        {
+          "zh": "完整可觀測性堆疊:Prometheus 搭配 node-exporter 與 nvidia-gpu-exporter 蒐集 CPU/記憶體/GPU 負載/VRAM 指標,Grafana 5 秒刷新視覺化儀表板,整套系統以 Docker Compose 一鍵編排成 GPU 容器堆疊。",
+          "en": "A complete observability stack: Prometheus with node-exporter and nvidia-gpu-exporter collecting CPU/memory/GPU-load/VRAM metrics, Grafana dashboards refreshing every 5 seconds, with the whole system orchestrated as a one-command GPU Docker Compose stack."
+        }
+      ],
+      "challengesZh": "最大的取捨在於「真實效能可比較性」與「工程複雜度」之間的平衡。為了讓評測結果可信,管線採固定基準(YOLOv8n-Pose、COCO 2017-pose val)、每組配置重複 100 次並記錄標準差,還要求驗證集張數能被所有批次大小整除以避免尾批失真,這對測試設計的嚴謹度要求很高。技術整合上,PT→ONNX→TensorRT 跨多套工具鏈(ultralytics/onnx-simplifier/trtexec)、不同 CUDA/TensorRT 版本與 FP16 硬體支援差異,都是常見破口;推論服務改用 Triton explicit 模式以支援動態載入/卸載,但也需要自行管理模型庫掛載與 GPU 記憶體釋放(程式中可見 torch/gc 與多種 GPU 記憶體量測備援)。此外平台刻意採檔案式 JSON 持久化而非資料庫,降低部署門檻、貼合單機 GPU 評測情境,代價是放棄並發寫入與查詢能力,屬有意識的範圍取捨。整套需 NVIDIA GPU 與 CUDA 環境,並以 Docker Compose 編排多容器(後端/前端/Triton/Prometheus/Grafana/exporters)協調啟動順序與資源限制。",
+      "challengesEn": "The central trade-off was balancing trustworthy, comparable performance numbers against engineering complexity. To make results credible, the pipeline fixes a baseline (YOLOv8n-Pose on COCO 2017-pose val), repeats each configuration 100 times while recording standard deviation, and requires the validation set size to be divisible by every batch size to avoid tail-batch distortion — demanding rigor in test design. On integration, the PT→ONNX→TensorRT path spans several toolchains (ultralytics, onnx-simplifier, trtexec) where CUDA/TensorRT version mismatches and differing FP16 hardware support are common breakage points; serving was moved to Triton's explicit mode for dynamic load/unload, which in turn required hand-managing the model repository mount and GPU memory release (the code shows torch/gc handling and several fallback paths for measuring GPU memory). The platform also deliberately uses file-based JSON persistence instead of a database, lowering the deployment barrier and fitting a single-machine GPU benchmarking scenario — at the conscious cost of concurrent writes and query capability. The whole system requires an NVIDIA GPU and CUDA, and is orchestrated via Docker Compose across multiple containers (backend, frontend, Triton, Prometheus, Grafana, exporters) with managed startup order and resource limits.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為瀏覽器 live demo。前端為 React/CRA SPA,核心功能(模型轉換、Triton 推論、效能評測、即時監控)全部依賴需要 NVIDIA GPU + CUDA + TensorRT + Triton 的 FastAPI 後端,屬硬體相依的本機/伺服器系統。public/ 內雖有 sample_performance_data.json,但其餘頁面均向後端 API 取資料,純前端靜態部署只會呈現空殼,無法展示真正價值。建議改以系統展示影片(README 內已附 YouTube 解說)、Grafana 儀表板與評測報告截圖呈現。"
+      }
+    },
+    {
+      "slug": "lolhelper",
+      "repoName": "lolhelper",
+      "githubUrl": "https://github.com/q86865511/lolhelper",
+      "titleZh": "LOL Helper — Arena / Mayhem 統計平台",
+      "titleEn": "LOL Helper — Arena / Mayhem Stats Platform",
+      "oneLinerZh": "OP.GG 風格的英雄聯盟 Arena / Mayhem 統計平台,自建 Riot API 爬蟲與 Wilson 信心區間排行引擎。",
+      "oneLinerEn": "OP.GG-style LoL Arena / Mayhem stats platform with a self-built Riot API crawler and a Wilson-interval ranking engine.",
+      "descZh": "針對英雄聯盟「競技場 Arena」與「海克斯大亂鬥 Mayhem」兩個模式的統計平台,pnpm + Turbo monorepo 架構,含 FastAPI 後端、Next.js 15 前端與 Electron 桌面端三個元件。後端以非同步 Python(SQLAlchemy 2 async + asyncpg + ARQ)實作 Match-V5 BFS 爬蟲,自寫雙層滑動視窗 token bucket 處理 Riot 速率限制,並以 Wilson 95% 信心區間下界作為排行指標、再依百分位指派 S/A/B/C/D 分級,避免小樣本灌水。前端走 App Router 提供 SEO 與 OP.GG 風英雄頁(augment / 裝備 / 核心組建 / 隊友搭配排行),全程 zh_tw 中文化。",
+      "descEn": "A statistics platform for League of Legends' Arena and Mayhem modes, built as a pnpm + Turbo monorepo spanning a FastAPI backend, a Next.js 15 frontend, and an Electron desktop client. The async-Python backend (SQLAlchemy 2 async + asyncpg + ARQ) runs a Match-V5 BFS crawler with a hand-written two-tier sliding-window token-bucket rate limiter for the Riot API, and ranks augments/items by the lower bound of a 95% Wilson confidence interval before assigning percentile-based S/A/B/C/D tiers — so small-sample 100% win rates don't outrank high-volume 80%. The App Router frontend serves SEO-friendly, OP.GG-style champion pages (augment / item / core-build / synergy rankings), fully localized to zh_tw.",
+      "techStack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "FastAPI",
+        "Python",
+        "SQLAlchemy",
+        "asyncio",
+        "PostgreSQL",
+        "Redis",
+        "Electron",
+        "Docker",
+        "Caddy",
+        "Playwright"
+      ],
+      "presentation": "showcase",
+      "highlights": [
+        {
+          "zh": "自寫雙層滑動視窗 token bucket 速率限制器,同時管理 App 層(20/s + 100/120s)與 per-method × per-region 兩種 Riot 限速,BFS 爬蟲跨 4 個 region cluster 並行,單一 personal key 可達約 5 萬場/日。",
+          "en": "Hand-written two-tier sliding-window token-bucket limiter that tracks both Riot's app budget (20/s + 100/120s) and per-method-per-region limits; the BFS crawler runs across 4 region clusters in parallel, reaching ~50k matches/day on a single personal key."
+        },
+        {
+          "zh": "以 Wilson 95% 信心區間下界作為排行指標,搭配百分位分級(S/A/B/C/D),解決『5/5=100% 勝率灌爆 800/1000=80%』的小樣本問題;設計取捨記錄於 ADR(對比 Bayesian shrinkage、min-sample 門檻等替代方案)。",
+          "en": "Ranks by the Wilson 95% confidence-interval lower bound plus percentile tiering (S/A/B/C/D), fixing the small-sample problem where 5/5 (100%) outranks 800/1000 (80%); the trade-off vs. Bayesian shrinkage and min-sample thresholds is documented in an ADR."
+        },
+        {
+          "zh": "非同步資料管線:ARQ cron 依優先級與時效性派發爬取任務(SELECT ... FOR UPDATE SKIP LOCKED 確保冪等),聚合層以原生 SQL UPSERT 在分割表(Alembic 分區 migration)上重算 augment / item 統計。",
+          "en": "Async data pipeline: ARQ cron dispatches crawl jobs by priority and staleness (idempotent via SELECT ... FOR UPDATE SKIP LOCKED), and the aggregation layer recomputes augment/item stats with raw-SQL UPSERTs over a partitioned participants table (Alembic partition migrations)."
+        },
+        {
+          "zh": "產品決策有真實洞察:因 Riot 永久封鎖 Mayhem/Brawl 的 Match-V5 API(連 OP.GG 都拿不到),規劃以 Electron 客戶端讀本機 LCU 上傳資料聚合,並另立 tos-compliance 文件逐項對應 Riot 第三方政策邊界。",
+          "en": "Grounded product insight: because Riot permanently blocked Match-V5 for Mayhem/Brawl (even OP.GG can't fetch it), the roadmap pivots to an Electron client that aggregates data uploaded from each user's local LCU, with a dedicated tos-compliance doc mapping every feature to Riot's third-party policy."
+        }
+      ],
+      "challengesZh": "最大難點是在 Riot personal key 嚴苛速率限制下,跨 region 高吞吐且不被封鎖地爬取資料 —— 解法是自寫複合滑動視窗 token bucket(以 asyncio.Lock 保護、計算各視窗 time_until_available 取最大值),並讓爬蟲依 region cluster 並行。第二是統計排行的公平性:刻意捨棄直覺的原始勝率,選用 Wilson 區間下界,並把『為何不用 Bayesian / Elo / min-sample』的取捨寫進 ADR。架構面的取捨包括選 ARQ 而非 Celery(輕量、async 原生)、聚合先用原生 SQL UPSERT 全量重算(MVP 階段夠快,留待資料成長後改增量),以及為被封鎖的 Mayhem 模式從「網站爬蟲」改採「本機 LCU 上傳」的資料來源策略,並主動處理對應的政策合規風險。",
+      "challengesEn": "The core challenge was achieving high cross-region crawl throughput under Riot's strict personal-key limits without getting throttled — solved with a custom composite sliding-window token bucket (guarded by an asyncio.Lock, taking the max time_until_available across windows) and a crawler parallelized per region cluster. The second was ranking fairness: deliberately rejecting raw win rate in favor of the Wilson interval lower bound, with the rationale for not using Bayesian shrinkage, Elo, or a bare min-sample threshold captured in an ADR. Architectural trade-offs include choosing ARQ over Celery (lighter, async-native), doing full-recompute raw-SQL UPSERT aggregation for the MVP (fast enough now, leaving incremental aggregation for later), and pivoting the data source for the API-blocked Mayhem mode from web crawling to local LCU upload — while proactively addressing the resulting policy-compliance risk.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "前端為 Next.js 15(App Router),但完全依賴 FastAPI 後端 API(NEXT_PUBLIC_API_URL),而後端需 PostgreSQL + Redis,且有意義的資料來自需長時間運行的 Riot Match-V5 爬蟲與聚合 worker。沒有後端與已爬取資料庫時頁面無內容,故不適合作為純前端 live demo。若要做 live demo,需提供帶 mock 資料的後端或預先 seed 的資料庫快照,並以 docker-compose 一併部署 —— 工程量不小,建議以截圖/錄影的 showcase 呈現,而非 live demo。"
+      }
+    },
+    {
+      "slug": "soulshard-hunter",
+      "repoName": "Soulshard-Hunter",
+      "titleZh": "魂晶獵手 Soulshard Hunter",
+      "titleEn": "Soulshard Hunter",
+      "oneLinerZh": "用原生 HTML5 Canvas、零依賴零建置打造的像素風 roguelike 生存遊戲,美術 100% 程式即時生成,並可選配雲端帳號與 1~3 人即時連線合作。",
+      "oneLinerEn": "A pixel-art roguelike survival game built on raw HTML5 Canvas with zero dependencies and zero build step — 100% procedurally generated art, plus optional cloud accounts and 1–3 player real-time co-op.",
+      "descZh": "Vampire-Survivors-like 的瀏覽器生存遊戲,以純 ES Modules + HTML5 Canvas 自製引擎(120 Hz 固定步模擬、相機/世界座標系、程序化像素繪圖 API、WebAudio 合成),不含任何外部圖片素材與第三方前端框架。內容完全資料驅動並經統一註冊表整合,規模達 63 敵人 / 27 角色 / 43 武器 / 10 生態系,大量內容透過自製 multi-agent workflow(生成 → 對抗式審查 → 自動整合、故障隔離)量產。採離線優先:雲端與多人皆為選配,未登入或連不上自動退回本機存檔。選配後端為 Node + Fastify + PostgreSQL,提供帳號、跨裝置雲端存檔、伺服器權威排行榜,以及主機權威中繼(host-authoritative relay)的即時合作。",
+      "descEn": "A Vampire-Survivors-like browser survival game running on a hand-rolled engine of pure ES Modules + HTML5 Canvas — a 120 Hz fixed-step simulation, a camera/world coordinate system, a procedural pixel-drawing API, and WebAudio synthesis — with no external image assets and no third-party frontend framework. Content is fully data-driven through a single registry (63 enemies / 27 characters / 43 weapons / 10 biomes), much of it mass-produced via a custom multi-agent workflow (generate → adversarial review → auto-integrate with fault isolation). It is offline-first: cloud and multiplayer are optional, and the game silently falls back to local saves when logged out or disconnected. The optional backend (Node + Fastify + PostgreSQL) provides accounts, cross-device cloud saves, a server-authoritative leaderboard, and host-authoritative relay real-time co-op.",
+      "techStack": [
+        "JavaScript",
+        "Node.js",
+        "Fastify",
+        "PostgreSQL",
+        "Docker",
+        "GitHub Actions",
+        "Oracle Cloud"
+      ],
+      "presentation": "live-demo",
+      "githubUrl": "https://github.com/q86865511/Soulshard-Hunter",
+      "liveUrl": "https://yeyesoulshard.duckdns.org/",
+      "highlights": [
+        {
+          "zh": "從零自製遊戲引擎:120 Hz 固定步主迴圈降低輸入延遲、自寫相機與世界↔螢幕座標轉換、純程式繪製的像素 sprite 系統(rasterise 後快取),全程零外部圖片素材、零前端框架、零建置流程。",
+          "en": "A from-scratch game engine: a 120 Hz fixed-step main loop for low input latency, a hand-written camera and world-to-screen transform, and a code-only pixel sprite system (rasterised then cached) — with zero external image assets, zero frontend framework, and zero build step."
+        },
+        {
+          "zh": "伺服器權威排行榜:後端依 kills/stage/time/difficulty/reaper 重算分數並忽略客戶端宣稱值,搭配逐欄位上限與「依存活時間推算的合理性閘門」反作弊(如擊殺數受時間上限約束、無盡模式不可能觸發破關或死神),從源頭杜絕分數灌水。",
+          "en": "Server-authoritative leaderboard: the backend recomputes each score from kills/stage/time/difficulty/reaper and ignores the client's claimed value, backed by per-field caps and time-derived plausibility gates (e.g. kills bounded by elapsed time, endless runs can never trigger a clear or the Reaper) — making score inflation impossible by construction."
+        },
+        {
+          "zh": "主機權威中繼的 1~3 人即時合作:開房玩家瀏覽器跑權威模擬並以 ~18Hz 廣播量化後的世界快照,Node 伺服器只當房間/中繼不跑模擬;單一 protocol.js 同時擁有編碼與解碼以防漂移,並對未信任的 host 資料做夾擠防範記憶體攻擊。單機路徑完全不受影響。",
+          "en": "Host-authoritative relay co-op for 1–3 players: the host's browser runs the authoritative simulation and broadcasts quantised world snapshots at ~18 Hz, while the Node server acts purely as room/relay and never simulates. A single protocol.js owns both encode and decode to prevent drift, and clamps untrusted host data to guard against memory attacks — the single-player path is left entirely unchanged."
+        },
+        {
+          "zh": "自製 multi-agent 內容生產流水線:以「生成 → 對抗式審查 → 自動整合」量產敵人/武器/角色/美術,整合工具掃描 gen 目錄重建索引、保留既有 pack 並做故障隔離,讓單機在零依賴前提下仍堆出 63 敵人、43 武器、27 角色、10 生態系的內容規模。",
+          "en": "A custom multi-agent content pipeline: enemies, weapons, characters, and art are mass-produced via generate → adversarial review → auto-integrate, with an integration tool that rebuilds indexes by scanning the gen directory, preserves prior packs, and isolates faults — letting a zero-dependency single-player game scale to 63 enemies, 43 weapons, 27 characters, and 10 biomes."
+        }
+      ],
+      "challengesZh": "最大的取捨是堅持「零依賴、零建置、原生 Canvas」,代價是引擎層(固定步迴圈、座標系、粒子、音訊、程序化繪圖 API)全得自己寫,但換來極小的部署面與長期可維護性。即時連線在「簡單」與「防作弊」之間選擇主機權威中繼:伺服器不跑模擬以保持輕量,代價是信任開房者,因此另用伺服器權威排行榜(重算分數 + 合理性閘門)守住公平性,並把編/解碼集中在單一 protocol.js 避免兩端漂移、對未信任資料夾擠以防記憶體攻擊。內容要做大又不能拖垮專案,於是用 multi-agent workflow 量產並以掃描式整合 + 故障隔離吸收生成內容的不穩定。整體以離線優先為紅線:雲端/多人全為選配,任何網路失敗都不能影響本機遊玩。",
+      "challengesEn": "The biggest trade-off was committing to \"zero dependencies, zero build, raw Canvas\": the price is hand-writing the entire engine layer (fixed-step loop, coordinate system, particles, audio, procedural drawing API), but the payoff is a tiny deployment surface and long-term maintainability. Real-time multiplayer chose host-authoritative relay between \"simple\" and \"cheat-proof\": keeping the server out of simulation makes it lightweight at the cost of trusting the host, so fairness is instead enforced by a server-authoritative leaderboard (recomputed scores plus plausibility gates), with encode/decode centralised in a single protocol.js to avoid client/host drift and untrusted data clamped against memory attacks. Scaling content without bloating the project led to a multi-agent generation workflow absorbed via scan-based integration and fault isolation. Throughout, offline-first was the hard line: cloud and multiplayer are strictly optional, and no network failure may ever affect local play.",
+      "demoFeasibility": {
+        "canRunInBrowser": true,
+        "notes": "前端為純 ES Modules + HTML5 Canvas,可純單機離線遊玩、無需建置(只需任一靜態伺服器,repo 內附 tools/serve.mjs)。雲端帳號、跨裝置存檔、排行榜與 1~3 人連線皆為選配,未登入或連不上會自動退回本機 localStorage 存檔,不影響核心遊玩。因此前端可獨立靜態部署,可作為候選 live demo(實際上已部署於 https://yeyesoulshard.duckdns.org/,並有 GitHub Actions push 到 main 自動部署至 Oracle Cloud + HTTPS)。完整體驗多人/排行榜需另跑 Node + Fastify + PostgreSQL 後端(docker compose 一鍵起)。"
+      }
+    },
+    {
+      "slug": "smart-pedestrian-navigation",
+      "repoName": "Smart-Pedestrian-Navigation-via-Scene-Analysis-and-Traffic-Light-Detection",
+      "titleZh": "結合街景分析與燈號辨識之智慧導航系統",
+      "titleEn": "Smart Navigation via Street-Scene Analysis and Traffic-Light Detection",
+      "oneLinerZh": "整合街景語意分割、手勢辨識與手機導航的輔助駕駛專題,在單一即時管線中判斷可行駛區域並做語音提示。",
+      "oneLinerEn": "A capstone driver-assist system that fuses street-scene semantic segmentation, hand-gesture recognition, and phone navigation into one real-time pipeline with road-area awareness and voice alerts.",
+      "descZh": "畢業專題,將三條獨立技術線整合成單一即時管線:以 FC-DenseNet103(InceptionV4 前端)在 TensorFlow 1.x 上做街景語意分割,以 MediaPipe 做手勢辨識,並透過 Java NIO Socket 從 Android 導航 App(改自 FancyNavi / HERE SDK)接收路線資訊。主程式 Main.py 逐幀擷取攝影機或影片,跑分割推論後,以 BFS 連通域分析判斷使用者是否位於可行區域(路面像素),並把導航距離、轉向角與箭頭疊加回畫面;偵測到揮手「Stop」手勢時以 playsound 觸發語音提示。整體偏研究/概念驗證,模型與資料前處理皆可重現。",
+      "descEn": "A university capstone that stitches three independent technology tracks into one real-time pipeline: street-scene semantic segmentation with FC-DenseNet103 (InceptionV4 frontend) on TensorFlow 1.x, hand-gesture recognition via MediaPipe, and route data received from an Android navigation app (adapted from FancyNavi / HERE SDK) over a Java NIO socket. The Main.py loop grabs frames from a camera or video, runs segmentation inference, then uses a BFS connected-component analysis to decide whether the user is standing on a walkable/road region (road-class pixels) and overlays navigation distance, turn angle and a direction arrow onto the frame; when a waving \"Stop\" gesture is detected it fires a voice alert via playsound. It is a research/proof-of-concept build with reproducible model training and dataset preprocessing.",
+      "techStack": [
+        "Python",
+        "TensorFlow 1.x",
+        "FC-DenseNet103",
+        "OpenCV",
+        "MediaPipe",
+        "NumPy",
+        "Pillow",
+        "Android (Java)",
+        "HERE SDK",
+        "Java NIO Socket",
+        "gTTS / playsound"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/Smart-Pedestrian-Navigation-via-Scene-Analysis-and-Traffic-Light-Detection",
+      "highlights": [
+        {
+          "zh": "以 FC-DenseNet103 + InceptionV4 前端在 TensorFlow 1.x 上訓練街景語意分割,並採 CamVid 與自製補充資料集 1:1 混合,提升對在地街景的泛化能力;附帶資料集 label 顏色轉換工具讓兩套資料的標註對齊。",
+          "en": "Trained FC-DenseNet103 with an InceptionV4 frontend on TensorFlow 1.x for street-scene segmentation, using a 1:1 mix of CamVid and a self-collected dataset to improve generalization to local scenes; a custom label-recoloring tool aligns annotations across the two datasets."
+        },
+        {
+          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷使用者是否站在可行駛區域,並把距離、轉向角與導引箭頭即時疊加回原畫面,而不是只輸出一張遮罩。",
+          "en": "On top of the segmentation mask, runs a BFS connected-component pass to compute the centroid and area of road regions, infers whether the user is on a walkable/road area, and overlays distance, turn angle and a guidance arrow back onto the live frame rather than just emitting a raw mask."
+        },
+        {
+          "zh": "用 MediaPipe Hands 加上 keypoint / point-history 分類器辨識揮手「Stop」手勢,連續觸發時以語音(gTTS 預生成、playsound 播放)提示,作為人機互動的安全信號。",
+          "en": "Recognizes a waving 'Stop' gesture using MediaPipe Hands with keypoint and point-history classifiers, and on sustained detection issues a voice alert (gTTS-generated audio played via playsound) as a human-in-the-loop safety signal."
+        },
+        {
+          "zh": "跨平台整合:Android 端(改自 FancyNavi,基於 HERE SDK)做即時導航,透過自寫的 Java NIO 非阻塞 Socket 伺服器把路線資訊串到 Python 主程式,並刻意以 Java 取代較慢的 Python socket 版本以維持吞吐。",
+          "en": "Cross-platform integration: an Android app (adapted from FancyNavi, built on the HERE SDK) handles live navigation and streams route data to the Python core through a hand-written non-blocking Java NIO socket server, deliberately chosen over a slower pure-Python socket to keep throughput up."
+        }
+      ],
+      "challengesZh": "最大的取捨是把三套來源各異的開源元件(語意分割套件、Android 導航 App、MediaPipe 手勢專案)整合成單一即時迴圈,且要在 TensorFlow 1.x 的舊式 session/placeholder API 下維持可用幀率——做法是每隔固定幀數才送一次分割推論。可行區域判斷沒有額外標註,而是用純像素級 BFS 連通域分析在分割輸出上即時計算,簡單但對分割品質與雜訊敏感。跨裝置通訊上,Python socket 版本太慢,因此改寫成 Java NIO 非阻塞伺服器接收手機端路線字串。需要誠實說明的限制:標題雖含「燈號辨識」,但整合後的執行管線中燈號分類僅以註解形式預留、尚未實際接上,實作完成的安全信號是「可行區域判斷 + 揮手 Stop 語音提示」;系統為桌面 Python + Android 的研究原型,綁定 TF1.x 與本機攝影機/socket,無法直接於瀏覽器執行。",
+      "challengesEn": "The core trade-off was fusing three differently-sourced open-source components (a segmentation suite, an Android navigation app, and a MediaPipe gesture project) into one real-time loop while keeping a usable frame rate under TensorFlow 1.x's legacy session/placeholder API — handled by running segmentation inference only every N frames. The walkability decision uses no extra labels; it is computed on the fly from the segmentation output via a pure pixel-level BFS connected-component analysis, which is simple but sensitive to mask quality and noise. For cross-device messaging, the pure-Python socket was too slow, so route strings from the phone are received by a rewritten non-blocking Java NIO server. An honest limitation: despite 'traffic-light detection' in the title, traffic-light classification is only stubbed (left as a comment) in the integrated runtime and not wired in — the implemented safety signals are the road-area check plus the wave 'Stop' voice alert. It is a desktop Python + Android research prototype bound to TF1.x and a local camera/socket, so it cannot run in a browser.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為瀏覽器 live demo。系統是桌面端 Python 即時管線(TensorFlow 1.x session/placeholder API、OpenCV 攝影機擷取、MediaPipe、playsound/gTTS)加上一支需 Android Studio 編譯、依賴 HERE SDK 的 Android App,並透過 Java NIO Socket 互通;前端並非可獨立靜態部署的網頁,且需要訓練好的模型 checkpoint 與本機攝影機/影片輸入。展示方式建議用 README 架構說明加上 output/ 內的分割疊加結果截圖或錄影,而非線上互動 demo。"
+      }
+    },
+    {
+      "slug": "discord-guild-keeper",
+      "repoName": "DiscordGuildKeeper",
+      "titleZh": "Discord 公會管家 Bot",
+      "titleEn": "Discord Guild Keeper Bot",
+      "oneLinerZh": "規格驅動開發的私人公會 Discord 管家 Bot,以 milestone 漸進交付動畫/票券訂閱、Gemini 問答與頻道摘要,部署於 Oracle Cloud ARM 免費資源。",
+      "oneLinerEn": "A spec-driven private-guild Discord butler bot, delivered milestone by milestone, targeting anime/ticket subscriptions, Gemini Q&A, and channel summaries on Oracle Cloud ARM free tier.",
+      "descZh": "服務小型朋友群組的多功能 Discord 管家 Bot,以 Python 3.12 async 為核心,在單一專案內收斂 Backend / DB / Cache / Scheduler / Crawler / LLM / Container / CI/CD 的技術廣度。專案以一份權威工程規格書(PROJECT_SPEC.md)驅動,明訂 milestone 順序與每階段的 Definition of Done。目前已完成 M0 骨架與 M1 核心:discord.py 2.x 生命週期管理與 guild-scoped slash command 同步、FastAPI 健康檢查端點(/healthz、/readyz、/version)、SQLAlchemy 2.x async + asyncpg 與首版 Alembic migration、指令呼叫追蹤,以及多階段 linux/arm64 Docker image 與 GitHub Actions CI。M3–M6 的動畫爬蟲、票券監控與 Gemini LLM 功能已完成介面與資料模型設計,實作尚在規劃中。",
+      "descEn": "A multi-function Discord butler bot for a small friend guild, built on Python 3.12 async and deliberately spanning backend, DB, cache, scheduler, crawler, LLM, container, and CI/CD within one project. Development is driven by a single canonical engineering spec (PROJECT_SPEC.md) that fixes milestone order and a Definition of Done per stage. The M0 skeleton and M1 core are complete: discord.py 2.x lifecycle with guild-scoped slash-command sync, FastAPI health endpoints (/healthz, /readyz, /version), SQLAlchemy 2.x async + asyncpg with the first Alembic migration, command-invocation tracking, plus a multi-stage linux/arm64 Docker image and GitHub Actions CI. The anime crawler, ticket monitoring, and Gemini LLM features (M3–M6) have their interfaces and data model designed but their implementation is still planned.",
+      "techStack": [
+        "Python",
+        "discord.py",
+        "FastAPI",
+        "SQLAlchemy",
+        "asyncio",
+        "PostgreSQL",
+        "Redis",
+        "APScheduler",
+        "Gemini AI",
+        "Docker",
+        "GitHub Actions",
+        "Oracle Cloud"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/DiscordGuildKeeper",
+      "highlights": [
+        {
+          "zh": "規格驅動開發:撰寫一份 v2.0 權威工程規格書,涵蓋系統架構、資料模型、技術選型理由、milestone 順序與每階段 Definition of Done,並明列反模式(如禁止 mock 冒充真實 API 通過、production image 必須 arm64),作為實作的單一真實來源。",
+          "en": "Spec-driven development: a v2.0 canonical engineering spec covers architecture, data model, technology trade-offs, milestone order, and a per-stage Definition of Done, plus explicit anti-patterns (e.g. never claim mocked tests as real-API coverage, production images must be arm64) — serving as the single source of truth."
+        },
+        {
+          "zh": "嚴謹的應用生命週期:main.py 以明確的啟動/關閉順序協調 FastAPI(uvicorn 作為 asyncio task)、Discord client、DB engine 與 Redis,自行接管 SIGINT/SIGTERM,並在 DISCORD_TOKEN 缺席時退化為 API-only 模式讓健康檢查持續運作。",
+          "en": "Disciplined application lifecycle: main.py orchestrates FastAPI (uvicorn as an asyncio task), the Discord client, the DB engine, and Redis with explicit startup/shutdown ordering, manages SIGINT/SIGTERM itself, and degrades to API-only mode when DISCORD_TOKEN is absent so health checks keep serving."
+        },
+        {
+          "zh": "為 OCI Always Free ARM 量身的部署管線:多階段 Docker build(uv 安裝、非 root 使用者、curl healthcheck),分離 dev/prod docker-compose,CI 跑 ruff + mypy strict + pytest 與 amd64 build smoke,正式部署則 build linux/arm64。",
+          "en": "Deployment pipeline tailored for OCI Always Free ARM: a multi-stage Docker build (uv install, non-root user, curl-based healthcheck), separate dev/prod docker-compose files, CI running ruff + mypy strict + pytest plus an amd64 build smoke, while production builds linux/arm64."
+        },
+        {
+          "zh": "可觀測性與分層設計從第一天落地:結構化 JSON logging(structlog)、command_invocations 追蹤每次指令的延遲與狀態,並以 cogs(Discord adapter)/ services(業務邏輯)/ repositories(資料存取)/ crawlers(外部呼叫)的清楚分層約束可測試性。",
+          "en": "Observability and layering baked in from day one: structured JSON logging (structlog), a command_invocations table tracking per-command latency and status, and a strict cogs (Discord adapters) / services (business logic) / repositories (data access) / crawlers (external calls) separation that keeps the code testable."
+        }
+      ],
+      "challengesZh": "最大的取捨是「先把工程地基做扎實,再逐步長出功能」:專案刻意以 milestone 推進(M0 骨架 → M1 lifecycle/health → M2 部署 → M3 動畫 → M4 LLM → M5 票券 → M6 observability),目前停在 M1 完成,M3–M6 的 service/crawler 檔案僅有 docstring 與規格引用、尚未實作,因此它呈現的是一個架構與規範完整、但功能仍在建構中的專案。技術層面的難點包含:在單一 async event loop 中協調 Discord gateway、uvicorn、scheduler 與 DB/Redis 的啟動與優雅關閉;為求快速迭代採用 guild-scoped slash command 同步而非全域(避免約一小時的傳播延遲);以及預先把爬蟲/LLM 的 rate limit、timeout、retry 與通知去重(notification_deliveries 唯一約束)納入資料模型設計,避免日後重構。另一個現實取捨是票券/動畫來源網站改版機率高,規格因此強制要求 crawler 必須有 fixture 測試、並尊重 robots.txt 與低頻率抓取,不做侵入式繞過。",
+      "challengesEn": "The central trade-off is foundations-first delivery: development is intentionally milestone-paced (M0 skeleton → M1 lifecycle/health → M2 deploy → M3 anime → M4 LLM → M5 tickets → M6 observability), and the repo currently sits at completed M1. The M3–M6 service/crawler files contain only docstrings and spec references and are not yet implemented, so the project reads as architecturally and procedurally complete but still under feature construction. Technical challenges include coordinating the Discord gateway, uvicorn, the scheduler, and DB/Redis startup and graceful shutdown within a single async event loop; choosing guild-scoped slash-command sync over global to avoid the ~1-hour propagation delay during iteration; and designing rate limiting, timeouts, retries, and notification de-duplication (a unique constraint on notification_deliveries) into the data model up front to avoid later rework. A further real-world trade-off: ticket/anime source sites change frequently, so the spec mandates crawler fixture tests and polite, low-frequency fetching that respects robots.txt rather than intrusive scraping.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "不適合作為瀏覽器 live demo。本專案是後端 Discord bot,執行需 Discord bot token 與已邀請的 guild、PostgreSQL 16、Redis 7,並透過 Discord gateway 與 slash command 互動,無獨立前端可靜態部署。展示形式建議用 showcase(架構圖、PROJECT_SPEC.md 規格書節錄、Dockerfile/CI 片段、健康檢查端點 JSON 範例),不建議嘗試在瀏覽器跑成 live demo。"
+      }
+    },
+    {
+      "slug": "discord-auto-bot",
+      "repoName": "discord-auto-bot",
+      "githubUrl": "https://github.com/q86865511/discord-auto-bot",
+      "titleZh": "Discord 斜線指令自動化機器人",
+      "titleEn": "Discord Slash-Command Automation Bot",
+      "oneLinerZh": "用 Playwright 驅動瀏覽器自動執行 Discord 斜線指令,內建 Kelly 投注、股票訊號、Rich 終端與零依賴 Web 儀表板雙介面的長時運行 asyncio 機器人。",
+      "oneLinerEn": "A long-running asyncio bot that drives Discord slash commands via Playwright, with Kelly-based betting, stock signals, and dual Rich-terminal plus zero-dependency web dashboard interfaces.",
+      "descZh": "以 Playwright 控制 Chromium、模擬使用者帳號自動執行 Discord 斜線指令的自動化機器人,以單一 asyncio event loop 並行協調 10 條排程 loop(整點/每日/賭博/轉帳/貓娘/股票/新聞/摘要/版本更新/除錯)。所有送指令動作共用一把 command_lock 序列化,並以「最新一則 ephemeral」錨點切片解析 Discord 累積式回應,解決多 loop 互相污染 parser 的核心難題。下注分析採半 Kelly + EV 95% 信賴區間下界(需 ≥200 筆樣本)做保守估計,並提供時段過濾、滾動視窗 EV、Trailing Stop 等可組合的風險管理策略。設定與歷史全存於 Fernet 加密的 SQLite,並同時提供 Rich 終端 UI 與純 Python stdlib(http.server)、零外部依賴的 Web 儀表板(HTTP Basic Auth + CSRF 防護)。",
+      "descEn": "An automation bot that drives Chromium via Playwright to run Discord slash commands as a user account, coordinating 10 scheduled loops (hourly/daily/gambling/transfer/nekomusume/stock/news/digest/updater/debug) concurrently on a single asyncio event loop. Every command-sending action shares one command_lock for serialization, and Discord's accumulating ephemeral replies are parsed by anchoring on the latest ephemeral slice — solving the core problem of multiple loops corrupting each other's response parsing. Betting analysis uses half-Kelly sizing off the lower bound of the EV's 95% confidence interval (requiring ≥200 samples) for conservative estimates, alongside composable risk-management strategies (hourly filtering, rolling-window EV, trailing stop). Config and history live in a Fernet-encrypted SQLite database, exposed through both a Rich terminal UI and a pure-stdlib (http.server) zero-dependency web dashboard with HTTP Basic Auth and CSRF protection.",
+      "techStack": [
+        "Python",
+        "Playwright",
+        "asyncio",
+        "SQLite",
+        "cryptography (Fernet)",
+        "Rich",
+        "matplotlib",
+        "http.server",
+        "ruff"
+      ],
+      "presentation": "showcase",
+      "highlights": [
+        {
+          "zh": "以單一 asyncio event loop 並行 10 條排程 loop,所有送指令動作共用 command_lock 序列化,並用 channel_context 在獨立頻道間切換,避免不同指令的回應互相污染解析。",
+          "en": "Runs 10 scheduled loops concurrently on one asyncio event loop, serializing every command via a shared command_lock and isolating commands across dedicated channels with a channel_context manager to prevent cross-contaminated response parsing."
+        },
+        {
+          "zh": "解決 Discord ephemeral 訊息累積不替換的解析難題:用 rfind + anchor 切片只解析「最新一則 ephemeral」,並自寫 DOM walk 把 emoji 的 <img> alt 接回 textContent,否則 slot 符號會全空。",
+          "en": "Tackles Discord's append-only ephemeral messages by slicing on the latest ephemeral via rfind anchoring, and walks the DOM to recover emoji <img> alt text into textContent — without which slot symbols parse as empty strings."
+        },
+        {
+          "zh": "保守的 Kelly 投注:用 EV 95% 信賴區間下界 (ev − 1.96·SE) 取代點估計、半 Kelly + 0.25 上限、需 ≥200 筆樣本才啟用;並坦承負 EV 下任何策略只能降 variance/drawdown 而非翻正期望值。",
+          "en": "Conservative Kelly sizing using the EV's 95% CI lower bound (ev − 1.96·SE) instead of a point estimate, half-Kelly capped at 0.25, gated on ≥200 samples — and is candid that under negative EV these strategies only reduce variance/drawdown, never flip expectation positive."
+        },
+        {
+          "zh": "工程化的可靠性與運維:loop 連續失敗自動 auto_paused 冷卻 30 分鐘、page 失敗 3 次觸發 exit 42 由 run.bat 自動重啟、session 過期偵測引導重登,並把 WARNING+ 推到獨立 Discord 頻道讓手機端遠端可見。",
+          "en": "Production-minded reliability: loops auto-pause for a 30-minute cooldown after repeated failures, 3 page failures trigger exit code 42 for run.bat to auto-relaunch, session expiry is detected and re-login guided, and WARNING+ logs are pushed to a dedicated Discord channel for remote visibility on mobile."
+        }
+      ],
+      "challengesZh": "最大難點是 Discord Web 的回應解析:ephemeral 訊息累積在 page textContent 而非替換,emoji 又被渲染成不含 alt 的 <img>,導致多個排程 loop 的回應會互相污染。取捨上選擇「browser 自動化使用者帳號」而非官方 Bot API,換取存取一般 bot 拿不到的私服互動指令,代價是違反 Discord ToS、解析脆弱且需大量防禦性工程(command_lock 序列化、anchor 切片、自寫 DOM walk)。另一刻意取捨是 Web 儀表板堅持用純 stdlib http.server 零外部依賴,雖犧牲框架便利性,卻換來極簡部署與更小攻擊面(再自行補上 hmac.compare_digest 比對、CSRF 同源檢查、log redaction)。風險管理上也誠實面對數學現實——負 EV 的拉霸無法靠下注策略翻正,因此策略定位為降 variance/drawdown 而非「致勝法」;且 Discord modal 太脆弱,自動下單功能已移除且不會回歸。",
+      "challengesEn": "The hardest problem is parsing Discord's web responses: ephemeral messages accumulate in page textContent instead of being replaced, and emoji render as <img> tags with no recoverable text, so multiple scheduled loops corrupt each other's parsing. The key trade-off was driving a *user account* via browser automation rather than the official Bot API — gaining access to private-server interaction commands a normal bot can't reach, at the cost of violating Discord's ToS, fragile parsing, and heavy defensive engineering (command_lock serialization, anchored slicing, custom DOM walking). Another deliberate trade-off is the web dashboard built on pure stdlib http.server with zero external dependencies: sacrificing framework convenience for trivial deployment and a smaller attack surface, while hand-rolling hmac.compare_digest comparison, CSRF same-origin checks, and log redaction. On risk management it confronts the math honestly — no betting strategy flips negative-EV slots positive, so the strategies are framed as variance/drawdown reducers, not a winning system; auto-trading was removed (Discord modals proved too fragile) and explicitly won't return.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為瀏覽器 live demo。專案本質是 Windows 桌面長時運行程式:用 Playwright 啟動 Chromium 自動化一個已登入的 Discord 使用者帳號(需手動 2FA 登入、需特定私服與目標 bot 互動),並把資料存進本機 Fernet 加密 SQLite。Web 儀表板雖然存在,但它讀取的是即時 runtime 狀態(http.server 後端 + 本機 DB),並非可獨立靜態部署的純前端,且需要 HTTP Basic Auth 與真實 bot 資料才有內容——無法用 mock 資料有意義地靜態化。建議在履歷以 showcase(README/架構圖/螢幕截圖)呈現,而非 live demo。"
+      }
+    },
+    {
+      "slug": "cyclepact",
+      "repoName": "cyclepact",
+      "titleZh": "輪迴盟約 Cyclepact",
+      "titleEn": "Cyclepact — Turn-Based Collection RPG",
+      "oneLinerZh": "用 Godot 4 打造的回合制收集養成 RPG,以資料驅動架構承載 500 隻精靈,並用 OpenAI Images API 自動化美術產線(開發中)。",
+      "oneLinerEn": "A data-driven turn-based collection RPG in Godot 4 with 500 creatures and an OpenAI-Images-API art pipeline (work in progress).",
+      "descZh": "個人開發中的回合制劇情向收集養成 RPG:玩家與精靈締結「盟約」取代捕捉,世界困於不斷重置的「輪迴」。技術核心是資料驅動架構——500 隻精靈以 24 份地區 JSON(19 欄 schema)為單一真實來源,Godot 端 autoload 載入並建索引(依屬性/地區/搜尋)。已可遊玩的垂直切片包含可走動 overworld、草叢遇敵、回合制戰鬥(屬性相剋 + Gen3 能力值/個體值/努力值公式 + 三系時間機制)、盟約捕捉、隊伍與自動存檔、500 隻圖鑑瀏覽。美術改用 OpenAI Images API 腳本化批量生成,目前正進行像素風格轉向。專案仍在開發中:核心遊戲循環已成形,劇情多周目與全套美術素材為後續軌。",
+      "descEn": "A solo, in-development turn-based story RPG where players form a \"Pact\" with creatures instead of capturing them, set in a world trapped in a resetting time loop. The technical core is a data-driven architecture: 500 creatures live in 24 region JSON files (19-column schema) as a single source of truth, loaded and indexed at runtime by a Godot autoload (by type / region / search). A playable vertical slice already covers a walkable overworld, tall-grass random encounters, a turn-based battle engine (type effectiveness + Gen-3 stat/IV/EV formulas + three time-attribute mechanics), Pact capture, party management with auto-save, and a 500-entry dex browser. Art has moved to a scripted OpenAI Images API generation pipeline and is currently mid-pivot to pixel style. Still WIP: the core gameplay loop is in place, while multi-playthrough story and the full art set remain on a later track.",
+      "techStack": [
+        "Godot 4",
+        "C#",
+        "GDScript",
+        "Python",
+        "OpenAI API",
+        "Pillow",
+        "JSON"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/cyclepact",
+      "highlights": [
+        {
+          "zh": "資料驅動設計:500 隻精靈以 24 份地區 JSON(19 欄 schema)為權威來源,Godot autoload(MonsterDB)在執行時載入並建立 by_type/by_region/search 索引;圖鑑 Markdown 與遊戲內容皆由同一份 JSON 衍生,避免設定與程式各自漂移。",
+          "en": "Data-driven design: 500 creatures defined in 24 region JSON files (19-column schema) as the authoritative source; a Godot autoload (MonsterDB) loads them at runtime and builds by-type / by-region / search indexes, with both the Markdown dex and in-game content derived from the same JSON to prevent drift."
+        },
+        {
+          "zh": "以 await 協程實作的回合制戰鬥狀態機:處理屬性相剋、Gen3+ 傷害與能力值公式、狀態異常/能力階級、自創「時間三系」機制(再行動、快照、無視防禦),以及盟約捕捉與換精靈;戰鬥中刻意隱藏屬性以提高難度。",
+          "en": "A turn-based battle engine built as an await-coroutine state machine handling type effectiveness, Gen-3 damage/stat formulas, status effects and stat stages, three custom time-attribute mechanics (extra action, snapshot, defense ignore), plus Pact capture and switching — with types deliberately hidden mid-battle for difficulty."
+        },
+        {
+          "zh": "腳本化 AI 美術產線:build_manifest.py 由 docs/data 產出生成清單,gen_assets.py 呼叫 OpenAI Images API(gpt-image-1.5,透明背景)依地區批量出去背 PNG,內建成本概估/確認、並發與速率節流、進度條與 skip-existing;零手動後處理。",
+          "en": "Scripted AI art pipeline: build_manifest.py turns docs/data into a generation manifest, and gen_assets.py calls the OpenAI Images API (gpt-image-1.5, transparent background) to batch region assets into ready-to-use transparent PNGs — with cost estimation/confirmation, concurrency, rate-limit throttling, progress bar and skip-existing, and zero manual post-processing."
+        },
+        {
+          "zh": "務實的範圍取捨:先做出可走動 overworld → 草叢遇敵 → 回合制戰鬥 → 捕捉/存檔 → 圖鑑的完整可玩切片,未生成素材以程式色塊佔位,確保專案任何階段都能直接 F5 執行,劇情多周目與全美術留待後續軌。",
+          "en": "Pragmatic scoping: a complete playable slice (walkable overworld → grass encounter → turn-based battle → capture/save → dex) was built first, with ungenerated assets falling back to procedural color blocks so the project is always F5-runnable, leaving multi-playthrough story and full art on a later track."
+        }
+      ],
+      "challengesZh": "最大的挑戰是讓「設定集規模」與「可執行遊戲」不脫鉤:500 隻精靈、24 區、18 屬性的龐大設定若用硬編碼會難以維護,因此選擇以地區 JSON 作單一真實來源,讓 Godot autoload 在執行時載入建索引,圖鑑文件也由同份資料衍生。戰鬥端要在 Godot 用 await 協程把「選招→依序行動→狀態/機制結算→勝負」寫成可讀的狀態機,並正確還原 Gen3 的能力值/個體值/努力值與傷害公式,還要疊上自創的時間三系機制。美術上採務實取捨:不等素材到齊就先用程式佔位讓核心循環隨時可玩,並把美術外包給 OpenAI Images API 腳本化產線(含成本估算、並發與速率節流),近期再評估並決定轉向像素風(含整數除數降採樣、調色盤量化與第三方 CC0 地磚萃取)。專案仍在開發中,核心循環已成形,劇情多周目為後續軌。",
+      "challengesEn": "The core challenge was keeping a large design bible coupled to a runnable game: hard-coding 500 creatures across 24 regions and 18 types would be unmaintainable, so region JSON files became the single source of truth, loaded and indexed by a Godot autoload at runtime, with the Markdown dex derived from the same data. On the battle side, the turn loop (select → ordered actions → status/mechanic resolution → win/lose) was written as a readable await-coroutine state machine in Godot, faithfully reproducing Gen-3 stat/IV/EV and damage formulas while layering on custom time-attribute mechanics. Art was handled pragmatically: rather than block on finished assets, procedural color-block placeholders keep the loop always playable, and asset creation was offloaded to a scripted OpenAI Images API pipeline (with cost estimation, concurrency and rate-limit throttling), followed by a deliberate go/no-go decision to pivot toward pixel style (integer-divisor downsampling, palette quantization, third-party CC0 tile extraction). The project remains WIP: the core loop is in place, with multi-playthrough story on a later track.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "這是用 Godot 4.6(.NET 版,Forward+ / D3D12 / Jolt Physics)開發的桌面遊戲,需以 Godot 編輯器開啟並按 F5 執行,或匯出原生執行檔;repo 內無瀏覽器可跑的 build,前端也並非可獨立靜態部署的純前端。不建議作為 live demo 候選。若日後要 web demo,需另行匯出 Godot 的 Web (WASM) 目標,但目前 repo 未提供該產物。較適合以截圖/錄影或原生執行檔展示。"
+      }
+    },
+    {
+      "slug": "mini-moba",
+      "repoName": "Mini-Moba",
+      "titleZh": "Mini MOBA 單機遊戲",
+      "titleEn": "Mini MOBA Game",
+      "oneLinerZh": "用原生 C++ 從零打造的單機 MOBA,刻意把模擬邏輯與渲染徹底分離,為日後多人連線預留架構。",
+      "oneLinerEn": "A native C++ single-player MOBA built from scratch, with simulation logic deliberately decoupled from rendering to leave room for future multiplayer.",
+      "descZh": "以 C++17 + raylib 開發的簡化版 LoL 風格 MOBA 學習專案,單機可玩一整局:選英雄、三線地圖補兵打野、買裝升級、推塔破主堡分勝負。核心設計是把純模擬邏輯(實體階層、固定時間步長、戰鬥)放進不依賴 raylib 與網路的 shared 靜態庫,client 只負責渲染/輸入/音效/資產,讓同一份邏輯日後能直接搬到權威伺服器重用。",
+      "descEn": "A simplified LoL-style MOBA learning project in C++17 + raylib, playable end-to-end in single-player: pick a hero, farm minions and jungle on a three-lane map, buy items, push towers, and destroy the enemy nexus to win. The key design separates pure simulation logic (entity hierarchy, fixed timestep, combat) into a raylib- and network-free `shared` static library, while the client handles only rendering, input, audio, and assets — so the same logic can later be reused unchanged on an authoritative server.",
+      "techStack": [
+        "C++",
+        "raylib",
+        "CMake",
+        "vcpkg"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/Mini-Moba",
+      "highlights": [
+        {
+          "zh": "邏輯與渲染分離:模擬放在不碰 raylib、不碰網路的 shared 庫,邏輯只寫一次,為多人連線預留可重用的伺服器邏輯。",
+          "en": "Logic/render split: simulation lives in a raylib-free, network-free `shared` library — written once and ready to be reused server-side for multiplayer."
+        },
+        {
+          "zh": "物件導向實體階層(Entity → Hero/Minion/Tower/Nexus/NeutralMonster/Projectile)+ 固定時間步長,模擬具決定性、便於日後搬上伺服器。",
+          "en": "OO entity hierarchy (Entity → Hero/Minion/Tower/Nexus/NeutralMonster/Projectile) with a fixed timestep for deterministic, server-portable simulation."
+        },
+        {
+          "zh": "附 headless 戰鬥單元測試,不需 raylib 即可驗證 shared 模擬邏輯。",
+          "en": "Includes headless combat unit tests that verify the `shared` simulation without needing raylib."
+        }
+      ],
+      "challengesZh": "vcpkg 的 raylib 6.0 在開發機上 EndDrawing 失效導致白畫面,因此改用 CMake FetchContent 固定 raylib 5.5,其餘相依仍走 vcpkg。Lua 腳本層與 ENet 連線屬規劃中的後期階段,尚未實作。",
+      "challengesEn": "vcpkg's raylib 6.0 had a broken EndDrawing on the dev machine (white screen), so raylib 5.5 is pinned via CMake FetchContent while other deps stay on vcpkg. The planned Lua scripting layer and ENet networking are later-phase work, not yet implemented.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "原生 C++/raylib 桌面應用,需 Windows + MSVC 編譯後執行 client.exe,無法在瀏覽器跑成 live demo,也沒有可獨立靜態部署的前端。建議用截圖/錄影展示。"
+      }
+    },
+    {
+      "slug": "anime-tracker",
+      "repoName": "AnimeTracker",
+      "titleZh": "動畫追蹤器(AnimeTracker)",
+      "titleEn": "AnimeTracker",
+      "oneLinerZh": "以 PyQt6 打造的 Windows 桌面動畫瀏覽器,串接巴哈姆特動畫瘋 API,全程非同步載入不卡 UI。",
+      "oneLinerEn": "A PyQt6 Windows desktop anime browser backed by the Bahamut Anime Crazy API, with fully asynchronous loading that keeps the UI responsive.",
+      "descZh": "整合巴哈姆特動畫瘋的 mobile 與 web 兩套 API,提供首頁熱播、本季新番、標籤篩選、關鍵字搜尋與我的最愛等功能。所有 API 與封面圖下載均透過 QRunnable + QThreadPool 在背景執行緒處理,搭配執行緒安全的限流重試、磁碟圖片快取(7 天 TTL)與本機 JSON 收藏持久化,UI 全程不卡頓。",
+      "descEn": "Integrates both the mobile and web APIs of Bahamut Anime Crazy to offer trending titles, seasonal lineups, tag filtering, keyword search, and a favorites list. All API calls and cover-image downloads run on background threads via QRunnable + QThreadPool, paired with thread-safe rate-limited retries, a disk image cache (7-day TTL), and local JSON persistence for favorites, keeping the UI responsive throughout.",
+      "techStack": [
+        "Python",
+        "PyQt6",
+        "requests",
+        "QThreadPool",
+        "pytest",
+        "PyInstaller"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/AnimeTracker",
+      "liveUrl": "",
+      "highlights": [
+        {
+          "zh": "以 QRunnable + QThreadPool 將所有 API 與圖片下載移至背景執行緒,圖片以 bytes 跨執行緒傳遞、QPixmap 僅在主執行緒建立,確保 UI 不阻塞。",
+          "en": "Moves all API and image work to background threads via QRunnable + QThreadPool, passing images as raw bytes across threads and constructing QPixmap only on the main thread to keep the UI unblocked."
+        },
+        {
+          "zh": "執行緒安全的 API 客戶端:以 Lock 序列化請求並強制 1 秒冷卻、失敗 3 次指數退避重試;在官方 v2 端點失效後改以 v3 與 web API 取得替代內容。",
+          "en": "Thread-safe API client that serializes requests with a lock, enforces a 1s cooldown and 3x exponential-backoff retries, and falls back to v3 plus the web API after the official v2 endpoint stopped working."
+        }
+      ],
+      "challengesZh": "官方 mobile v2/list.php 回傳「APP版本過舊」而失效,改以 v3/index.php 各分區與 web API 拼湊出等效的分類與標籤篩選內容;評分需於詳情載入後才取得,因此設計評分快取機制,讓卡片評分在切換頁面後仍能保留。",
+      "challengesEn": "The official mobile v2/list.php endpoint returned an outdated-version error, so categories and tag filtering were reconstructed from v3/index.php sections plus the web API; scores are only available after loading detail, so a score-cache mechanism was designed to persist card ratings across page switches.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "PyQt6 原生 Windows 桌面 GUI,需在本機執行(python main.py 或打包的 .exe),無法在瀏覽器跑成 live demo。應以截圖或錄影方式於 showcase 呈現。"
+      }
+    },
+    {
+      "slug": "ros-ball-chaser",
+      "repoName": "Ros-Ball-Chaser",
+      "titleZh": "ROS 視覺循球機器人",
+      "titleEn": "ROS Vision-Based Ball Chaser",
+      "oneLinerZh": "在 Gazebo/RViz 模擬中用 OpenCV 偵測紅球、以 ROS 服務驅動 TurtleBot 追球的雙節點機器人專案。",
+      "oneLinerEn": "A two-node ROS robot that detects a red ball with OpenCV and chases it via a ROS service, simulated in Gazebo/RViz.",
+      "descZh": "以 ROS 實作的雙節點架構:影像節點訂閱 TurtleBot3 (waffle_pi) 相機影像,透過 cv_bridge 轉為 OpenCV 格式,以 HSV 雙區間遮罩與 medianBlur 偵測紅球並計算質心。驅動節點作為自訂 DriveToTarget 服務的伺服端,依球體在畫面中的水平位置(左/中/右三分區)發布 cmd_vel 的 Twist 速度指令,使機器人轉向或前進追球。中原大學 ROS 智慧機器人系統概論課程專案。",
+      "descEn": "A two-node ROS package: the perception node subscribes to the TurtleBot3 (waffle_pi) camera, converts frames via cv_bridge to OpenCV, and locates a red ball using dual-range HSV masking plus median blur to compute its centroid. The driver node acts as the server of a custom DriveToTarget service, mapping the ball's horizontal position (left/center/right thirds) to cmd_vel Twist commands so the robot turns or advances to chase it. Built for a robotics course at Chung Yuan Christian University.",
+      "techStack": [
+        "Python",
+        "ROS",
+        "OpenCV",
+        "Gazebo",
+        "RViz",
+        "TurtleBot3",
+        "CMake"
+      ],
+      "presentation": "external",
+      "githubUrl": "https://github.com/q86865511/Ros-Ball-Chaser",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為瀏覽器 live demo。此專案依賴 ROS (rospy)、Gazebo/RViz 模擬環境、TurtleBot3 模型與 cv_bridge/OpenCV,需在 Linux 上完整安裝 ROS 工具鏈並 catkin_make 編譯後執行,無前端或可靜態部署的部分。建議以截圖(repo 內附結果圖)或錄影呈現。"
+      },
+      "highlights": [
+        {
+          "zh": "雙節點 + 自訂 service 設計:感知與控制職責分離,以 DriveToTarget.srv 定義介面(球座標、影像寬高)。",
+          "en": "Two-node design with a custom DriveToTarget service that cleanly separates perception from control via a defined interface (ball coords, image dimensions)."
+        },
+        {
+          "zh": "以 HSV 雙紅色區間遮罩 + medianBlur 處理紅色在色相環兩端的偵測問題,再取輪廓質心定位球體。",
+          "en": "Handles red's wrap-around in HSV by combining two hue-range masks with median blur, then locates the ball via contour centroid."
+        }
+      ],
+      "challengesZh": "紅色在 HSV 色相環橫跨兩端,需用兩組區間遮罩再合併才能穩定偵測;追球策略採簡化的三分區比例控制(left/center/right),易於實作但屬開關式而非連續比例控制。",
+      "challengesEn": "Red spans both ends of the HSV hue wheel, requiring two merged masks for reliable detection; the chase logic uses a simplified three-zone (left/center/right) scheme that is easy to implement but bang-bang rather than continuous proportional control."
+    },
+    {
+      "slug": "pay-the-money",
+      "repoName": "PayTheMoney-Discord_Bot",
+      "titleZh": "PayTheMoney 借還款記帳 Discord Bot",
+      "titleEn": "PayTheMoney Discord Bot",
+      "oneLinerZh": "用 discord.js 互動元件做的借還款記帳機器人,並以 GitHub Actions 自動部署到 AWS EC2。",
+      "oneLinerEn": "A loan-tracking Discord bot built with discord.js interactions, auto-deployed to AWS EC2 via GitHub Actions.",
+      "descZh": "以 Node.js 與 discord.js v14 開發的 Discord 機器人:透過 /adddebt 斜線指令彈出表單(Modal)輸入借款人、債權人、金額與用途,記錄後附上「確認已收到」按鈕來標記還款狀態。專案重點在 DevOps 串接——以 GitHub Actions 跑 Jest 測試後,經 SSH 部署到 AWS EC2 並用 PM2 重啟服務,形成完整 CI/CD 流程;記錄目前存於記憶體 Map,重啟後不保留。",
+      "descEn": "A Discord bot in Node.js with discord.js v14: an /adddebt slash command opens a Modal to enter debtor, creditor, amount, and purpose, then posts the record with a \"confirm received\" button to mark repayment. The notable part is the DevOps wiring — a GitHub Actions pipeline runs Jest tests, then SSH-deploys to an AWS EC2 instance and restarts the service via PM2. Records currently live in an in-memory Map and are not persisted across restarts.",
+      "techStack": [
+        "Node.js",
+        "JavaScript",
+        "discord.js v14",
+        "Jest",
+        "GitHub Actions",
+        "AWS EC2",
+        "PM2",
+        "dotenv"
+      ],
+      "presentation": "external",
+      "githubUrl": "https://github.com/q86865511/PayTheMoney-Discord_Bot",
+      "liveUrl": "",
+      "highlights": [
+        {
+          "zh": "完整 CI/CD:GitHub Actions 跑 npm ci 與 Jest 測試,通過後以 SSH 部署到 EC2,並用 PM2 重啟服務。",
+          "en": "End-to-end CI/CD: GitHub Actions runs npm ci and Jest tests, then SSH-deploys to EC2 and restarts via PM2."
+        },
+        {
+          "zh": "善用 discord.js v14 互動元件(Slash Command + Modal + Button)組出表單式記帳流程。",
+          "en": "Uses discord.js v14 interactions (slash command + modal + button) to build a form-style bookkeeping flow."
+        }
+      ],
+      "challengesZh": "記錄存於記憶體 Map,缺乏資料庫持久化,重啟即遺失;屬課程/個人練習等級的小型專案。",
+      "challengesEn": "State is held in an in-memory Map with no database persistence, so data is lost on restart; this is a small course/personal-practice-scale project.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為 live demo。這是伺服器端 Discord bot,需 Discord Bot Token 並連上 Discord Gateway 才能運作,沒有任何前端或靜態頁面可供瀏覽器獨立執行。"
+      }
+    },
+    {
+      "slug": "draw-julia-set",
+      "repoName": "Draw-Julia-Set",
+      "titleZh": "Julia Set 動畫 (ARM 組合語言)",
+      "titleEn": "Julia Set Animation (ARM Assembly)",
+      "oneLinerZh": "以手寫 ARM 組合語言計算 Julia Set 碎形,直寫 Linux framebuffer 產生即時動畫。",
+      "oneLinerEn": "Hand-written ARM assembly that computes the Julia Set fractal and renders an animation by writing directly to the Linux framebuffer.",
+      "descZh": "中原大學「組合語言與嵌入式系統」期末小組專案。核心碎形迭代以純手寫 ARM 組合語言實作,搭配 C 主程式透過 /dev/fb0 將 RGB565 影格直接寫入 Linux framebuffer 形成連續動畫。著重於暫存器配置、整數定點運算(以 __aeabi_idiv 做軟體除法)與二維陣列位址計算等底層細節。",
+      "descEn": "Final group project for the Assembly Language & Embedded Systems course at CYCU. The fractal iteration is implemented in hand-written ARM assembly, paired with a C driver that streams RGB565 frames straight to the Linux framebuffer (/dev/fb0) to produce a continuous animation. Emphasizes low-level concerns such as register allocation, integer fixed-point math (software division via __aeabi_idiv), and 2D array address computation.",
+      "techStack": [
+        "Assembly",
+        "C"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/Draw-Julia-Set",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為 live demo。程式需在 ARM 環境(實機或模擬器)執行,且仰賴 Linux framebuffer 裝置 /dev/fb0 直接輸出影像,無法在瀏覽器或純前端環境中運行;成果僅能以 README 中的截圖呈現。"
+      }
+    },
+    {
+      "slug": "multi-process-thread",
+      "repoName": "Multi-Process-Thread-Comparison",
+      "titleZh": "Multi-Process vs Thread 排序效能分析",
+      "titleEn": "Multi-Process vs Thread Sorting Performance Analysis",
+      "oneLinerZh": "作業系統課程專案:用 C++ 比較多行程(fork)與多執行緒(std::thread)在平行排序下的效能差異。",
+      "oneLinerEn": "An OS course project comparing multi-process (fork) vs multi-thread (std::thread) performance for parallel sorting in C++.",
+      "descZh": "作業系統課程作業,以 C++ 實作四種排序策略並比較其效能:單行程基準、序列切割合併、以 fork() 多行程搭配 System V 共享記憶體(shmget/shmat)做 IPC,以及 std::thread 多執行緒。透過調整資料切割份數(N 值)量測 CPU 時間,實證探討多行程與多執行緒在泡沫排序與合併排序上的取捨。",
+      "descEn": "An OS course assignment implementing and benchmarking four sorting strategies in C++: a single-process baseline, sequential split-and-merge, multi-process parallelism via fork() with System V shared memory (shmget/shmat) for IPC, and multi-thread parallelism via std::thread. It measures CPU time across varying data-partition counts (N) to empirically study the trade-offs between processes and threads for bubble sort and merge sort.",
+      "techStack": [
+        "C++",
+        "std::thread",
+        "fork()",
+        "System V Shared Memory (IPC)",
+        "WSL / Ubuntu"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/Multi-Process-Thread-Comparison",
+      "highlights": [
+        {
+          "zh": "同時實作行程版(fork + 共享記憶體 IPC)與執行緒版(std::thread)的平行排序,涵蓋切割排序與合併兩階段,直接對照兩種並行模型。",
+          "en": "Implements both process-based (fork + shared-memory IPC) and thread-based (std::thread) parallel sorting across the partition and merge phases, giving a direct head-to-head of the two concurrency models."
+        }
+      ],
+      "challengesZh": "多行程版需自行管理 System V 共享記憶體生命週期(shmget/shmat/shmdt/shmctl)與 fork/waitpid 同步,將子行程排序結果跨行程傳回父行程,是相對於執行緒共享位址空間的主要成本來源。",
+      "challengesEn": "The process variant requires manually managing the System V shared-memory lifecycle (shmget/shmat/shmdt/shmctl) and fork/waitpid synchronization to pass child sort results back across process boundaries — the key cost versus threads that share an address space.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "純命令列 C++ 程式,依賴 Linux-only 系統呼叫(sys/shm.h、sys/wait.h、unistd.h、fork),需在 WSL/Ubuntu 編譯執行,無前端介面。不適合作為瀏覽器 live demo;適合以程式碼與隨附 PDF 報告(含效能圖表)作為學術型展示。"
+      }
+    },
+    {
+      "slug": "c-interpreter",
+      "repoName": "PAL-PL-Project2-C-C-grammer-interpreter",
+      "titleZh": "類 C 語言直譯器",
+      "titleEn": "C-Like Language Interpreter",
+      "oneLinerZh": "手刻的類 C 語言直譯器,從 tokenizer、遞迴下降剖析到求值全程自製,並區分詞法/語法/語意三類錯誤。",
+      "oneLinerEn": "A hand-written C-like language interpreter built from scratch — tokenizer, recursive-descent parser, and evaluator — that distinguishes lexical, syntactic, and semantic errors.",
+      "descZh": "中原大學程式語言課程 Project 2:以 C++ 從零實作一款類 C 語言直譯器,涵蓋自製詞法分析器、遞迴下降剖析器與符號表,支援變數/函式/陣列宣告、運算式、條件與迴圈。採兩階段設計——先完整檢查文法、把正確語句存下,第二遍才執行求值——並透過自訂例外類別分別回報詞法錯誤(不合法 token)、語法錯誤與語意錯誤(使用未宣告變數),同時標示出錯行號。",
+      "descEn": "Programming Languages course Project 2 (CYCU): a C-like language interpreter written from scratch in C++, with a hand-rolled lexer, recursive-descent parser, and symbol table supporting variable/function/array declarations, expressions, conditionals, and loops. It uses a two-pass design — first fully validating grammar and storing valid statements, then evaluating on the second pass — and reports lexical (illegal tokens), syntactic, and semantic (undeclared-variable) errors separately via custom exception classes, each with the offending line number.",
+      "techStack": [
+        "C++"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/PAL-PL-Project2-C-C-grammer-interpreter",
+      "highlights": [
+        {
+          "zh": "手刻整條前端管線:詞法分析(含 >=、>> 等多字元運算子)、遞迴下降剖析器、符號表,未依賴任何 parser generator。",
+          "en": "Entire front-end hand-written: lexer (incl. multi-char operators like >= and >>), recursive-descent parser, and symbol table — no parser generator used."
+        },
+        {
+          "zh": "明確區分三類錯誤——詞法(不合法 token)、語法、語意(呼叫未宣告變數),並以自訂例外類別搭配出錯行號回報。",
+          "en": "Cleanly separates three error classes — lexical (illegal tokens), syntactic, and semantic (undeclared identifiers) — reported via custom exceptions with line numbers."
+        },
+        {
+          "zh": "兩階段執行模型:先完整驗證文法並存下正確語句,第二遍才求值,而非邊剖析邊執行。",
+          "en": "Two-pass execution model: fully validate and store valid statements first, then evaluate on a second pass rather than interpreting inline."
+        }
+      ],
+      "challengesZh": "在沒有 parser generator 的前提下,手動處理多字元運算子的最長匹配、數字 token 中小數點的判別,以及在符號表中同時管理變數與函式的型別與內容。README 註明第二次驗收最後一題未通過,推測為 ListFunction 輸出格式問題。",
+      "challengesEn": "Without a parser generator, manually handling longest-match for multi-char operators, decimal-point disambiguation in numeric tokens, and managing both variable and function types/contents in one symbol table. The README notes the final test case in the second review failed, likely due to a ListFunction output formatting issue.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "純 C++ 命令列程式,透過 stdin 讀取程式碼、stdout 輸出結果(repo 內附 input.txt / output.txt),無任何前端或可靜態部署的介面,無法作為瀏覽器 live demo。若要展示需編譯後在終端機執行,或另行包裝為 WebAssembly,但專案本身不含此能力。"
+      }
+    },
+    {
+      "slug": "sic-xe-assembler",
+      "repoName": "SIC-SIC-XE-Cross-Assembler",
+      "titleZh": "SIC / SIC-XE 交叉組譯器",
+      "titleEn": "SIC / SIC-XE Cross Assembler",
+      "oneLinerZh": "以 C++ 實作的 Two-pass 組譯器,可將 SIC 與 SIC/XE 組合語言翻譯成 Object Code。",
+      "oneLinerEn": "A C++ two-pass assembler that translates SIC and SIC/XE assembly into object code.",
+      "descZh": "中原大學系統程式課程作業:以 C++ 實作能同時處理 SIC 與 SIC/XE 兩種架構的交叉組譯器,採 Lexer / Table / Assembler 三個類別分工,經 Two-pass 流程完成符號表建立與機器碼產生。Pass 1 記錄各指令位置與符號位址並檢測重複定義,Pass 2 處理各類 Pseudo 指令(START、BYTE、WORD、RESB/RESW、EQU、BASE、LTORG 等)、計算相對定址 disp,並依 Format 2/3/4 與立即/間接定址產生最終 Object Code。",
+      "descEn": "A systems-programming course project (Chung Yuan Christian University) implementing a cross assembler that handles both SIC and SIC/XE architectures in C++. It splits responsibilities across Lexer / Table / Assembler classes and runs a two-pass flow for symbol resolution and code generation: Pass 1 records instruction locations and symbol addresses (detecting duplicate definitions); Pass 2 handles pseudo-instructions (START, BYTE, WORD, RESB/RESW, EQU, BASE, LTORG, etc.), computes relative-addressing displacements, and emits object code across Format 2/3/4 with immediate and indirect addressing.",
+      "techStack": [
+        "C++"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/SIC-SIC-XE-Cross-Assembler",
+      "liveUrl": "",
+      "highlights": [
+        {
+          "zh": "Lexer / Table / Assembler 三類別分工,搭配 Symbol Table 與 Literal Table 等七張表管理組譯狀態",
+          "en": "Three-class design (Lexer / Table / Assembler) backed by seven tables including symbol and literal tables to manage assembly state"
+        },
+        {
+          "zh": "完整的定址模式處理:Format 2/3/4、PC/Base 相對定址、立即(#)與間接(@)定址,並支援 EQU 兩符號加減運算",
+          "en": "Full addressing-mode handling: Format 2/3/4, PC/Base relative addressing, immediate (#) and indirect (@) modes, plus EQU two-symbol arithmetic"
+        }
+      ],
+      "challengesZh": "README 誠實記錄了已知限制:多重 literal 與 EQU 並存時 object code 偶有少 3 的情形,且 EQU 後方若含乘除或多運算元的算式、以及括號運算尚未支援,反映出組譯器相對定址與運算式求值的實作邊界。",
+      "challengesEn": "The README honestly documents known limits: object code can occasionally be short by 3 when multiple literals and EQUs coexist, and EQU expressions involving multiplication/division, multiple operands, or parentheses are not yet supported — reflecting the practical edges of relative-addressing and expression evaluation in an assembler.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "純命令列 C++ 程式,以 Dev-C++ / MSVC 編譯為 Windows .exe,透過標準輸入輸出讀寫 .txt 檔案,無任何前端或網頁介面,無法作為瀏覽器 live demo。如需展示,僅能以原始碼、輸入/輸出 .txt 範例與 README 中的結果截圖呈現。"
+      }
+    },
+    {
+      "slug": "pipelined-cpu",
+      "repoName": "Pipelined-CPU-Design",
+      "titleZh": "流水線 MIPS-Lite CPU 設計",
+      "titleEn": "Pipelined MIPS-Lite CPU Design",
+      "oneLinerZh": "用 Verilog 從零打造的五級流水線 MIPS-Lite CPU,可執行 13 道 MIPS 指令。",
+      "oneLinerEn": "A five-stage pipelined MIPS-Lite CPU built from scratch in Verilog, executing 13 MIPS instructions.",
+      "descZh": "計算機組織課程團隊專案,以 Verilog 實作一顆可執行 13 道 MIPS 指令的五級流水線(IF/ID/EX/MEM/WB)CPU,並用 Icarus Verilog 模擬驗證、輸出波形觀察。資料路徑包含 ALU、自製乘法器(MULTU 搭配 Hi/Lo 暫存器)、以位移級串接而成的桶式位移器,以及四組流水線暫存器。Terry 主要負責乘法器與架構圖,並協助位移器與波形驗證。",
+      "descEn": "A computer-organization course team project implementing a five-stage pipelined (IF/ID/EX/MEM/WB) MIPS-Lite CPU in Verilog that executes 13 MIPS instructions, verified via Icarus Verilog simulation and waveform inspection. The datapath includes the ALU, a hand-built multiplier (MULTU with Hi/Lo registers), a barrel shifter composed of cascaded shift stages, and four pipeline registers. Terry primarily built the multiplier and architecture diagrams, and assisted with the shifter and waveform verification.",
+      "techStack": [
+        "Verilog",
+        "Icarus Verilog",
+        "MIPS",
+        "Digital Logic Design"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/Pipelined-CPU-Design",
+      "liveUrl": "",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "純 Verilog RTL 硬體模擬專案,需以 Icarus Verilog 等 HDL 工具編譯與跑模擬(repo 內含 .vvp 編譯產物與 .vcd 波形檔),無前端、無法獨立靜態部署。不適合作為瀏覽器 live demo;若要展示,較合適的方式是放架構圖與波形截圖。"
+      },
+      "challengesZh": "在團隊分工下整合 ALU、乘法器、桶式位移器與多級流水線暫存器,並透過波形比對驗證跨級資料傳遞與控制訊號的正確性。",
+      "challengesEn": "Integrating the ALU, multiplier, barrel shifter, and multi-stage pipeline registers under a team division of labor, and validating cross-stage data flow and control signals through waveform comparison.",
+      "highlights": [
+        {
+          "zh": "五級流水線資料路徑:以 IF_ID / ID_EX / EX_MEM / MEM_WB 四組暫存器串接 IF/ID/EX/MEM/WB 五個階段。",
+          "en": "Five-stage pipelined datapath with IF_ID / ID_EX / EX_MEM / MEM_WB registers connecting the IF/ID/EX/MEM/WB stages."
+        },
+        {
+          "zh": "自製運算單元:MULTU 乘法器搭配 Hi/Lo 暫存器,以及由 SLL1/2/4/8/16 串接而成的桶式位移器。",
+          "en": "Custom compute units: a MULTU multiplier with Hi/Lo registers, and a barrel shifter built from cascaded SLL1/2/4/8/16 stages."
+        },
+        {
+          "zh": "以 Icarus Verilog 編譯模擬並產生 VCD 波形,驗證 13 道 MIPS 指令的執行正確性。",
+          "en": "Compiled and simulated with Icarus Verilog, producing VCD waveforms to verify correct execution of all 13 MIPS instructions."
+        }
+      ]
+    },
+    {
+      "slug": "fsm-ticket",
+      "repoName": "FSM",
+      "titleZh": "有限狀態機售票機",
+      "titleEn": "FSM Ticket Vending Machine",
+      "oneLinerZh": "以 Verilog 有限狀態機模擬車站自動售票機的購票與找零流程。",
+      "oneLinerEn": "A station ticket vending machine modeled as a Verilog finite state machine.",
+      "descZh": "課程作業:用 Verilog 將車站自動售票機建模為四狀態有限狀態機(選站算票價、計算總額、逐枚投幣累計、出票找零並重置)。支援 5 站起訖選擇(同站即月台票)、1~5 張票數,與 1/5/10/50 元逐枚投幣,投入金額不足時顯示尚需金額,足額後輸出找零與票數。",
+      "descEn": "A coursework project that models a station ticket vending machine as a four-state Verilog FSM (fare calculation, total cost, coin-by-coin accumulation, then dispense change and reset). It supports origin/destination selection across 5 stations (same station = platform ticket), 1-5 tickets, and one-at-a-time 1/5/10/50-dollar coins, printing the remaining amount due when underpaid and the change plus ticket count once fully paid.",
+      "techStack": [
+        "Verilog"
+      ],
+      "presentation": "academic",
+      "githubUrl": "https://github.com/q86865511/FSM",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "純 RTL 硬體描述(單一 vending_machine_x.v),靠 $display 在模擬器輸出結果,無任何前端或可獨立靜態部署的程式碼。需以 Verilog 模擬器(如 Icarus Verilog / ModelSim)搭配 testbench 跑波形或文字輸出,無法作為瀏覽器 live demo 候選。"
+      }
+    }
+  ]
+}

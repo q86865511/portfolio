@@ -1,0 +1,45 @@
+# 相依套件
+node_modules/
+.pnpm-store/
+
+# 建置產物
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Turborepo
+.turbo/
+
+# 環境變數(範例檔保留)
+.env
+.env.*
+!.env.example
+
+# 日誌
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# 作業系統
+.DS_Store
+Thumbs.db
+
+# 編輯器
+.vscode/
+.idea/
+
+# 其他
+*.local
+.cache/
+
+# 子站 demo 的大型二進位匯出(例如 Godot Web 匯出),改由 CI 產生或另存
+apps/**/public/godot/*.wasm
+apps/**/public/godot/*.pck
+
+# 產生的 PDF 履歷(由 generate-pdf 腳本 / CI 重生成)
+apps/**/public/resume-*.pdf
+
+# 驗證用截圖(可重生成,不入庫;mockup-main.html 保留)
+design/shots/

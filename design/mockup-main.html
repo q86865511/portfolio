@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>周暐倫 Terry — 全端 / AI-ML 部署 / DevOps 工程師</title>
+<style>
+:root{
+  --color-bg:#0B0F14; --color-surface:#121821; --color-surface-2:#1A222D;
+  --color-elevated:#212C39; --color-overlay:rgba(5,8,12,.72);
+  --color-text:#E8EDF2; --color-text-muted:#9FB0C0; --color-text-subtle:#6B7C8C;
+  --color-text-onbrand:#04201F;
+  --color-border:rgba(159,176,192,.14); --color-border-strong:rgba(159,176,192,.28);
+  --color-focus:#5EE6D0;
+  --color-brand:#2DD4BF; --color-brand-hover:#5EEAD4; --color-brand-dim:rgba(45,212,191,.12);
+  --color-accent:#A78BFA; --color-accent-dim:rgba(167,139,250,.14);
+  --color-success:#34D399; --color-success-dim:rgba(52,211,153,.14);
+  --color-warning:#FBBF24; --color-warning-dim:rgba(251,191,36,.14);
+  --color-danger:#F87171; --color-danger-dim:rgba(248,113,113,.14);
+  --color-info:#60A5FA; --color-info-dim:rgba(96,165,250,.14);
+  --font-sans:"Inter","Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-mono:"JetBrains Mono","Fira Code","Cascadia Code",ui-monospace,"Noto Sans Mono CJK TC",monospace;
+  --container:1120px; --measure:68ch;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --radius-xl:24px; --radius-full:999px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.30); --shadow-md:0 6px 20px rgba(0,0,0,.35); --shadow-lg:0 16px 48px rgba(0,0,0,.45);
+  --ring:0 0 0 3px var(--color-brand-dim),0 0 0 1.5px var(--color-focus);
+  --ease:cubic-bezier(.2,.7,.2,1); --dur-fast:120ms; --dur:200ms;
+  --sp4:16px; --sp5:24px; --sp6:32px; --sp7:48px; --sp8:64px; --sp9:96px;
+}
+[data-theme="light"]{
+  --color-bg:#F7F9FB; --color-surface:#FFFFFF; --color-surface-2:#EFF3F7;
+  --color-elevated:#FFFFFF; --color-overlay:rgba(15,23,32,.45);
+  --color-text:#0E1620; --color-text-muted:#475565; --color-text-subtle:#6B7888;
+  --color-text-onbrand:#04201F;
+  --color-border:rgba(14,22,32,.12); --color-border-strong:rgba(14,22,32,.22);
+  --color-focus:#0D9488;
+  --color-brand:#0D9488; --color-brand-hover:#0F766E; --color-brand-dim:rgba(13,148,136,.10);
+  --color-accent:#7C3AED; --color-accent-dim:rgba(124,58,237,.10);
+  --color-success:#059669; --color-success-dim:rgba(5,150,105,.12);
+  --color-warning:#B45309; --color-warning-dim:rgba(180,83,9,.12);
+  --color-danger:#DC2626; --color-danger-dim:rgba(220,38,38,.12);
+  --color-info:#2563EB; --color-info-dim:rgba(37,99,235,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--color-bg);color:var(--color-text);font-family:var(--font-sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-weight:700;line-height:1.15;letter-spacing:-.01em}
+.mono{font-family:var(--font-mono)}
+.container{max-width:var(--container);margin:0 auto;padding:0 24px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--radius-sm)}
+
+/* Skip link */
+.skip{position:absolute;left:16px;top:-60px;background:var(--color-brand);color:var(--color-text-onbrand);padding:10px 16px;border-radius:var(--radius-md);font-weight:500;z-index:100;transition:top var(--dur) var(--ease)}
+.skip:focus{top:16px}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:50;transition:background var(--dur) var(--ease),box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease);border-bottom:1px solid transparent}
+.nav.scrolled{background:color-mix(in srgb,var(--color-elevated) 86%,transparent);backdrop-filter:blur(10px);border-bottom-color:var(--color-border);box-shadow:var(--shadow-md)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:500}
+.brand .dot{width:10px;height:10px;border-radius:var(--radius-full);background:var(--color-brand);box-shadow:0 0 0 4px var(--color-brand-dim)}
+.nav-links{display:none;gap:28px;align-items:center}
+.nav-links a{color:var(--color-text-muted);font-size:14px;transition:color var(--dur) var(--ease)}
+.nav-links a:hover{color:var(--color-text)}
+.nav-actions{display:flex;align-items:center;gap:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:14px;font-weight:500;border-radius:var(--radius-md);border:1px solid transparent;cursor:pointer;transition:all var(--dur) var(--ease);padding:0 18px;height:40px;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--color-brand);color:var(--color-text-onbrand)}
+.btn-primary:hover{background:var(--color-brand-hover)}
+.btn-secondary{background:transparent;color:var(--color-text);border-color:var(--color-border-strong)}
+.btn-secondary:hover{background:var(--color-surface-2);border-color:var(--color-text-subtle)}
+.btn-ghost{background:transparent;color:var(--color-text-muted);padding:0 12px}
+.btn-ghost:hover{background:var(--color-surface-2);color:var(--color-text)}
+.btn-icon{width:40px;height:40px;padding:0;justify-content:center;background:transparent;color:var(--color-text-muted);border-color:var(--color-border)}
+.btn-icon:hover{background:var(--color-surface-2);color:var(--color-text);border-color:var(--color-border-strong)}
+.btn-icon svg{width:18px;height:18px}
+.btn-sm{height:32px;font-size:13px;padding:0 12px}
+
+/* Segmented (LangToggle / ThemeToggle) */
+.seg{display:inline-flex;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:2px}
+.seg button{font-family:inherit;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--color-text-muted);padding:5px 12px;border-radius:7px;cursor:pointer;transition:all var(--dur) var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--color-brand);color:var(--color-text-onbrand)}
+
+/* Hero */
+.hero{padding:var(--sp9) 0 var(--sp8)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:var(--sp7);align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:13px;color:var(--color-brand);background:var(--color-brand-dim);padding:5px 12px;border-radius:var(--radius-full);margin-bottom:24px}
+.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--color-success);box-shadow:0 0 0 3px var(--color-success-dim)}
+.hero h1{font-size:clamp(38px,7vw,49px);margin-bottom:14px}
+.hero .role{font-size:clamp(22px,4vw,31px);font-weight:500;color:var(--color-text-muted);margin-bottom:20px;line-height:1.3}
+.hero .role b{color:var(--color-text);font-weight:700}
+.hero .role .hl{color:var(--color-brand);font-weight:700}
+.hero .lede{font-size:17px;color:var(--color-text-muted);max-width:54ch;margin-bottom:28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:18px;font-size:14px;color:var(--color-text-subtle)}
+.hero-meta span{display:inline-flex;align-items:center;gap:7px}
+.hero-meta svg{width:15px;height:15px;opacity:.8}
+
+/* Terminal card */
+.term{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+.term-bar{display:flex;align-items:center;gap:7px;padding:12px 16px;background:var(--color-surface-2);border-bottom:1px solid var(--color-border)}
+.term-bar .c{width:11px;height:11px;border-radius:50%}
+.term-bar .c1{background:#FF5F56}.term-bar .c2{background:#FFBD2E}.term-bar .c3{background:#27C93F}
+.term-bar .t{margin-left:8px;font-family:var(--font-mono);font-size:12px;color:var(--color-text-subtle)}
+.term-body{padding:18px 20px;font-family:var(--font-mono);font-size:13.5px;line-height:1.9}
+.term-body .p{color:var(--color-brand)}
+.term-body .c{color:var(--color-text)}
+.term-body .o{color:var(--color-text-muted)}
+.term-body .k{color:var(--color-accent)}
+.term-body .s{color:var(--color-success)}
+
+/* Section */
+.section{padding:var(--sp9) 0;scroll-margin-top:80px}
+.section-head{margin-bottom:var(--sp6);max-width:var(--measure)}
+.section-eyebrow{font-family:var(--font-mono);font-size:13px;color:var(--color-brand);letter-spacing:.04em;margin-bottom:10px}
+.section h2{font-size:clamp(28px,4vw,39px);margin-bottom:12px}
+.section .intro{color:var(--color-text-muted);font-size:17px}
+
+/* Skills */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.skill-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:22px}
+.skill-card h3{font-size:15px;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.skill-card h3 .ic{width:34px;height:34px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.skill-card h3 .ic svg{width:18px;height:18px}
+.ic-brand{background:var(--color-brand-dim);color:var(--color-brand)}
+.ic-accent{background:var(--color-accent-dim);color:var(--color-accent)}
+.ic-info{background:var(--color-info-dim);color:var(--color-info)}
+.badges{display:flex;flex-wrap:wrap;gap:7px}
+
+/* TechBadge */
+.badge{font-family:var(--font-mono);font-size:12px;background:var(--color-surface-2);color:var(--color-text-muted);border:1px solid var(--color-border);padding:4px 10px;border-radius:var(--radius-sm);line-height:1.4}
+.badge.b-ml{background:var(--color-accent-dim);color:var(--color-accent);border-color:transparent}
+.badge.b-infra{background:var(--color-brand-dim);color:var(--color-brand);border-color:transparent}
+
+/* Status badge */
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--radius-full)}
+.status .d{width:6px;height:6px;border-radius:50%}
+.st-live{background:var(--color-success-dim);color:var(--color-success)}.st-live .d{background:var(--color-success)}
+.st-wip{background:var(--color-warning-dim);color:var(--color-warning)}.st-wip .d{background:var(--color-warning)}
+.st-show{background:var(--color-info-dim);color:var(--color-info)}.st-show .d{background:var(--color-info)}
+
+/* Project grid */
+.proj-tier{margin-bottom:var(--sp7)}
+.tier-label{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.tier-label .name{font-family:var(--font-mono);font-size:13px;color:var(--color-text-muted);letter-spacing:.03em;text-transform:uppercase}
+.tier-label .line{flex:1;height:1px;background:var(--color-border)}
+.tier-label .count{font-size:12px;color:var(--color-text-subtle);font-family:var(--font-mono)}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px}
+
+/* Card base */
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.card:hover{border-color:var(--color-border-strong);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.card .body{padding:22px;display:flex;flex-direction:column;flex:1}
+.card .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.card h3{font-size:18px}
+.card h3 a{transition:color var(--dur) var(--ease)}
+.card:hover h3 a{color:var(--color-brand)}
+.card .desc{color:var(--color-text-muted);font-size:14.5px;margin-bottom:16px;flex:1}
+.card .badges{margin-bottom:18px}
+.card .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
+
+/* Featured */
+.featured{grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:18px}
+.card-featured .topband{height:118px;background:linear-gradient(135deg,var(--color-surface-2),var(--color-elevated));border-bottom:1px solid var(--color-border);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-featured .topband .glyph{font-family:var(--font-mono);font-size:60px;font-weight:700;opacity:.10;letter-spacing:-2px}
+.card-featured .topband .accentbar{position:absolute;left:0;top:0;bottom:0;width:4px}
+.ab-brand{background:var(--color-brand)}.ab-accent{background:var(--color-accent)}
+.card-featured .topband .float{position:absolute;right:18px;bottom:16px;display:flex;gap:7px}
+.card-featured h3{font-size:21px}
+
+/* Mini */
+.mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card-mini .body{padding:16px 18px}
+.card-mini h3{font-size:16px}
+.card-mini .lang{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-subtle);margin-top:6px}
+.card-mini .lang .ld{width:9px;height:9px;border-radius:50%}
+.card-mini .ext{position:absolute;top:14px;right:14px;color:var(--color-text-subtle);transition:color var(--dur) var(--ease)}
+.card-mini:hover .ext{color:var(--color-brand)}
+.card-mini .ext svg{width:16px;height:16px}
+
+/* Showcase highlight card */
+.card-showcase{border:1px solid var(--color-accent-dim);background:linear-gradient(180deg,var(--color-accent-dim),transparent),var(--color-surface)}
+
+/* Academic details */
+.academic details{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden}
+.academic summary{padding:18px 22px;cursor:pointer;font-weight:500;display:flex;align-items:center;justify-content:space-between;list-style:none}
+.academic summary::-webkit-details-marker{display:none}
+.academic summary .chev{transition:transform var(--dur) var(--ease);color:var(--color-text-muted)}
+.academic details[open] summary .chev{transform:rotate(180deg)}
+.academic .aclist{padding:0 22px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.academic .acitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--color-surface-2);border-radius:var(--radius-md);font-size:14px}
+.academic .acitem .meta{font-family:var(--font-mono);font-size:12px;color:var(--color-text-subtle)}
+
+/* Footer */
+footer{border-top:1px solid var(--color-border);padding:var(--sp7) 0 var(--sp6);margin-top:var(--sp8)}
+.foot-grid{display:grid;grid-template-columns:1fr;gap:var(--sp5)}
+.foot-grid h4{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--color-text-subtle);margin-bottom:14px;font-weight:500;font-family:var(--font-mono)}
+.foot-grid a{color:var(--color-text-muted);font-size:14px;display:block;padding:3px 0;transition:color var(--dur) var(--ease)}
+.foot-grid a:hover{color:var(--color-brand)}
+.foot-bottom{margin-top:var(--sp6);padding-top:24px;border-top:1px solid var(--color-border);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;font-size:13px;color:var(--color-text-subtle)}
+.foot-stack{font-family:var(--font-mono);font-size:12px}
+.foot-stack b{color:var(--color-text-muted);font-weight:500}
+
+@media (min-width:768px){
+  .nav-links{display:flex}
+  .hero-meta{gap:24px}
+}
+@media (min-width:1024px){
+  .hero-grid{grid-template-columns:1.05fr .95fr;gap:var(--sp8)}
+  .foot-grid{grid-template-columns:2fr 1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  .card:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip">跳至主要內容</a>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="#" class="brand"><span class="dot" aria-hidden="true"></span>周暐倫 · Terry</a>
+    <nav class="nav-links" aria-label="主導覽">
+      <a href="#about">關於</a>
+      <a href="#skills">技能</a>
+      <a href="#projects">專案</a>
+      <a href="#contact">聯絡</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="seg" role="group" aria-label="Language / 語言">
+        <button aria-pressed="true">繁</button>
+        <button aria-pressed="false">EN</button>
+      </div>
+      <button class="btn-icon" id="themeBtn" aria-label="切換深淺色主題" title="切換主題">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <a class="btn-icon" href="https://github.com" aria-label="GitHub(另開新視窗)" rel="noopener noreferrer" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.7c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.34 9.34 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9l-.01 2.82c0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-h1">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>OPEN TO WORK · 桃園 / 遠端</span>
+      <h1 id="hero-h1">周暐倫 Terry</h1>
+      <p class="role"><b>全端工程師</b> · <span class="hl">AI-ML 部署</span> · <b>DevOps</b></p>
+      <p class="lede">CS 碩士。把模型從筆記本帶到生產環境,從推論最佳化、容器化到 CI/CD 與雲端部署一條龍。喜歡能跑、可維護、有架構的東西。</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#projects">
+          看專案
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-secondary" href="#" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+          下載 PDF 履歷
+        </a>
+        <a class="btn-icon" href="https://github.com" aria-label="GitHub 個人頁(另開新視窗)" rel="noopener noreferrer" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.7c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.34 9.34 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9l-.01 2.82c0 .27.18.6.69.49A10.02 10.02 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/></svg>
+        </a>
+        <a class="btn-icon" href="https://linkedin.com" aria-label="LinkedIn(另開新視窗)" rel="noopener noreferrer" target="_blank">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.4 8.2h4.4V24H.4V8.2Zm7.5 0h4.2v2.16h.06c.59-1.05 2.02-2.16 4.16-2.16 4.45 0 5.27 2.93 5.27 6.73V24h-4.4v-6.96c0-1.66-.03-3.8-2.32-3.8-2.32 0-2.67 1.8-2.67 3.68V24H7.9V8.2Z"/></svg>
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>桃園市,台灣</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9 12 4l9 5-9 5-9-5Z"/><path d="M7 11v5c0 1 2.2 2.5 5 2.5s5-1.5 5-2.5v-5"/></svg>資訊工程 碩士</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>q86865511@gmail.com</span>
+      </div>
+    </div>
+
+    <div class="term" role="img" aria-label="模擬終端機:顯示 Terry 的技術定位與主力技術棧">
+      <div class="term-bar"><span class="c c1"></span><span class="c c2"></span><span class="c c3"></span><span class="t">terry@portfolio: ~</span></div>
+      <div class="term-body" aria-hidden="true">
+        <div><span class="p">$</span> <span class="c">whoami</span></div>
+        <div class="o">周暐倫 — full-stack / ML-ops / devops engineer</div>
+        <div><span class="p">$</span> <span class="c">cat</span> <span class="o">stack.yml</span></div>
+        <div><span class="k">languages</span>: <span class="s">Python, TypeScript, C++</span></div>
+        <div><span class="k">ml</span>:        <span class="s">PyTorch, YOLOv8, TensorRT, Triton</span></div>
+        <div><span class="k">infra</span>:     <span class="s">Docker, K8s, Cloudflare, Oracle A1</span></div>
+        <div><span class="k">web</span>:       <span class="s">Next.js, FastAPI, Postgres, Redis</span></div>
+        <div><span class="p">$</span> <span class="c">./deploy</span> <span class="o">--prod</span> <span class="s">✓ ready</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="section" id="skills" aria-labelledby="skills-h2">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-eyebrow">01 / SKILLS</p>
+      <h2 id="skills-h2">技術棧</h2>
+      <p class="intro">三條主線:全端應用、把 ML 模型送上線、以及讓一切自動化部署且可維運。</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3><span class="ic ic-brand" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></span>全端開發</h3>
+        <div class="badges">
+          <span class="badge">TypeScript</span><span class="badge">Next.js</span><span class="badge">React</span>
+          <span class="badge">FastAPI</span><span class="badge">Python</span><span class="badge">PostgreSQL</span><span class="badge">Redis</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3><span class="ic ic-accent" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></span>AI / ML 部署</h3>
+        <div class="badges">
+          <span class="badge b-ml">PyTorch</span><span class="badge b-ml">YOLOv8</span><span class="badge b-ml">TensorRT</span>
+          <span class="badge b-ml">Triton</span><span class="badge b-ml">語義分割</span><span class="badge b-ml">ONNX</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3><span class="ic ic-info" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg></span>DevOps / 基礎設施</h3>
+        <div class="badges">
+          <span class="badge b-infra">Docker</span><span class="badge b-infra">Kubernetes</span><span class="badge b-infra">CI/CD</span>
+          <span class="badge b-infra">Cloudflare</span><span class="badge b-infra">Caddy</span><span class="badge b-infra">Oracle Cloud</span><span class="badge b-infra">Linux/ARM64</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="projects" aria-labelledby="proj-h2">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-eyebrow">02 / PROJECTS</p>
+      <h2 id="proj-h2">精選專案</h2>
+      <p class="intro">依重要性分層呈現。代表作可進 showcase 詳情頁或直接玩 live demo;課程作業收在底部摺疊區。</p>
+    </div>
+
+    <!-- FEATURED -->
+    <div class="proj-tier">
+      <div class="tier-label"><span class="name">Featured · 代表作</span><span class="line" aria-hidden="true"></span><span class="count">02</span></div>
+      <div class="proj-grid featured">
+
+        <article class="card card-featured">
+          <div class="topband">
+            <span class="accentbar ab-accent" aria-hidden="true"></span>
+            <span class="glyph" aria-hidden="true">AI</span>
+            <div class="float"><span class="badge b-ml">YOLOv8</span><span class="badge b-ml">TensorRT</span></div>
+          </div>
+          <div class="body">
+            <div class="row">
+              <h3><a href="/projects/ai-deployment-pipeline">AI-Deployment-Pipeline</a></h3>
+              <span class="status st-show" aria-label="呈現方式:showcase"><span class="d" aria-hidden="true"></span>Showcase</span>
+            </div>
+            <p class="desc">把物件偵測模型從訓練到上線的完整管線:YOLOv8 → TensorRT 量化 → Triton Inference Server,容器化部署並監控推論延遲與吞吐。</p>
+            <div class="badges">
+              <span class="badge b-ml">PyTorch</span><span class="badge b-ml">TensorRT</span><span class="badge b-ml">Triton</span>
+              <span class="badge b-infra">Docker</span><span class="badge b-infra">CUDA</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-secondary btn-sm" href="/projects/ai-deployment-pipeline">看詳情</a>
+              <a class="btn btn-ghost btn-sm" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card card-featured">
+          <div class="topband">
+            <span class="accentbar ab-brand" aria-hidden="true"></span>
+            <span class="glyph" aria-hidden="true">⚔</span>
+            <div class="float"><span class="badge">JavaScript</span><span class="badge b-infra">Canvas</span></div>
+          </div>
+          <div class="body">
+            <div class="row">
+              <h3><a href="https://soulshard.YOUR_DOMAIN" rel="noopener noreferrer" target="_blank">Soulshard-Hunter</a></h3>
+              <span class="status st-live" aria-label="狀態:可線上遊玩"><span class="d" aria-hidden="true"></span>Live</span>
+            </div>
+            <p class="desc">純 JavaScript 打造的 Roguelike 動作遊戲,自製碰撞、粒子與波次系統。部署為獨立子網域,可直接在瀏覽器遊玩。</p>
+            <div class="badges">
+              <span class="badge">JavaScript</span><span class="badge">Canvas API</span><span class="badge b-infra">Vite</span><span class="badge b-infra">Cloudflare</span>
+            </div>
+            <div class="actions">
+              <a class="btn btn-primary btn-sm" href="https://soulshard.YOUR_DOMAIN" rel="noopener noreferrer" target="_blank">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M8 5v14l11-7z"/></svg>
+                線上遊玩
+              </a>
+              <a class="btn btn-secondary btn-sm" href="/projects/soulshard-hunter">看詳情</a>
+              <a class="btn btn-ghost btn-sm" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- NOTABLE -->
+    <div class="proj-tier">
+      <div class="tier-label"><span class="name">Notable · 值得一提</span><span class="line" aria-hidden="true"></span><span class="count">03</span></div>
+      <div class="proj-grid">
+
+        <article class="card">
+          <div class="body">
+            <div class="row">
+              <h3><a href="/projects/lolhelper">lolhelper</a></h3>
+              <span class="status st-show"><span class="d" aria-hidden="true"></span>Showcase</span>
+            </div>
+            <p class="desc">全端遊戲輔助平台:Next.js 前端 + FastAPI 後端 + PostgreSQL + Redis 快取,規劃中的前端靜態版可成為第二個 live demo。</p>
+            <div class="badges">
+              <span class="badge">Next.js</span><span class="badge">FastAPI</span><span class="badge b-infra">PostgreSQL</span><span class="badge b-infra">Redis</span>
+            </div>
+            <div class="actions"><a class="btn btn-secondary btn-sm" href="/projects/lolhelper">看詳情</a><a class="btn btn-ghost btn-sm" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="body">
+            <div class="row">
+              <h3><a href="/projects/smart-pedestrian-navigation">Smart-Pedestrian-Navigation</a></h3>
+              <span class="status st-show"><span class="d" aria-hidden="true"></span>Showcase</span>
+            </div>
+            <p class="desc">行人導航輔助:以語義分割辨識人行道與障礙物,結合 Android 端即時影像,為視障使用者提供路徑提示。</p>
+            <div class="badges">
+              <span class="badge b-ml">語義分割</span><span class="badge b-ml">PyTorch</span><span class="badge">Android</span><span class="badge">Kotlin</span>
+            </div>
+            <div class="actions"><a class="btn btn-secondary btn-sm" href="/projects/smart-pedestrian-navigation">看詳情</a><a class="btn btn-ghost btn-sm" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="body">
+            <div class="row">
+              <h3><a href="/projects/discord-guild-keeper">DiscordGuildKeeper</a></h3>
+              <span class="status st-show"><span class="d" aria-hidden="true"></span>Showcase</span>
+            </div>
+            <p class="desc">Discord 公會管理機器人:成員追蹤、自動化角色與事件排程,以 asyncio 處理高併發事件流。</p>
+            <div class="badges">
+              <span class="badge">Python</span><span class="badge">discord.py</span><span class="badge">asyncio</span><span class="badge b-infra">SQLite</span>
+            </div>
+            <div class="actions"><a class="btn btn-secondary btn-sm" href="/projects/discord-guild-keeper">看詳情</a><a class="btn btn-ghost btn-sm" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- MINI -->
+    <div class="proj-tier">
+      <div class="tier-label"><span class="name">Mini · 小品與工具</span><span class="line" aria-hidden="true"></span><span class="count">04</span></div>
+      <div class="mini-grid">
+
+        <article class="card card-mini">
+          <a class="ext" href="https://github.com" aria-label="cyclepact GitHub(另開新視窗)" rel="noopener noreferrer" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          <div class="body">
+            <h3><a href="/projects/cyclepact">cyclepact</a></h3>
+            <div class="row" style="margin:8px 0 0"><span class="status st-wip"><span class="d" aria-hidden="true"></span>WIP</span></div>
+            <div class="lang"><span class="ld" style="background:#478CBF" aria-hidden="true"></span>Godot 4 · GDScript</div>
+          </div>
+        </article>
+
+        <article class="card card-mini">
+          <a class="ext" href="https://github.com" aria-label="Mini-Moba GitHub(另開新視窗)" rel="noopener noreferrer" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          <div class="body">
+            <h3><a href="/projects/mini-moba">Mini-Moba</a></h3>
+            <div class="lang"><span class="ld" style="background:#F34B7D" aria-hidden="true"></span>C++ · 多人對戰原型</div>
+          </div>
+        </article>
+
+        <article class="card card-mini">
+          <a class="ext" href="https://github.com" aria-label="Ros-Ball-Chaser GitHub(另開新視窗)" rel="noopener noreferrer" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          <div class="body">
+            <h3><a href="/projects/ros-ball-chaser">Ros-Ball-Chaser</a></h3>
+            <div class="lang"><span class="ld" style="background:#22314E" aria-hidden="true"></span>ROS · C++ 機器人</div>
+          </div>
+        </article>
+
+        <article class="card card-mini">
+          <a class="ext" href="https://github.com" aria-label="PayTheMoney GitHub(另開新視窗)" rel="noopener noreferrer" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          <div class="body">
+            <h3><a href="/projects/paythemoney">PayTheMoney</a></h3>
+            <div class="lang"><span class="ld" style="background:#F1E05A" aria-hidden="true"></span>JavaScript · 分帳工具</div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- SHOWCASE FEATURE CARD (single highlighted showcase) -->
+    <div class="proj-tier">
+      <div class="tier-label"><span class="name">Showcase 範例 · 詳情頁入口</span><span class="line" aria-hidden="true"></span></div>
+      <article class="card card-showcase">
+        <div class="body" style="gap:6px">
+          <div class="row">
+            <h3 style="font-size:20px"><a href="/projects/ai-deployment-pipeline">深入閱讀:AI-Deployment-Pipeline 的 showcase 詳情頁</a></h3>
+            <span class="status st-show"><span class="d" aria-hidden="true"></span>/projects/[slug]</span>
+          </div>
+          <p class="desc" style="margin-bottom:8px">showcase 詳情頁模板提供:頁首 + 狀態徽章、關鍵資訊條(角色 / 時間 / 領域)、TL;DR、分組技術棧、含架構圖與程式碼的內文、以及上一個 / 下一個專案導覽。不便執行的專案(需 GPU / 桌面 / bot)都走此模板。</p>
+          <div class="badges" style="margin-bottom:14px">
+            <span class="badge">麵包屑</span><span class="badge">Meta bar</span><span class="badge">TL;DR</span><span class="badge">架構圖</span><span class="badge">程式碼區塊</span><span class="badge">上/下一個</span>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary btn-sm" href="/projects/ai-deployment-pipeline">前往詳情頁
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- ACADEMIC (collapsible) -->
+    <div class="proj-tier academic" style="margin-bottom:0">
+      <details>
+        <summary>
+          <span>Academic · 課程與學術專案(Verilog / Assembly / C++)</span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="m6 9 6 6 6-6"/></svg></span>
+        </summary>
+        <div class="aclist">
+          <a class="acitem" href="https://github.com" rel="noopener noreferrer" target="_blank"><span>RISC CPU 設計</span><span class="meta">Verilog ↗</span></a>
+          <a class="acitem" href="https://github.com" rel="noopener noreferrer" target="_blank"><span>組合語言作業集</span><span class="meta">x86 ASM ↗</span></a>
+          <a class="acitem" href="https://github.com" rel="noopener noreferrer" target="_blank"><span>資料結構與演算法</span><span class="meta">C++ ↗</span></a>
+          <a class="acitem" href="https://github.com" rel="noopener noreferrer" target="_blank"><span>作業系統模擬</span><span class="meta">C ↗</span></a>
+        </div>
+      </details>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="contact" aria-labelledby="foot-h">
+  <div class="container">
+    <h2 id="foot-h" class="sr-only">聯絡與頁尾</h2>
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="brand" style="margin-bottom:12px"><span class="dot" aria-hidden="true"></span>周暐倫 · Terry</a>
+        <p style="color:var(--color-text-muted);font-size:14px;max-width:42ch">全端 / AI-ML 部署 / DevOps 工程師。開放工作機會,歡迎來信聊聊。</p>
+        <p style="color:var(--color-text-subtle);font-size:13px;margin-top:16px">© 2026 周暐倫 Terry</p>
+      </div>
+      <div>
+        <h4>導覽</h4>
+        <a href="#about">關於</a><a href="#skills">技能</a><a href="#projects">專案</a>
+      </div>
+      <div>
+        <h4>聯絡</h4>
+        <a href="mailto:q86865511@gmail.com">Email</a>
+        <a href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub ↗</a>
+        <a href="https://linkedin.com" rel="noopener noreferrer" target="_blank">LinkedIn ↗</a>
+        <a href="#" rel="noopener">下載 PDF 履歷</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span class="foot-stack">本站技術 · <b>Next.js</b> · <b>Tailwind</b> · <b>Cloudflare Tunnel</b> · <b>Oracle A1</b></span>
+      <span>以無障礙 (WCAG AA) 與 RWD 為前提設計</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+const onScroll=()=>nav.classList.toggle('scrolled',window.scrollY>24);
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+const html=document.documentElement, tb=document.getElementById('themeBtn');
+tb.addEventListener('click',()=>{
+  html.setAttribute('data-theme',html.getAttribute('data-theme')==='dark'?'light':'dark');
+});
+
+document.querySelectorAll('.seg button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+  });
+});
+</script>
+</body>
+</html>
