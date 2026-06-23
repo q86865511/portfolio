@@ -1,114 +1,60 @@
 # ============================================================================
-# Caddyfile — origin 端的反向代理 / 靜態檔伺服器
+# Caddyfile — origin 端反向代理 / 靜態檔伺服器(跑在 Oracle A1)
 # ----------------------------------------------------------------------------
-# 角色:Caddy 跑在 Oracle A1 主機上,作為 cloudflared 連入的唯一 origin。
-#       它「只聽 127.0.0.1:8080」(不對外),依 Host(網域)把請求分流到
-#       對應的靜態檔目錄或動態服務。
-#
+# 角色:Caddy 只聽 127.0.0.1:8080(不對外),作為 cloudflared 連入的唯一 origin,
+#       依 Host 把請求分流到各站(靜態檔 / 反代後端)。
 # 資料流:cloudflared → http://127.0.0.1:8080(本檔)→ file_server / reverse_proxy
 #
-# 為什麼用 http://、且關掉自動 HTTPS:
-#   TLS 已在 Cloudflare 邊緣終結,Cloudflare↔主機這段走 Tunnel 本身就是加密的,
-#   所以 origin 不需要、也不該再自簽 Let's Encrypt(會去搶 443 / 反覆嘗試簽發失敗)。
-#   下面用「http://站台位址」的寫法,Caddy 對 http:// 站台預設就不會啟用自動 HTTPS。
-#
-# 與既有服務共存:
-#   原本服務 Soulshard-Hunter 的 Caddy 改為統一聽 127.0.0.1:8080,本檔即整合後的設定。
-#   所有對外 vhost 都掛在這個 :8080 上,由 cloudflared 依 hostname 帶進來、Caddy 再依 Host 分流。
-#
-# ⚠️ 佔位符(使用者稍後以實際網域替換):terrychou.com → 例如 example.com
+# 為什麼 http:// + auto_https off:TLS 已在 Cloudflare 邊緣終結,Tunnel 內已加密,
+#   origin 不需也不該再自簽憑證。http_port 8080 讓所有 http:// 站台改聽 8080。
 # ============================================================================
 
-# --- 全域選項 --------------------------------------------------------------
 {
-	# 保險:整台 Caddy 都不要自動管理憑證(避免去搶 443 / 與邊緣 TLS 重複)。
 	auto_https off
-
-	# 讓所有 http:// 站台改聽 8080(對上 cloudflared 轉發的 127.0.0.1:8080)。
-	# 少了這行,http:// 站台會聽預設的 80,和 Tunnel 的 :8080 對不上。
-	http_port 8080
-
-	# 管理 API 也綁本機即可(預設就是 localhost:2019,這裡明示)。
+	http_port 8080          # http:// 站台改聽 8080(對上 cloudflared 轉發的 127.0.0.1:8080)
 	admin localhost:2019
-
-	# 統一的 access log(可選)。需要時取消註解。
-	# log {
-	# 	output file /var/log/caddy/access.log
-	# }
 }
 
-# ============================================================================
-# 主站:terrychou.com → /srv/main 的靜態檔
-# ----------------------------------------------------------------------------
-# 寫成 `http://terrychou.com` + 綁定 :8080。因為 cloudflared 進來時帶的 Host
-# 是 terrychou.com,Caddy 以此匹配此區塊;同時關閉自動 HTTPS。
-# ============================================================================
+# --- 主站:terrychou.com → /srv/main 靜態檔 -------------------------------
 http://terrychou.com {
-	bind 127.0.0.1                 # 只聽本機,絕不對外
-	root * /srv/main               # 靜態檔根目錄(由 deploy 腳本 rsync 進來)
-	encode zstd gzip               # 回應壓縮
-	file_server
-
-	# 單頁式 / 靜態匯出網站:找不到檔案時回退到 index.html(避免深連結 404)。
-	# 若你的框架輸出的是純多檔靜態站,可視需要拿掉這行。
-	try_files {path} {path}/ /index.html
-
-	# 健康檢查端點:deploy 腳本會 curl 這個路徑確認服務正常(回 200)。
-	respond /healthz 200
-
-	log {
-		output file /var/log/caddy/main.access.log
-	}
-}
-
-# ============================================================================
-# live demo:soulshard.terrychou.com → /srv/soulshard 的靜態檔
-# ============================================================================
-http://soulshard.terrychou.com {
 	bind 127.0.0.1
-	root * /srv/soulshard
+	root * /srv/main
 	encode zstd gzip
 	file_server
 	try_files {path} {path}/ /index.html
 	respond /healthz 200
+}
 
-	log {
-		output file /var/log/caddy/soulshard.access.log
+# --- live demo:soulshard.terrychou.com ------------------------------------
+# 前端為純靜態遊戲(/srv/soulshard);後端 Soulshard-Hunter `server/`(Node+Fastify+
+# Postgres)以 docker compose 跑在 127.0.0.1:8787,提供 REST(/api/*)與 co-op
+# WebSocket(/rt)。
+#
+# ⚠️ 用 handle 區塊隔離:Caddy 的 try_files 屬 rewrite 階段、順序在 reverse_proxy
+#    之前,若不隔離會把 /api/* 先改寫成 /index.html 而打不到後端。handle 群組互斥,
+#    /api 與 /rt 命中 @backend 群組,其餘才進靜態群組(try_files 只作用於此)。
+http://soulshard.terrychou.com {
+	bind 127.0.0.1
+	encode zstd gzip
+
+	@backend path /api/* /rt /rt/*
+	handle @backend {
+		reverse_proxy 127.0.0.1:8787   # reverse_proxy 會自動處理 WebSocket upgrade
+	}
+
+	handle {
+		root * /srv/soulshard
+		file_server
+		try_files {path} {path}/ /index.html
 	}
 }
 
-# ============================================================================
-# 預留:cyclepact.terrychou.com(未來啟用)
-# ----------------------------------------------------------------------------
-# 啟用時:1) 取消本區塊註解 2) config.yml 加 ingress 3) 加 DNS CNAME。
-# ============================================================================
+# --- 預留:cyclepact.terrychou.com(Godot 完成後啟用)----------------------
+# 啟用時:1) 取消註解 2) cloudflared config.yml 加 ingress 3) cloudflared tunnel route dns
 # http://cyclepact.terrychou.com {
 # 	bind 127.0.0.1
 # 	root * /srv/cyclepact
 # 	encode zstd gzip
 # 	file_server
 # 	try_files {path} {path}/ /index.html
-# 	respond /healthz 200
-# }
-
-# ============================================================================
-# 範例:未來「動態服務」用 reverse_proxy(非靜態檔)
-# ----------------------------------------------------------------------------
-# 例如某子站是 Next.js SSR / FastAPI / Node 服務,跑在本機某個 port。
-# 這裡示範把 api.terrychou.com 反代到本機 :3001。實際啟用時記得同步:
-#   1) cloudflared config.yml 加 ingress  2) 加 DNS CNAME
-# ============================================================================
-# http://api.terrychou.com {
-# 	bind 127.0.0.1
-# 	encode zstd gzip
-#
-# 	reverse_proxy 127.0.0.1:3001 {
-# 		# 把原始 Host / 來源資訊帶給後端(後端若需要判斷網域 / 來源 IP 會用到)。
-# 		header_up Host {host}
-# 		header_up X-Forwarded-Proto {scheme}
-#
-# 		# 後端健康檢查(被動):連不上時短暫剔除,避免一直打死掉的後端。
-# 		health_uri /healthz
-# 		health_interval 10s
-# 	}
 # }

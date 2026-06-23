@@ -124,7 +124,7 @@
       ],
       "presentation": "live-demo",
       "githubUrl": "https://github.com/q86865511/Soulshard-Hunter",
-      "liveUrl": "https://yeyesoulshard.duckdns.org/",
+      "liveUrl": "https://soulshard.terrychou.com",
       "highlights": [
         {
           "zh": "從零自製遊戲引擎:120 Hz 固定步主迴圈降低輸入延遲、自寫相機與世界↔螢幕座標轉換、純程式繪製的像素 sprite 系統(rasterise 後快取),全程零外部圖片素材、零前端框架、零建置流程。",
