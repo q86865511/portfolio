@@ -27,6 +27,8 @@ export function PrintView() {
     if (q === "en" || q === "zh") {
       setLang(q);
       document.documentElement.lang = q === "zh" ? "zh-Hant" : "en";
+      // 供 generate-pdf 等待語言已套用後再截圖(避免抓到預設語言)。
+      document.documentElement.setAttribute("data-print-lang", q);
     }
   }, []);
 

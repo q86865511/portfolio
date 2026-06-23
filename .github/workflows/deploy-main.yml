@@ -67,7 +67,9 @@ jobs:
       - name: Generate resume PDFs
         continue-on-error: true
         run: |
-          npx --yes serve apps/main/out --listen 4173 --single &
+          # 注意:不可加 --single(SPA fallback 會把 /print/ 這類無副檔名路徑改寫成
+          # index.html → PDF 會變成首頁。靜態匯出有真實 /print/index.html,直接靜態服務即可。
+          npx --yes serve apps/main/out --listen 4173 &
           SERVE_PID=$!
           for i in $(seq 1 30); do curl -fsS -o /dev/null "http://localhost:4173/" && break; sleep 1; done
           BASE_URL=http://localhost:4173 pnpm --filter main run generate-pdf
