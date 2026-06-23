@@ -115,3 +115,20 @@ jobs:
         run: |
           chmod +x infra/scripts/deploy-static.sh
           ./infra/scripts/deploy-static.sh main
+
+      # 部署後清 Cloudflare 邊緣快取,讓更新立即可見(免手動 purge)。
+      # best-effort:未設定 secret/variable 時略過,不影響部署。
+      # 需要:repo secret CF_API_TOKEN(權限 Zone → Cache Purge)+ repo variable CF_ZONE_ID。
+      - name: Purge Cloudflare cache
+        continue-on-error: true
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ vars.CF_ZONE_ID }}
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ZONE_ID" ]; then
+            echo "CF_API_TOKEN / CF_ZONE_ID 未設定,略過 purge"; exit 0
+          fi
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' | head -c 300; echo
