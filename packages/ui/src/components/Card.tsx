@@ -29,6 +29,8 @@ interface BaseCardProps {
   desc?: string;
   techStack?: string[];
   actions?: CardAction[];
+  /** 學術/來源標籤(碩士論文 / 大學專題 / 課程專案),可選。 */
+  kind?: string;
   className?: string;
 }
 
@@ -56,6 +58,20 @@ function ActionButtons({ actions }: { actions: CardAction[] }) {
   );
 }
 
+/** 學術/來源小標籤(碩士論文 / 大學專題 / 課程專案);中性 mono pill,與 status 徽章區隔。 */
+function KindTag({ label, className }: { label: string; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center font-mono text-xs px-2 py-1 rounded-md bg-surface border border-border text-text-muted",
+        className,
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
 // B 立體層次:提亮表面(card-surface) + 頂部高光邊 + hover 上浮,
 // 高光邊與表面色取自 globals.css 的 --color-card* 變數(深淺色各一)。
 const cardBase =
@@ -76,6 +92,7 @@ export function FeaturedCard({
   titleHref,
   titleExternal,
   status,
+  kind,
   desc,
   techStack = [],
   actions = [],
@@ -94,6 +111,7 @@ export function FeaturedCard({
       )}
     >
       <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
+        {kind && <KindTag label={kind} className="absolute left-4 top-4 z-10" />}
         {glyph && (
           <span
             aria-hidden="true"
@@ -145,6 +163,7 @@ export function NotableCard({
   titleHref,
   titleExternal,
   status,
+  kind,
   desc,
   techStack = [],
   actions = [],
@@ -153,6 +172,11 @@ export function NotableCard({
   return (
     <article className={cn(cardBase, "group card-accent-bar", className)}>
       <div className="p-5 pl-6 flex flex-col flex-1">
+        {kind && (
+          <div className="mb-2">
+            <KindTag label={kind} />
+          </div>
+        )}
         <div className="flex items-start justify-between gap-3 mb-3">
           <h3 className="text-lg">
             <CardTitle
@@ -185,6 +209,8 @@ export interface MiniCardProps {
   titleHref?: string;
   titleExternal?: boolean;
   status?: { status: ProjectStatus; label: string; ariaLabel?: string };
+  /** 學術/來源標籤,可選。 */
+  kind?: string;
   /** 語言 / 一行說明。 */
   langLine?: string;
   /** 語言點顏色。 */
@@ -200,6 +226,7 @@ export function MiniCard({
   titleHref,
   titleExternal,
   status,
+  kind,
   langLine,
   langColor = "#6B7C8C",
   githubUrl,
@@ -224,6 +251,11 @@ export function MiniCard({
         <h3 className="text-base pr-7">
           <CardTitle title={title} href={titleHref} external={titleExternal} />
         </h3>
+        {kind && (
+          <div className="mt-2">
+            <KindTag label={kind} />
+          </div>
+        )}
         {status && (
           <div className="mt-2">
             <StatusBadge {...status} />

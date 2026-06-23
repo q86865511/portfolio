@@ -33,7 +33,7 @@ Oracle Cloud A1 (ARM64) 上的 Caddy
 │  └─ main/          # 主站:履歷門面、showcase 詳情頁、PDF 履歷、雙語
 ├─ packages/
 │  └─ ui/            # 共用設計系統(主題、元件、雙語基礎)
-├─ content/          # 專案資料(projects.json,17 筆雙語,內容單一真實來源)
+├─ content/          # 專案資料(projects.json,16 筆雙語,內容單一真實來源)
 ├─ infra/            # cloudflared / Caddy / 部署腳本
 ├─ docs/             # 教學文件(Cloudflare / CI/CD,繁體中文)
 ├─ .github/workflows/# 主站 path-filtered CI/CD(各 demo 子站於自有 repo)

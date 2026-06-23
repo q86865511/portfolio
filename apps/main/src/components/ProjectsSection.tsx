@@ -98,9 +98,22 @@ function actionsFor(p: Project): CardAction[] {
   return actions;
 }
 
+/** 代表作的水印字標與左強調條色(依 slug,穩定於排序變動)。 */
+const FEATURED_GLYPH: Record<string, string> = {
+  "ai-deployment-pipeline": "AI",
+  "smart-pedestrian-navigation": "CV",
+};
+const FEATURED_ACCENT: Record<string, "brand" | "accent"> = {
+  "ai-deployment-pipeline": "accent",
+  "smart-pedestrian-navigation": "brand",
+};
+
 export function ProjectsSection() {
   const { t } = useLang();
   const groups = projectsByTier();
+  /** 學術/來源標籤(依語言)。 */
+  const kindOf = (p: Project) =>
+    p.kindZh ? t(p.kindZh, p.kindEn ?? p.kindZh) : undefined;
 
   return (
     <>
@@ -117,11 +130,12 @@ export function ProjectsSection() {
               titleHref={primaryLink(p).href}
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
+              kind={kindOf(p)}
               desc={t(p.oneLinerZh, p.oneLinerEn)}
               techStack={p.techStack.slice(0, 5)}
               actions={actionsFor(p)}
-              glyph={i === 0 ? "AI" : "λ"}
-              accentBar={i === 0 ? "accent" : "brand"}
+              glyph={FEATURED_GLYPH[p.slug] ?? (i === 0 ? "AI" : "λ")}
+              accentBar={FEATURED_ACCENT[p.slug] ?? (i === 0 ? "accent" : "brand")}
             />
           ))}
         </div>
@@ -140,6 +154,7 @@ export function ProjectsSection() {
               titleHref={primaryLink(p).href}
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
+              kind={kindOf(p)}
               desc={t(p.oneLinerZh, p.oneLinerEn)}
               techStack={p.techStack.slice(0, 4)}
               actions={actionsFor(p)}
@@ -163,6 +178,7 @@ export function ProjectsSection() {
                 titleHref={link.href}
                 titleExternal={link.external}
                 status={statusFor(p, t)}
+                kind={kindOf(p)}
                 langLine={langLineFor(p)}
                 langColor={langColor(p)}
                 githubUrl={p.githubUrl}
