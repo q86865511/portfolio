@@ -4,6 +4,7 @@
 **全套上線並自動化**:主站 https://terrychou.com、子站 https://soulshard.terrychou.com 皆上線。兩個 repo(portfolio、Soulshard-Hunter)各有獨立 self-hosted runner 與 CI/CD,push 即自動部署;對外經 Cloudflare Tunnel(零入站),主站部署後自動 purge 邊緣快取;Cloudflare Web Analytics 運作中(CWV 全綠)。文件齊備、SEO/分享優化完成。
 
 ## 已完成
+- **2026-06-24** 履歷 PDF 微調:① 專案順序固定為 碩士(AI 部署)→ 大學專題(智慧導航)→ 魂晶 → Discord 自動化機器人 → 輪迴盟約(`projects.ts` 加 `RESUME_ORDER` 排序;只影響 PDF,不動首頁分層);② `discord-auto-bot` 標題去掉「斜線指令 / Slash-Command」→「Discord 自動化機器人 / Discord Automation Bot」(連帶詳情頁標題;首頁卡用 repoName 不受影響)。pdftotext 驗證順序與去名皆正確。
 - **2026-06-24** 修正(重要):履歷 PDF 產線渲染到「首頁」而非 /print——CI 的 `serve --single`(SPA fallback)把無副檔名的 `/print/` 改寫成 index.html,導致線上 `resume-zh/en.pdf` 其實是首頁截圖。移除 `--single`(靜態匯出有真實 `/print/index.html`)。另修 client-side 語言競態:`PrintView` 設 `data-print-lang`,`generate-pdf` 等該屬性套用後才截圖,確保 en 為英文。實測:zh 819KB(中文)/ en 82KB(英文),內容為 ATS /print。
 - **2026-06-24** 履歷 PDF 改 **ATS 格式**:重寫 `PrintView` 為嚴格 ATS-safe——單欄、純黑、標準無襯線字體(Arial/Helvetica + CJK fallback)、線性排版、零圖示/色塊/分欄;專案改用**可讀標題** + 學術標籤(碩士論文/大學專題)+ **完整技術關鍵字**(利於 ATS 比對);聯絡資訊純文字置於內文(含 terrychou.com)。`site.ts` 加 `website` 欄位。zh/en 兩版皆產出且為可選取文字(實測 innerText 3008/5790 字、PDF 非圖片)。沿用既有 `/print` + `generate-pdf` 產線,站上 `resume-zh.pdf` 連結不變。
 - **2026-06-24** 前端微調(併入 PR #13):① 小品卡(MiniCard)改用技術徽章(techStack 前 4 個),取代單行語言+色點,與 featured/notable 一致;② Discord 公會管家改標 **Showcase**(自 WIP 清單移除);③ 學歷改 **2 欄**(桌機左右各一);④ 技術棧新增第六類「**遊戲 / 圖形**」(Godot 4 / GDScript / C# / raylib / HTML5 Canvas,3×2 排列),`SkillGroup.icon` 加 `game`(Gamepad2)。build/lint/typecheck 綠、深色+手機截圖驗證。
