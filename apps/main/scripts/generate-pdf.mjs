@@ -56,6 +56,14 @@ async function main() {
       const url = `${BASE_URL}/print/?lang=${lang}`;
       console.log(`[generate-pdf] 載入 ${url}`);
       await page.goto(url, { waitUntil: "networkidle0", timeout: 60000 });
+      // 等前端 client-side 套用語言(PrintView 設 data-print-lang)後再截圖。
+      await page
+        .waitForFunction(
+          (l) => document.documentElement.getAttribute("data-print-lang") === l,
+          { timeout: 8000 },
+          lang,
+        )
+        .catch(() => {});
       await page.emulateMediaType("print");
       const outPath = resolve(OUT_DIR, file);
       await page.pdf({
