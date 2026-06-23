@@ -1,61 +1,26 @@
 # ============================================================================
-# deploy-main.yml — 只部署「主站 apps/main」到 Oracle A1 主機
+# deploy-main.yml — 兩段式部署主站到 Oracle A1
 # ----------------------------------------------------------------------------
-# 角色:當「會影響主站產物」的東西被 push 進 main,就在主機上 build 主站、
-#       產生 PDF 履歷、用 deploy-static.sh 把 apps/main/out 同步到 /srv/main,
-#       並做健康檢查。這是「真正寫入正式環境」的 workflow。
+# 設計:
+#   job 1「build」在 GitHub-hosted(amd64)build 靜態站 + 產 PDF,輸出成 artifact。
+#   job 2「deploy」在 self-hosted ARM runner 下載 artifact,rsync 到 /srv/main(零入站)。
 #
-# 為什麼 runs-on 是 self-hosted + linux + ARM64?
-#   1) 零入站、與 Tunnel 哲學一致:主機完全不開任何入站埠(80/443 都沒開,見 docs/11)。
-#      self-hosted runner 是「主機主動連出」去 GitHub 領工作的——和 cloudflared 主動連出
-#      建立 Tunnel 是同一個思路:外面永遠連不進來,連線方向永遠是「由內向外」。
-#      因此部署不需要任何 SSH / 對外開埠;runner 就在主機本機,build 完直接寫 /srv。
-#   2) runner 與 Caddy 同機:deploy-static.sh 用 rsync 寫 /srv/main、再 curl
-#      127.0.0.1:8080 做健康檢查——這些都必須「在主機本機」才做得到。
-#   3) ARM 原生:主機是 Oracle A1(ARM64)。在 ARM 上 build,產物與執行環境一致,
-#      日後若有需要原生相依的動態 app 也不會踩 x86/ARM 差異。
+# 為什麼把 build/PDF 放 hosted、deploy 放 self-hosted:
+#   - Chrome for Testing 沒有官方 Linux ARM64 版,puppeteer 在 ARM 上會抓到 x64 Chrome
+#     無法執行(chrome: Syntax error / 無法 launch)。放 amd64 hosted 產 PDF 最乾淨。
+#   - 正式機是小台 ARM(2 OCPU/12GB),把 build 與 Chrome 移走,正式機只做輕量 rsync。
+#   - 這正是企業常見分工:「CI 建置產物 → 具正式環境存取的 runner 部署」。
+#   - deploy 仍在 self-hosted、主動連出、零入站,維持 Tunnel 的安全哲學。
 #
-#   labels 對應:在主機註冊 runner 時要掛上 self-hosted, linux, ARM64 三個 label
-#   (註冊步驟見 docs/22-self-hosted-arm-runner.md)。三個 label 同時符合才會被排到這台。
-#
-# 為什麼「不需要任何 secrets」?
-#   runner 就在主機上,以本機檔案系統權限寫 /srv/main(runner 使用者需有 /srv 寫入權,
-#   見 docs/22 的權限強化)。沒有跨機傳輸,所以不需要 SSH 金鑰、不需要部署 token。
-#
-#   替代方案(GitHub-hosted x86 + 透過 cloudflared access SSH 部署)需要哪些 secrets?
-#     - CF_ACCESS_CLIENT_ID / CF_ACCESS_CLIENT_SECRET:Cloudflare Access service token,
-#       讓 GitHub runner 能通過 Zero Trust 認證、用 `cloudflared access ssh` 連進主機。
-#     - SSH_PRIVATE_KEY:連入主機部署使用者的私鑰。
-#     - SSH_KNOWN_HOSTS / DEPLOY_HOST / DEPLOY_USER:主機指紋與連線目標。
-#   那條路要把產物 scp / rsync over ssh 過去再遠端跑 deploy 腳本——多了金鑰管理與一個
-#   對外(經 Tunnel)的 SSH 入口。本專案選 self-hosted 正是為了「零這些 secrets」。
-#   取捨與完整對照見 docs/20 第 4 節與 docs/22 最後一節。
-#
-# 教學交叉連結:
-#   - 整體架構與「self-hosted ARM vs hosted」取捨:docs/00-architecture-overview.md §3.5
-#   - GitHub Actions 基本 / runner / secrets:docs/20-cicd-github-actions.md
-#   - paths 過濾如何讓「改 docs/infra 不會觸發主站部署」:docs/21-path-filtered-pipelines.md
-#   - 註冊 self-hosted ARM runner、安全強化:docs/22-self-hosted-arm-runner.md
-#   - 部署最終落點(Caddy /srv/main、健康檢查):docs/12-caddy-origin.md
+# 教學交叉連結:docs/20(Actions/runner)、docs/21(path-filtered)、docs/22(self-hosted runner)。
 # ============================================================================
 
 name: Deploy main
 
-# --- 觸發條件 ----------------------------------------------------------------
-# 只在 push 進 main 時部署(PR 不部署——PR 只跑 ci.yml 的驗證)。
-#
-# paths 過濾(體現「path-filtered 解耦」):
-#   只有真的會改變「主站產物」的路徑才觸發本次部署:
-#     - apps/main/**   主站本身
-#     - packages/ui/** 主站用到的共用設計系統(改它,主站外觀會變)
-#     - content/**     主站讀的內容(projects.json 等)
-#     - 本檔            部署流程本身改動時
-#   反過來說:只改 docs/ 或 infra/(Caddyfile、cloudflared 設定、deploy 腳本以外的)
-#   或別的子站(apps/soulshard/**)時,「不會」觸發主站部署。每個子站各有自己
-#   paths 過濾的 workflow,彼此獨立 build / deploy(monorepo 解耦,見 docs/21)。
 on:
-  # 手動觸發:runner 與網域就緒後,可在 Actions 頁面手動跑一次驗證部署。
+  # 手動觸發(Actions 頁面)
   workflow_dispatch:
+  # 只在 push 進 main、且「主站相關路徑」變動時才部署(path-filtered 解耦)
   push:
     branches: [main]
     paths:
@@ -64,122 +29,87 @@ on:
       - "content/**"
       - ".github/workflows/deploy-main.yml"
 
-# --- concurrency:同一 ref 不並行,但「不互相取消」---------------------------
-# 部署是「寫入正式環境」的動作,半途被取消可能讓 /srv/main 處於 rsync 到一半的狀態。
-# 因此:
-#   - group 以 ref 區分(main 的部署排成一列)。
-#   - cancel-in-progress: false → 後來的部署「排隊等前一個跑完」,絕不打斷進行中的部署。
-# (這跟 ci.yml 相反:CI 可以、也應該取消舊的;部署則必須跑完。)
+# 同一分支的部署排隊、不互相取消(避免 rsync 到一半被打斷)
 concurrency:
   group: deploy-main-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Build + Deploy main to /srv/main
-    # 部署閘門:預設「跳過」(skipped),而非失敗。
-    #   在 self-hosted ARM runner 尚未註冊、網域尚未接好之前,若直接讓本 job 排程,
-    #   會因為「找不到符合 labels 的 runner」而讓整次 push 顯示失敗(startup_failure)。
-    #   因此用 job-level if 當開關:vars.DEPLOY_ENABLED 未設(預設)→ 條件為 false → job 直接 skipped,
-    #   完全不需要 runner、不會失敗。
-    #   啟用方式(Phase 5 完成後):repo Settings → Secrets and variables → Actions → Variables
-    #   新增 DEPLOY_ENABLED=true,之後 push 到 main 才會真正部署(詳見 docs/22)。
-    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
-    # self-hosted ARM runner,三個 label 全中才會排到主機這台(理由見檔頭)。
-    runs-on: [self-hosted, linux, ARM64]
-
+  # --- job 1:在 hosted amd64 build + 產 PDF,輸出 artifact ---------------------
+  build:
+    name: Build + PDF (hosted amd64)
+    runs-on: ubuntu-latest
     steps:
-      # 1) 取出原始碼到 runner 的工作目錄(就在主機本機上)。
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2) 啟用 corepack,鎖定 pnpm 版本到 package.json 的 packageManager(pnpm@11.1.2)。
-      #    note:self-hosted runner 上 Node / pnpm 是「常駐」的,不像 hosted 每次全新;
-      #    corepack enable 仍能確保用到的是 packageManager 指定的版本。
-      - name: Enable Corepack (pin pnpm to packageManager field)
+      - name: Enable Corepack (pin pnpm to packageManager)
         run: corepack enable
 
-      # 3) 安裝相依。--frozen-lockfile 嚴格依 lockfile,保證可重現。
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 4) Build 主站(Next.js output:'export')→ 產出 apps/main/out。
-      - name: Build (main)
+      - name: Build (main, static export)
         run: pnpm --filter main run build
 
-      # 5) 安裝 Puppeteer 的 Chrome。
-      #    workspace 設定刻意「不在 install 期下載 Chromium」(allowBuilds.puppeteer=false),
-      #    所以這裡明確抓一份。產 PDF 用得到,CI 驗證階段用不到(故只在部署做)。
-      - name: Install Chrome for Puppeteer
-        continue-on-error: true   # PDF 非必要:Chrome 裝不起來也不該擋部署
-        # 用「專案自己的 puppeteer」裝它對應版本的 Chrome。
-        # npx 會抓最新版 puppeteer、裝到不相符的 Chrome,導致 launch 找不到對應版本(131.x)。
-        run: pnpm --filter main exec puppeteer browsers install chrome
+      # PDF:amd64 上 Chrome for Testing 正常;另裝 CJK 字型,雙語履歷的中文才不會變方框。
+      - name: Install CJK fonts + Chrome for Puppeteer
+        continue-on-error: true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+          pnpm --filter main exec puppeteer browsers install chrome
 
-      # 6) 用本機靜態伺服器把剛 build 出來的 out/ 跑起來,讓 generate-pdf 有東西可載。
-      #    generate-pdf.mjs 預設打 http://localhost:3000,但用 BASE_URL 可覆寫;
-      #    這裡用 4173,避免和主機上可能存在的其他服務撞 port。
-      #    npx serve 把 out/ 當靜態站起在背景(&),記下 PID 等等收掉。
-      #    --single 讓深連結回退 index.html(對齊 Caddy 的 try_files 行為)。
-      - name: Serve out/ for PDF generation
+      - name: Generate resume PDFs
+        continue-on-error: true
         run: |
           npx --yes serve apps/main/out --listen 4173 --single &
-          echo "SERVE_PID=$!" >> "$GITHUB_ENV"
-          # 等待伺服器就緒(最多約 30 秒),就緒就往下走。
-          for i in $(seq 1 30); do
-            if curl -fsS -o /dev/null "http://localhost:4173/"; then
-              echo "static server ready"
-              break
-            fi
-            sleep 1
-          done
+          SERVE_PID=$!
+          for i in $(seq 1 30); do curl -fsS -o /dev/null "http://localhost:4173/" && break; sleep 1; done
+          BASE_URL=http://localhost:4173 pnpm --filter main run generate-pdf
+          kill "$SERVE_PID" 2>/dev/null || true
 
-      # 7) 產生 PDF 履歷(zh / en)。
-      #    generate-pdf.mjs 會把 PDF 寫到 apps/main/public/(resume-zh.pdf、resume-en.pdf)。
-      #    BASE_URL 指向上一步的本機伺服器。
-      - name: Generate resume PDFs
-        continue-on-error: true   # 同上:產 PDF 失敗不擋部署
-        env:
-          BASE_URL: "http://localhost:4173"
-        run: pnpm --filter main run generate-pdf
-
-      # 8) 把產出的 PDF 併入 out/。
-      #    重點:public/ 只有在「next build 當下」才會被複製進 out/;PDF 是 build 之後
-      #    才產生的,所以必須手動 copy 進 apps/main/out,部署出去才有得下載。
       - name: Merge PDFs into out/ (best-effort)
         run: |
-          # PDF 屬非必要產物:有就併入 out/,沒有(例如 Chrome 跑不動)就略過,不讓部署失敗。
           for f in resume-zh.pdf resume-en.pdf; do
             if [ -f "apps/main/public/$f" ]; then
-              cp "apps/main/public/$f" "apps/main/out/$f"
-              echo "已併入 $f"
+              cp "apps/main/public/$f" "apps/main/out/$f"; echo "merged $f"
             else
-              echo "略過(未產生):$f"
+              echo "skip (not generated): $f"
             fi
           done
 
-      # 9) 收掉背景靜態伺服器(無論前面成敗都嘗試收,避免殘留行程佔 port)。
-      - name: Stop static server
-        if: always()
-        run: |
-          if [ -n "${SERVE_PID:-}" ]; then
-            kill "$SERVE_PID" 2>/dev/null || true
-          fi
+      - name: Upload built site (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-out
+          path: apps/main/out
+          retention-days: 3
+          if-no-files-found: error
 
-      # 10) 部署:呼叫 infra/scripts/deploy-static.sh。
-      #     腳本介面(見該檔註解):
-      #         ./deploy-static.sh <app_name> [src_dir] [dest_dir] [health_host]
-      #     這裡只給 app_name="main",其餘全用腳本預設:
-      #         src_dir     → apps/main/out          (相對路徑,故必須在 repo 根目錄執行)
-      #         dest_dir    → /srv/main              (Caddy 主站 root)
-      #         health_host → $DOMAIN(main 用裸網域)
-      #     腳本內部:rsync -a --delete out/ → /srv/main/,再帶 Host 打 127.0.0.1:8080/healthz,
-      #     非 200 即非零退出 → 本 step 失敗 → 部署被標記失敗。
-      #
-      #     DOMAIN:腳本預設健康檢查的 Host 是 YOUR_DOMAIN 佔位符。請在 runner 環境設定
-      #     真實網域(下方用 repo/環境變數 vars.DOMAIN 帶入;若未設定則沿用腳本內預設)。
-      #     設定方式見 docs/20「環境變數 / secrets」一節。
-      - name: Deploy to /srv/main + health check
+  # --- job 2:在 self-hosted ARM runner 部署(零 build / 零 Chrome / 零入站)-----
+  deploy:
+    name: Deploy to /srv/main (self-hosted ARM)
+    needs: build
+    # 部署閘門:未設 DEPLOY_ENABLED=true 時整個 deploy job 跳過(不失敗)。
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    runs-on: [self-hosted, linux, ARM64]
+    steps:
+      # 取得 repo 以使用 infra/scripts/deploy-static.sh(out/ 不在 repo,改由 artifact 帶入)
+      - uses: actions/checkout@v4
+
+      - name: Download built site (artifact)
+        uses: actions/download-artifact@v4
+        with:
+          name: main-out
+          path: apps/main/out
+
+      # rsync apps/main/out → /srv/main,再帶 Host 打 127.0.0.1:8080/healthz 確認 200。
+      - name: Deploy + health check
         env:
           DOMAIN: ${{ vars.DOMAIN }}
         run: |
