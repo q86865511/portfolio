@@ -51,17 +51,22 @@ on:
 
 ## 3. 一個站一條 workflow:解耦的具體形狀
 
-本專案的約定(見專案 `CLAUDE.md`):**`.github/workflows/` 下,每個 app 一條 `paths:` 過濾的 workflow,彼此解耦。**
+本專案的約定(見專案 `CLAUDE.md`):**每個 app 一條 `paths:` 過濾的 pipeline,彼此解耦。** 解耦有兩種落地形狀,本專案兩種都用上了:
+
+**(A) 同 repo 內、一個 app 一條 workflow(path-filtered)** ——主站(`portfolio` repo)目前是這形狀:
 
 ```
 .github/workflows/
   ci.yml            # 驗證:任何影響 build 的改動都驗(較寬的 paths)
   deploy-main.yml   # 只部署 apps/main(paths 限 apps/main + packages/ui + content)
-  deploy-soulshard.yml  # (未來)只部署 apps/soulshard(paths 限 apps/soulshard + packages/ui)
   ...
 ```
 
-每多一個 live demo 子站,就「複製一份部署 workflow、把 `paths:` 和 `deploy-static.sh` 的 app 參數換成那個子站」。例如未來的 soulshard 部署 workflow,`paths:` 會是 `apps/soulshard/**`(加上它若也用 `packages/ui` 就再列上),最後呼叫 `./infra/scripts/deploy-static.sh soulshard`——同一支腳本、不同參數,落到 `/srv/soulshard`(見 [`12-caddy-origin.md`](./12-caddy-origin.md))。
+每在同一 repo 多一個 live demo 子站,就「複製一份部署 workflow、把 `paths:` 和 `deploy-static.sh` 的 app 參數換成那個子站」,最後呼叫 `./infra/scripts/deploy-static.sh <子站>`——同一支腳本、不同參數,落到 `/srv/<子站>`(見 [`12-caddy-origin.md`](./12-caddy-origin.md))。
+
+**(B) 子站自己一個 repo、各自的 pipeline 與 runner(polyrepo)** ——這是**已經上線的現況**:`Soulshard-Hunter` 是獨立 repo,有自己的 CI/CD,**push 即自動部署到 `soulshard.terrychou.com`**,跟主站 repo 完全解耦(下一節詳述為什麼是這形狀)。
+
+> 換句話說,「一個 app 一條 pipeline」這條原則沒變,只是子站依「耦合度」選擇「留在主 repo 用 `paths:` 解耦」或「獨立成自己的 repo 解耦」——主站走 (A),Soulshard 走 (B)。
 
 **為什麼 CI 的 `paths:` 比部署寬?** 因為 CI 是「合併前的整體驗證」,只要任何影響 build 的東西變了(任一 app、任一 package、內容、根設定)都該驗一遍;而部署是「把特定站送上線」,範圍越精準越好,避免誤上線。
 
@@ -83,7 +88,13 @@ on:
 
 **取捨**:monorepo 的代價是「單一 repo 變大、需要 Turborepo 之類工具做選擇性建置、`paths:` 要維護對」;但對單一開發者的履歷專案,共用設計系統的便利 + 一處管理的低心智負擔,利遠大於弊。而 `paths:` 過濾讓我們「不必犧牲 polyrepo 的 pipeline 解耦」——兩邊的好處基本都拿到了。
 
-> 為什麼有些子站(例如某些獨立性很強的專案)仍可能在「各自的 repo」有各自 pipeline?當一個子站的技術棧、發布節奏、或協作者和主站完全不同(例如一個會頻繁獨立發布、或本來就是 private 的遊戲專案)時,把它留在自己的 repo、用自己的 CI 反而更乾淨——這時它就是 polyrepo 模式,透過子網域接進同一個 Tunnel / Caddy 即可(見 [`00`](./00-architecture-overview.md) §3.2)。本專案的原則是:**呈現面(子網域 / 路徑)與部署面(monorepo / polyrepo)可以分開決定**——對外都是一個履歷門面下的子站,對內則按「耦合度」選最省事的 repo 佈局。
+> **本專案真的混用了兩種模式**:`Soulshard-Hunter` 就是一個「獨立性很強」的子站——它有自己的技術棧(含 Node+Fastify+Postgres 後端,用 docker compose 跑)、自己的發布節奏、本來就是獨立 repo。把它留在自己的 repo、用自己的 CI/CD 反而更乾淨,於是它走 polyrepo 模式,透過子網域 `soulshard.terrychou.com` 接進同一個 Tunnel / Caddy(見 [`00`](./00-architecture-overview.md) §3.2)。本專案的原則是:**呈現面(子網域 / 路徑)與部署面(monorepo / polyrepo)可以分開決定**——對外都是一個履歷門面下的子站,對內則按「耦合度」選最省事的 repo 佈局。
+
+> **目前實際有兩條完全獨立的 pipeline、兩個 runner**(同一台 Oracle A1 上、彼此解耦):
+> - `portfolio` repo → runner **`cfwebsite`** → 部署 `/srv/main` → **terrychou.com**(主站,兩段式部署見 [`20`](./20-cicd-github-actions.md))。
+> - `Soulshard-Hunter` repo → runner **`cfwebsite-soulshard`** → 部署 `/srv/soulshard` 靜態前端 + docker compose 後端(`/api/*`、`/rt` 經 Caddy 反代後端 port)→ **soulshard.terrychou.com**。
+>
+> 兩條互不觸發、各自 push 各自上線。這就是「子站解耦」從藍圖變成已上線現況的具體樣子。
 
 ---
 
@@ -99,7 +110,7 @@ on:
 ## 6. 小結
 
 - `on.<event>.paths` 讓 workflow「只在改動命中指定路徑時」觸發,是 monorepo 解耦的核心。
-- 本專案**一個 app 一條 `paths:` 過濾的部署 workflow**;主站只認 `apps/main/** + packages/ui/** + content/**`,改 docs/infra/別的子站都不會誤觸發主站部署。
+- 主站(`portfolio` repo)走 path-filtered:`deploy-main.yml` 只認 `apps/main/** + packages/ui/** + content/**`,改 docs/infra 都不會誤觸發主站部署。
 - CI 的 `paths:` 較寬(整體驗證),部署的 `paths:` 較窄(精準上線)。
-- 相對 polyrepo,monorepo + `paths:` 同時拿到「pipeline 解耦」與「共用元件 / 集中維護」;呈現面與部署面可分開決定。
+- 相對 polyrepo,monorepo + `paths:` 同時拿到「pipeline 解耦」與「共用元件 / 集中維護」;呈現面與部署面可分開決定。**本專案實際混用兩種**:主站留在主 repo 用 `paths:` 解耦,Soulshard 子站獨立成自己的 repo / runner / pipeline——目前同機跑兩個 runner、兩條互不干擾的 pipeline。
 - 下一篇看部署那端的主角:在 Oracle A1 上的 self-hosted ARM runner。

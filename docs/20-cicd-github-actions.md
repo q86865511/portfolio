@@ -15,9 +15,9 @@
 CI/CD 把「驗證」與「部署」這兩件重複勞動**自動化、標準化**:
 
 - **CI(Continuous Integration,持續整合)**:每次提交都自動「整合驗證」——把程式碼在一個乾淨環境裡 build 一遍、跑型別檢查與 lint,確保「合進主線前是綠的」。本專案的 CI 就是 [`ci.yml`](../.github/workflows/ci.yml)。
-- **CD(Continuous Delivery / Deployment,持續交付 / 部署)**:驗證過的程式碼自動送到正式環境。本專案的 CD 就是 [`deploy-main.yml`](../.github/workflows/deploy-main.yml),它把主站 build 出來、產 PDF、同步到主機 `/srv/main`。
+- **CD(Continuous Delivery / Deployment,持續交付 / 部署)**:驗證過的程式碼自動送到正式環境。本專案的 CD 就是 [`deploy-main.yml`](../.github/workflows/deploy-main.yml),它**兩段式**地把主站 build 出來、產 PDF(在 GitHub-hosted amd64),再把產物同步到主機 `/srv/main`(在 self-hosted ARM runner),最後 purge Cloudflare 邊緣快取。
 
-**在本架構中的角色**:CI/CD 是把「架構圖」自動跑起來的引擎——你只管 push,剩下「build → 產 PDF → 同步到 Caddy 服務目錄 → 健康檢查」都自動完成。
+**在本架構中的角色**:CI/CD 是把「架構圖」自動跑起來的引擎——你只管 push,剩下「build → 產 PDF → 上傳 artifact → self-hosted runner 下載 → 同步到 Caddy 服務目錄 → 健康檢查 → purge 快取」都自動完成。
 
 ---
 
@@ -70,7 +70,7 @@ workflow（一個 .yml 檔，例如 ci.yml）
 **本專案的選擇(兩條 workflow 各取所需)**:
 
 - **CI 用 GitHub-hosted `ubuntu-latest`**:靜態匯出的產物 x86 / ARM 完全一樣,驗證階段沒必要用主機;而且 PR 可能來自外部分支,讓不可信程式碼跑在 prod 主機上有風險。用拋棄式 hosted runner 最安全、零維護。
-- **部署用 self-hosted `[self-hosted, linux, ARM64]`**:部署必須「在主機本機」rsync 寫 `/srv/main`、再 curl `127.0.0.1:8080` 健康檢查——這只有主機自己做得到。而 self-hosted runner「主動連出」領工作的方向,與 Cloudflare Tunnel「主動連出」建立通道完全一致:**主機永遠不開入站埠**(見 [`11-cloudflare-tunnel.md`](./11-cloudflare-tunnel.md))。
+- **部署是兩段式,兩種 runner 各司其職**:`deploy-main.yml` 拆成兩個 job——**job 1「build + PDF」跑在 GitHub-hosted `ubuntu-latest`(amd64)**,build 靜態站、產雙語 PDF,上傳成 artifact;**job 2「deploy」跑在 self-hosted `[self-hosted, linux, ARM64]`**,下載 artifact、rsync 寫 `/srv/main`、再 curl `127.0.0.1:8080` 健康檢查、最後 purge Cloudflare 快取。**runner 不再 build,只負責部署。** 為什麼把 build/PDF 移到 hosted:**Chrome for Testing 沒有官方 Linux ARM64 版**,puppeteer 在 ARM 上會抓到 x64 Chrome 而無法執行,所以產 PDF 必須在 amd64;同時正式機是小台 ARM,把 build/Chrome 移走讓它只做輕量部署(取捨詳見 [`00`](./00-architecture-overview.md) §3.5 與本檔 §6)。而 self-hosted runner「主動連出」領工作的方向,與 Cloudflare Tunnel「主動連出」建立通道完全一致:**主機永遠不開入站埠**(見 [`11-cloudflare-tunnel.md`](./11-cloudflare-tunnel.md))。
 
 > `runs-on` 的 label:`[self-hosted, linux, ARM64]` 是「三個 label 同時符合」才排到那台。註冊 runner 時要把這三個 label 都掛上,詳見 [`22-self-hosted-arm-runner.md`](./22-self-hosted-arm-runner.md)。
 
@@ -95,9 +95,14 @@ workflow（一個 .yml 檔，例如 ci.yml）
 本專案的情形:
 
 - **CI(`ci.yml`)**:不需要任何 secrets——只是 build,不碰外部資源。
-- **部署(`deploy-main.yml`)**:**不需要任何 secrets**。runner 就在主機本機、以檔案系統權限寫 `/srv/main`,沒有跨機傳輸,所以不需要 SSH 金鑰或部署 token。唯一用到的是一個 **variable** `DOMAIN`——`deploy-static.sh` 健康檢查時要帶的 Host 標頭。設定方式:repo → Settings → Secrets and variables → Actions → Variables → 新增 `DOMAIN = 你的網域`。若不設,腳本會用內建的 `YOUR_DOMAIN` 佔位符(部署不會壞,但健康檢查的 Host 會對不上你真正的 vhost)。
+- **部署(`deploy-main.yml`)**:**部署本身**不需要 SSH 金鑰或跨機傳輸 token——self-hosted runner 就在主機本機、以檔案系統權限寫 `/srv/main`。它用到的設定值有:
+  - **variable `DOMAIN`**——`deploy-static.sh` 健康檢查時要帶的 Host 標頭。若不設,腳本會用內建的 `YOUR_DOMAIN` 佔位符(部署不會壞,但健康檢查的 Host 會對不上你真正的 vhost)。
+  - **variable `DEPLOY_ENABLED`**——部署閘門,設 `true` 才會跑 deploy job(runner 尚未就緒時安全跳過而非失敗)。
+  - **secret `CF_API_TOKEN` + variable `CF_ZONE_ID`**——部署後 purge Cloudflare 邊緣快取用(權限只需 Zone → Cache Purge)。這是這條 workflow 唯一的 secret,而且是 **best-effort**:沒設時 purge 步驟會略過,不影響部署。
+  
+  設定方式都在:repo → Settings → Secrets and variables → Actions(token 放 Secrets、其餘放 Variables)。
 
-> 上一節「SSH 替代方案」需要的那些 `CF_ACCESS_*` / `SSH_*` 才是 secrets——本專案的 self-hosted 路線刻意避開它們。
+> 上一節「SSH 替代方案」需要的那些 `CF_ACCESS_*` / `SSH_*` 才是「為了跨機部署而存在」的 secrets——本專案的 self-hosted 路線刻意避開它們;唯一保留的 `CF_API_TOKEN` 純粹是為了部署後自動 purge 快取,與「怎麼把產物送上主機」無關。
 
 ---
 
@@ -105,17 +110,18 @@ workflow（一個 .yml 檔，例如 ci.yml）
 
 | | [`ci.yml`](../.github/workflows/ci.yml) | [`deploy-main.yml`](../.github/workflows/deploy-main.yml) |
 |---|---|---|
-| 目的 | 驗證(CI) | 部署主站(CD) |
-| 觸發 | `pull_request` + `push` to main | 只 `push` to main |
+| 目的 | 驗證(CI) | 部署主站(CD,**兩段式**) |
+| 觸發 | `pull_request` + `push` to main | 只 `push` to main(+ `workflow_dispatch`) |
 | `paths:` 過濾 | apps/** · packages/** · content/** · 根設定 · 本檔 | 只 apps/main/** · packages/ui/** · content/** · 本檔 |
-| runner | `ubuntu-latest`(hosted x86) | `[self-hosted, linux, ARM64]`(主機) |
+| job / runner | 一個 `verify` job @ `ubuntu-latest`(hosted x86) | job 1 `build` @ `ubuntu-latest`(hosted amd64);job 2 `deploy` @ `[self-hosted, linux, ARM64]`(主機),`needs: build` |
 | concurrency | 同 ref 取消舊跑(`cancel-in-progress: true`) | 同 ref 排隊不互相取消(`cancel-in-progress: false`) |
-| 關鍵步驟 | checkout → corepack/pnpm → install → typecheck → lint → build | checkout → install → build → 裝 Chrome → 起本機伺服器 → 產 PDF → 併入 out/ → `deploy-static.sh main` |
-| secrets | 無 | 無(僅用 var `DOMAIN`) |
+| 關鍵步驟 | checkout → corepack/pnpm → install → typecheck → lint → build | **job 1(hosted)**:checkout → install → build → 裝 CJK 字型 + Chrome → 起本機伺服器 → 產雙語 PDF → 併入 out/ → 上傳 artifact `main-out`;**job 2(self-hosted)**:checkout → 下載 artifact → `deploy-static.sh main`(rsync + health check)→ purge Cloudflare 快取 |
+| secrets / vars | 無 | secret `CF_API_TOKEN`(purge,best-effort);vars `DOMAIN`、`DEPLOY_ENABLED`、`CF_ZONE_ID` |
 
 兩條為什麼這樣分:
 
-- **關注點分離**:CI 只管「能不能 build / 過不過檢查」,任何人 PR 都跑、跑在拋棄式 runner;CD 只管「把驗證過的主站送上線」,只在 push 進 main 後跑、跑在主機。
+- **關注點分離**:CI 只管「能不能 build / 過不過檢查」,任何人 PR 都跑、跑在拋棄式 runner;CD 只管「把驗證過的主站送上線」,只在 push 進 main 後跑。
+- **CD 內部還再分兩段**:重的 build / 產 PDF 放 GitHub-hosted amd64(避開 ARM 無 Chrome、不佔正式機),輕的 rsync 部署放 self-hosted ARM runner;兩段用 artifact 接力(`needs: build`)。理由與取捨見上面 §4 與 [`00`](./00-architecture-overview.md) §3.5。
 - **concurrency 相反**:CI 連推多個 commit 時,舊的 CI 取消掉省資源、最新狀態更快得到;部署則「不可半途被取消」(rsync 到一半會讓 `/srv/main` 處於壞狀態),所以排隊跑完。
 - **paths 不同**:CI 對「任何影響 build 的改動」都驗;部署只對「真的影響主站產物」的改動才上線——改 docs / infra / 別的子站「不會」誤觸發主站部署。這層解耦見 [`21-path-filtered-pipelines.md`](./21-path-filtered-pipelines.md)。
 
@@ -123,8 +129,8 @@ workflow（一個 .yml 檔，例如 ci.yml）
 
 ## 7. 小結
 
-- **CI = 合併前驗證,CD = 驗證後部署**;本專案各一條 workflow。
-- GitHub Actions 由 **workflow → trigger(`on:`) → job(`runs-on:`)→ step(`uses:` / `run:`)** 構成。
-- **runner** 分 hosted(乾淨拋棄式、x86、安全)與 self-hosted(自有主機、可零入站部署、可 ARM);本專案 CI 用 hosted、CD 用 self-hosted ARM。
-- **secrets** 放敏感值、**vars** 放環境差異值;本專案 self-hosted 路線連部署都不需要 secrets,只用一個 `DOMAIN` variable。
+- **CI = 合併前驗證,CD = 驗證後部署**;CI 一條 workflow,CD(`deploy-main.yml`)**一條 workflow 內兩段式 job**。
+- GitHub Actions 由 **workflow → trigger(`on:`) → job(`runs-on:`)→ step(`uses:` / `run:`)** 構成;多 job 用 `needs:` 串接、用 artifact 傳遞產物。
+- **runner** 分 hosted(乾淨拋棄式、amd64、安全)與 self-hosted(自有主機、可零入站部署、可 ARM);本專案 CI 與 CD 的「build + PDF」都用 hosted amd64,只有 CD 的「部署」用 self-hosted ARM(runner 不 build,只 rsync + health check + purge)。
+- **secrets** 放敏感值、**vars** 放環境差異值;本專案部署本身不需跨機金鑰,唯一的 secret `CF_API_TOKEN` 純為部署後 purge 快取,另搭 `DOMAIN` / `DEPLOY_ENABLED` / `CF_ZONE_ID` 三個 variable。
 - 下一篇看 `paths:` 怎麼讓 monorepo 裡每個子站獨立 build / deploy。

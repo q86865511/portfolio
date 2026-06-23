@@ -13,4 +13,4 @@
 | `20-cicd-github-actions.md` | GitHub Actions:workflow、runner(hosted vs self-hosted)、secrets | Phase 5 |
 | `21-path-filtered-pipelines.md` | path-filtered workflows:如何讓每個子站獨立 build/deploy | Phase 5 |
 | `22-self-hosted-arm-runner.md` | 在 Oracle A1 上註冊 self-hosted ARM runner、零入站部署 | Phase 5 |
-| `30-interview-talking-points.md` | 面試講稿:用一頁說清楚整套架構與取捨 | Phase 7 |
+| `30-interview-talking-points.md` | 面試講稿:用一頁說清楚整套架構與取捨 | Phase 7 ✅ 完成 |
