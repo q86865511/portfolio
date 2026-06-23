@@ -4,6 +4,7 @@
 **全套上線並自動化**:主站 https://terrychou.com、子站 https://soulshard.terrychou.com 皆上線。兩個 repo(portfolio、Soulshard-Hunter)各有獨立 self-hosted runner 與 CI/CD,push 即自動部署;對外經 Cloudflare Tunnel(零入站),主站部署後自動 purge 邊緣快取;Cloudflare Web Analytics 運作中(CWV 全綠)。文件齊備、SEO/分享優化完成。
 
 ## 已完成
+- **2026-06-23** 收尾:移除 Soulshard Postgres 5432 主機映射(Soulshard PR #68);Postgres 每日備份 cron(04:30 / 保留 14 天);UptimeRobot uptime 監控(terrychou.com + soulshard)。5a/5c 決定不做。
 - **2026-06-23** Polish:`docs/30` 面試講稿;`docs/20–22` 改成反映兩段式+雙 runner+auto-purge 現況;主站 SEO/分享優化(layout 與 /projects/[slug] 完整 metadata、OG 圖 `public/og.png`、`icon.svg`、`sitemap.ts`、`robots.ts`)。build/lint/typecheck 綠。Web Analytics 確認運作(邊緣自動注入;CWV 全綠、LCP P90 ~856ms)。
 - **2026-06-23** Item 3a 自動 purge:`deploy-main` 部署後呼叫 Cloudflare API purge(secret `CF_API_TOKEN` + var `CF_ZONE_ID`),實測 `{"success":true}`。
 - **2026-06-23** Item 2 Soulshard 子站:soulshard.terrychou.com(靜態 + 後端 Node+Fastify+Postgres via docker compose,`/api`+`/rt` 經 Caddy handle 反代);**子站獨立 pipeline**(Soulshard-Hunter repo 自己的 runner `cfwebsite-soulshard`,取代舊 duckdns SSH 部署)。
@@ -15,9 +16,9 @@
 - (無)
 
 ## 待辦
-- **#5 安全強化**(主機):移除 Soulshard 後端 Postgres 的 5432 對主機映射;改非預設 DB 密碼(`ALTER ROLE` 保留資料);(可選、較高工程)runner 改用獨立低權限使用者。
-- **#7 備援/監控**:Soulshard Postgres 每日 `pg_dump` 備份(cron + 保留 N 天);uptime 監控(UptimeRobot)。
 - `cyclepact` 完成後接 `cyclepact.terrychou.com`(Caddy/ingress 已預留)。
+
+> 已決定**不做**:DB 帳密移到 env / 改密碼、runner 改獨立低權限使用者(5432 已移除、DB 僅 docker 內網,風險低)。
 
 ## 已知問題
 - `.pdf` 等被 Cloudflare 快取的副檔名,更新後靠部署後 auto-purge 即時生效(已驗證)。
