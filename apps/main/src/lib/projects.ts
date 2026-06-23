@@ -129,10 +129,24 @@ export function primaryLink(p: Project): { href: string; external: boolean } {
   return { href: p.githubUrl, external: true };
 }
 
-/** PDF 履歷會用到的 featured + notable 專案。 */
+/** PDF 履歷的專案顯示順序(使用者指定;只影響 PDF,不動首頁分層順序)。 */
+const RESUME_ORDER = [
+  "ai-deployment-pipeline",
+  "smart-pedestrian-navigation",
+  "soulshard-hunter",
+  "discord-auto-bot",
+  "cyclepact",
+];
+
+/** PDF 履歷會用到的 featured + notable 專案(依 RESUME_ORDER 排序)。 */
 export function resumeProjects(): Project[] {
-  return projects.filter((p) => {
+  const inResume = projects.filter((p) => {
     const t = tierOf(p.slug);
     return t === "featured" || t === "notable";
   });
+  const rank = (slug: string) => {
+    const i = RESUME_ORDER.indexOf(slug);
+    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  return [...inResume].sort((a, b) => rank(a.slug) - rank(b.slug));
 }
