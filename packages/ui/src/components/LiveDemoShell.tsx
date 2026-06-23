@@ -31,20 +31,22 @@ export function LiveDemoShell({
 
   return (
     <div className="flex flex-col h-screen">
+      {/* 薄外殼維持 48px 高度;內部連結用負 margin 外擴 ≥44px 命中區,
+          不撐高頂條,兼顧觸控目標與緊湊外觀。 */}
       <header className="h-12 shrink-0 bg-elevated border-b border-border flex items-center justify-between px-4 gap-3">
         <a
           href={homeUrl}
-          className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors"
+          className="link-underline inline-flex items-center gap-2 min-h-[44px] -my-2 text-sm text-text-muted hover:text-text transition-colors"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t("返回作品集", "Back to portfolio")}
         </a>
         <span className="font-medium text-sm truncate">{projectName}</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {showcaseUrl && (
             <a
               href={showcaseUrl}
-              className="hidden sm:inline text-sm text-text-muted hover:text-brand transition-colors"
+              className="link-underline hidden sm:inline-flex items-center min-h-[44px] -my-2 px-2 text-sm text-text-muted hover:text-brand transition-colors"
             >
               {t("看 showcase", "Showcase")}
             </a>
@@ -54,9 +56,9 @@ export function LiveDemoShell({
             aria-label="GitHub"
             rel="noopener noreferrer"
             target="_blank"
-            className="text-text-muted hover:text-text transition-colors"
+            className="inline-flex items-center justify-center h-11 w-11 -my-2 text-text-muted hover:text-text transition-colors"
           >
-            <Github className="h-[18px] w-[18px]" aria-hidden="true" />
+            <Github className="h-5 w-5" aria-hidden="true" />
           </a>
           <LangToggle />
         </div>

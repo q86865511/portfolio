@@ -36,7 +36,10 @@ export function Footer({
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-5">
           <div>
-            <a href="#main" className="flex items-center gap-[10px] font-medium mb-3">
+            <a
+              href="#main"
+              className="link-underline inline-flex items-center gap-3 min-h-[44px] font-medium mb-2"
+            >
               <span
                 aria-hidden="true"
                 className="w-[10px] h-[10px] rounded-full bg-brand shadow-[0_0_0_4px_var(--color-brand-dim)]"
@@ -55,7 +58,7 @@ export function Footer({
           </div>
 
           <div>
-            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-[14px] font-medium font-mono">
+            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-3 font-medium font-mono">
               {t("導覽", "Navigate")}
             </h3>
             {navLinks.map((link) => (
@@ -65,7 +68,7 @@ export function Footer({
                 {...(link.external
                   ? { rel: "noopener noreferrer", target: "_blank" }
                   : {})}
-                className="text-text-muted text-sm block py-[3px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
+                className="link-underline text-text-muted text-sm flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
               >
                 {t(link.labelZh, link.labelEn)}
               </a>
@@ -73,7 +76,7 @@ export function Footer({
           </div>
 
           <div>
-            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-[14px] font-medium font-mono">
+            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-3 font-medium font-mono">
               {t("聯絡", "Contact")}
             </h3>
             {contactLinks.map((link) => (
@@ -83,7 +86,7 @@ export function Footer({
                 {...(link.external
                   ? { rel: "noopener noreferrer", target: "_blank" }
                   : {})}
-                className="text-text-muted text-sm block py-[3px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
+                className="link-underline text-text-muted text-sm flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
               >
                 {t(link.labelZh, link.labelEn)}
               </a>
@@ -91,7 +94,7 @@ export function Footer({
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-border flex flex-wrap gap-[14px] justify-between items-center text-sm text-text-subtle">
+        <div className="mt-6 pt-6 border-t border-border flex flex-wrap gap-4 justify-between items-center text-sm text-text-subtle">
           <span className="font-mono text-xs">
             {t("本站技術", "Built with")} ·{" "}
             <b className="text-text-muted font-medium">Next.js</b> ·{" "}

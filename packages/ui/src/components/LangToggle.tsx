@@ -17,7 +17,7 @@ export function LangToggle({ className }: { className?: string }) {
       role="group"
       aria-label="Language / 語言"
       className={cn(
-        "inline-flex bg-surface-2 border border-border rounded-md p-[2px]",
+        "inline-flex bg-surface-2 border border-border rounded-md p-1",
         className,
       )}
     >
@@ -30,7 +30,9 @@ export function LangToggle({ className }: { className?: string }) {
             aria-pressed={active}
             onClick={() => setLang(opt.value)}
             className={cn(
-              "font-medium text-sm border-none rounded-[7px] px-3 py-[5px] cursor-pointer transition-all duration-DEFAULT ease-ease",
+              // 觸控目標 ≥44px:每顆 segment 本身 min-h 40px,
+              // 加上外框 p-1(各 4px)總高 48px,單顆命中區也夠大。
+              "inline-flex items-center justify-center min-h-[40px] min-w-[40px] font-medium text-sm border-none rounded-sm px-3 cursor-pointer transition-all duration-DEFAULT ease-ease",
               active
                 ? "bg-brand text-text-onbrand"
                 : "bg-transparent text-text-muted hover:text-text",

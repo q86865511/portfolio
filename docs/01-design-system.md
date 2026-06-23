@@ -35,6 +35,7 @@
 - **輔色 violet(紫)**:用於 AI-ML 類專案標記與次要強調,和 teal 形成冷色雙主軸,避免單色單調。*為什麼*:Terry 有 AI-ML 主線,給它一個專屬色能在專案 grid 中做語意分群。
 - **語意色(success/warning/danger/info)**:用於專案狀態徽章(Live / WIP / Archived)與 a11y 提示。
 - **背景採三階表面(bg → surface → elevated)**:深色版用「不同明度的近黑」堆疊層級,而非靠陰影。*為什麼*:深色介面靠陰影區分層級效果差,用表面明度階更乾淨,也呼應「flat」理念。
+- **卡片走「立體層次(B 方向)」**:卡片不直接用 `--color-surface`,而是用提亮一階的 `--color-card`,並在頂部疊一條 1px 高光邊(`--color-card-highlight`,用 `inset box-shadow` 實作,不佔版面)。Featured / Notable 卡再加 **左側 3px teal / violet 強調條**。淺色模式對應:卡片維持純白、高光邊改用對應暗色細邊(白色高光在白底無效)。*為什麼*:純 flat 卡片在資訊密集的 grid 中偏扁、層次不足;提亮表面 + 頂部高光 + 左強調條能在不犧牲「克制」的前提下,讓代表作/可點卡片更突出、更精緻,且深淺色皆成立。
 
 ### 2.2 深色(預設)+ 淺色對應
 
@@ -57,6 +58,10 @@
   --color-border:        rgba(159,176,192,.14); /* 預設細邊框 */
   --color-border-strong: rgba(159,176,192,.28); /* hover / 強調 */
   --color-focus:         #5EE6D0;  /* 焦點環(高亮 teal) */
+
+  /* ── 立體層次(B 方向)卡片 token ──────────── */
+  --color-card:           #161D27;            /* 卡片表面:較 surface 提亮一階 */
+  --color-card-highlight: rgba(255,255,255,.14); /* 頂部 1px 高光邊(深色) */
 
   /* ── 品牌 / 強調 ────────────────────────── */
   --color-brand:         #2DD4BF;  /* teal 主色:連結、CTA、accent */
@@ -91,6 +96,9 @@
   --color-border:        rgba(14,22,32,.12);
   --color-border-strong: rgba(14,22,32,.22);
   --color-focus:         #0D9488;
+
+  --color-card:           #FFFFFF;            /* 淺色卡片維持純白(已是最亮),靠陰影 + 高光邊做層次 */
+  --color-card-highlight: rgba(14,22,32,.06); /* 淺色:白色高光無效,改用對應暗色細高光邊 */
 
   --color-brand:         #0D9488;  /* 淺色底要壓深以保對比 */
   --color-brand-hover:   #0F766E;
@@ -156,7 +164,10 @@
 --space-9: 96px;  --space-10: 128px;
 ```
 - 元件內部間距用 4 / 8 / 12 / 16;區塊之間(section padding)用 64 / 96 / 128。*為什麼 8px 柵格*:業界標準、好對 Tailwind(`p-4` = 16px)、視覺節奏穩定。
+- 元件樣式**一律用柵格 token**(`gap-3`/`p-5`/`px-4` …),避免散落的 `px-[18px]`/`gap-[10px]` 繞過柵格;僅「裝飾性子像素元素」(品牌圓點、終端機紅綠燈、accent 條寬、bullet 光學對齊)可用 arbitrary 值。圖示尺寸對齊 16 / 20 / 24。
 - 內容最大寬 `--container: 1120px`,長文段落 `--measure: 68ch`。*為什麼限制行寬*:超過 ~75 字元行寬可讀性下降。
+
+> **⚠ 維護注意:spacing token 與 Tailwind 內建 scale 衝突**。`tailwind-preset.ts` 的 `theme.extend.spacing` 把鍵 `1`–`10` 覆寫成 4–128px,因此 `h-8`/`w-9`/`h-10`/`p-10` 等會取**自訂值**(如 `w-9` = 96px,而非預設 36px),而鍵 `11`/`12`/`14` 未覆寫、維持 Tailwind 預設(`h-11` = 44px、`h-12` = 48px、`h-14` = 56px)。因此:**觸控高度用 `h-11/h-12/h-14`(44/48/56px)是安全的**;**需要 32/36px 等非柵格尺寸時,改用 arbitrary 值**(`w-[36px]`),別用 `w-8`/`w-9`(會被放大)。同理 icon 用 `h-4`(=16px)、`h-5`(=24px,非 20px)需留意。
 
 ### 4.2 圓角
 
@@ -205,14 +216,14 @@
 | `ghost` | 無邊框、hover 才上 `--color-surface-2` | nav、低調動作 |
 | `icon` | 正方、僅圖示,需 `aria-label` | GitHub / LinkedIn |
 
-- 尺寸:`sm` 32 / `md` 40 / `lg` 48 高;水平 padding = 高度的 0.5–0.6 倍;圓角 `--radius-md`。
+- 尺寸(均符合觸控目標 ≥44px,見 §7.7):`sm` `min-h 44` / `md` 44 / `lg` 48 / `xl` 56 高(`xl` 供 Hero 用);icon button 一律 ≥44×44。水平 padding 用 8px 柵格 token(`px-4`/`px-5`/`px-6`/`px-7`),圓角 `--radius-md`。*為什麼最小也要 44*:最小的 `sm`(卡片 CTA 用)若維持 32px 會低於觸控命中區下限;統一抬到 44px,觸控與視覺一致。
 - 狀態:hover 提亮 / 上表面;`:focus-visible` 套 `--ring`;active `transform: scale(.98)`;disabled 降透明度 + `cursor:not-allowed`。
 - *為什麼用 `:focus-visible` 而非 `:focus`*:滑鼠點擊不顯示焦點環、鍵盤操作才顯示,兼顧美觀與無障礙。
 - 帶外連的 button(GitHub)附 `↗` 圖示與 `rel="noopener noreferrer"`。
 
 ### 5.2 Card(三層 + academic 第四層)
 
-統一基底:`--color-surface` 底、`--color-border` 細邊框、`--radius-lg`、hover 時邊框轉 `--color-border-strong` 並輕微上浮(translateY -2px)。四層差異在**尺寸、資訊密度、視覺重量**:
+統一基底(**立體層次 / B 方向**,見 §2.1):`--color-card` 提亮表面 + 頂部 1px 高光邊(`--color-card-highlight`,`.card-surface` 工具類)、`--color-border` 細邊框、`--radius-lg`、hover 時邊框轉 `--color-border-strong` 並輕微上浮(translateY -3px)+ `--shadow-md`。內距用 8px 柵格 token(Featured/Notable `p-5`、Mini `p-4`)。Featured / Notable 另加 **左側 3px 強調條**(`.card-accent-bar`;Featured 可切 violet)。四層差異在**尺寸、資訊密度、視覺重量**:
 
 | 層 | 用途 | grid 佔幅 | 內容密度 | 特徵 |
 |---|---|---|---|---|
@@ -223,6 +234,7 @@
 
 - *為什麼用尺寸與密度編碼層級*:讓「代表作」在視覺上自然壓過「課程作業」,招募者不需讀完就能排序重要性。
 - 每張卡整體可點(`<a>` 包裹)時,內部次要連結用 `position: relative; z-index` 處理避免巢狀互動;或主卡用「stretched-link」模式並確保鍵盤可達。
+- **觸控與連結指示**:卡片標題連結用 `inline-flex + min-h 44px` 撐起命中區(不改可見字級);MiniCard 的外連 GitHub 圖示用外擴 padding(`h-11 w-11`)達 44px;標題連結 hover 顯示底線(`.link-underline`,見 §7.2),不只靠顏色變化。
 
 ### 5.3 TechBadge
 
@@ -312,13 +324,13 @@
 
 目標 **WCAG 2.1 AA**。落地清單:
 
-1. **對比**:正文 / 互動元件對其背景 ≥ 4.5:1,大字與圖示 ≥ 3:1;色票已按此挑值(§2)。不只靠顏色傳達狀態——徽章同時有文字(Live / WIP)。
+1. **對比與不只靠顏色**:正文 / 互動元件對其背景 ≥ 4.5:1,大字與圖示 ≥ 3:1;色票已按此挑值(§2)。不只靠顏色傳達狀態——徽章同時有文字(Live / WIP)。**文字連結**(nav 錨點、footer、麵包屑、卡片標題、前後頁導航、子站外殼連結)除顏色外,**hover 一律加底線**(`.link-underline` = `text-underline-offset: 3px` + hover `underline`),確保連結在「只看一張靜態截圖 / 色弱使用者」眼中仍可辨識為可點(WCAG 1.4.1)。
 2. **焦點可見**:所有互動元素 `:focus-visible` 套 `--ring`(2 像素以上、對比足夠);不可 `outline:none` 而無替代。
 3. **語意標籤**:用 `<header><nav><main><section><footer>`、單一 `<h1>`、標題層級不跳級;`<section aria-labelledby>`;圖片有意義者給 `alt`、純裝飾者 `alt=""` / `aria-hidden`。
 4. **鍵盤可達**:所有功能可用鍵盤完成;漢堡選單 / 主題 / 語言切換有 `aria-expanded` / `aria-pressed`;抽屜支援 Esc 關閉與焦點管理;Skip-link 直達 `#main`。
 5. **動效尊重**:`prefers-reduced-motion: reduce` 時關閉位移與自動播放。
 6. **語言標註**:`<html lang>` 隨 LangToggle 切換;中英混排段落必要時用 `lang` 屬性輔助報讀器。
-7. **觸控目標**:互動命中區 ≥ 44×44px(行動版尤甚)。
+7. **觸控目標**:所有互動命中區 ≥ 44×44px(行動版尤甚)。落地手段:Button 最小尺寸抬到 `min-h 44`;icon button `44×44`;文字連結(nav 桌機錨點、footer、麵包屑、前後頁、卡片標題、LangToggle、子站外殼)用 `min-h-[44px]` + flex 置中或外擴 padding 撐起命中區,薄外殼用負 margin 抵銷視覺位移、不撐高容器。展示性元素(TechBadge)非觸控,不受此限。
 8. **可縮放**:不鎖 `user-scalable`;版面在 200% 縮放與 320px 寬下不破版。
 
 *為什麼把 a11y 寫進設計系統而非事後補*:對技術受眾,無障礙品質是工程素養的直接證據;在 token 與元件層就內建,落地時不會漏。

@@ -60,7 +60,10 @@ export function Nav({
       )}
     >
       <div className="container flex items-center justify-between h-16">
-        <a href="#main" className="flex items-center gap-[10px] font-medium">
+        <a
+          href="#main"
+          className="link-underline inline-flex items-center gap-3 min-h-[44px] font-medium"
+        >
           <span
             aria-hidden="true"
             className="w-[10px] h-[10px] rounded-full bg-brand shadow-[0_0_0_4px_var(--color-brand-dim)]"
@@ -69,21 +72,21 @@ export function Nav({
         </a>
 
         <nav
-          className="hidden md:flex gap-7 items-center"
+          className="hidden md:flex gap-6 items-center"
           aria-label={t("主導覽", "Main navigation")}
         >
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-text-muted text-sm transition-colors duration-DEFAULT ease-ease hover:text-text"
+              className="link-underline inline-flex items-center min-h-[44px] px-1 text-text-muted text-sm transition-colors duration-DEFAULT ease-ease hover:text-text"
             >
               {t(link.labelZh, link.labelEn)}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <LangToggle />
           <ThemeToggle />
           <Button
@@ -95,7 +98,7 @@ export function Nav({
             target="_blank"
             className="hidden sm:inline-flex"
           >
-            <Github className="h-[18px] w-[18px]" aria-hidden="true" />
+            <Github className="h-5 w-5" aria-hidden="true" />
           </Button>
           <Button
             variant="icon"
@@ -106,9 +109,9 @@ export function Nav({
             onClick={() => setMenuOpen((v) => !v)}
           >
             {menuOpen ? (
-              <X className="h-[18px] w-[18px]" aria-hidden="true" />
+              <X className="h-5 w-5" aria-hidden="true" />
             ) : (
-              <Menu className="h-[18px] w-[18px]" aria-hidden="true" />
+              <Menu className="h-5 w-5" aria-hidden="true" />
             )}
           </Button>
         </div>

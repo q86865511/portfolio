@@ -140,18 +140,18 @@ export function HomeView() {
               return (
                 <div
                   key={group.titleEn}
-                  className="bg-surface border border-border rounded-lg p-[22px]"
+                  className="card-surface border border-border rounded-lg p-5"
                 >
-                  <h3 className="text-[15px] flex items-center gap-[10px] mb-[14px] font-medium">
+                  <h3 className="text-lg flex items-center gap-3 mb-4 font-medium">
                     <span
                       aria-hidden="true"
-                      className={`w-[34px] h-[34px] rounded-md flex items-center justify-center shrink-0 ${skillIconClass[group.category]}`}
+                      className={`w-[36px] h-[36px] rounded-md flex items-center justify-center shrink-0 ${skillIconClass[group.category]}`}
                     >
-                      <Icon className="h-[18px] w-[18px]" />
+                      <Icon className="h-5 w-5" />
                     </span>
                     {t(group.titleZh, group.titleEn)}
                   </h3>
-                  <div className="flex flex-wrap gap-[7px]">
+                  <div className="flex flex-wrap gap-2">
                     {group.items.map((item) => (
                       <TechBadge key={item} category={group.category === "neutral" ? undefined : group.category}>
                         {item}
@@ -187,13 +187,13 @@ export function HomeView() {
             {eduItems.map((edu) => (
               <div
                 key={edu.period}
-                className="bg-surface border border-border rounded-lg p-5 flex items-start gap-4"
+                className="card-surface border border-border rounded-lg p-5 flex items-start gap-4"
               >
                 <span
                   aria-hidden="true"
-                  className="w-[34px] h-[34px] rounded-md flex items-center justify-center shrink-0 bg-brand-dim text-brand"
+                  className="w-[36px] h-[36px] rounded-md flex items-center justify-center shrink-0 bg-brand-dim text-brand"
                 >
-                  <GraduationCap className="h-[18px] w-[18px]" />
+                  <GraduationCap className="h-5 w-5" />
                 </span>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">

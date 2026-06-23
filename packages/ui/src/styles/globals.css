@@ -25,6 +25,12 @@
   --color-border-strong: rgba(159, 176, 192, 0.28);
   --color-focus: #5ee6d0;
 
+  /* ── B 立體層次:卡片表面提亮 + 頂部高光邊 + 左強調條 ── */
+  /* 卡片表面提亮一階(介於 surface 與 elevated 之間) */
+  --color-card: #161d27;
+  /* 頂部 1px 高光邊(深色:白色微透明) */
+  --color-card-highlight: rgba(255, 255, 255, 0.14);
+
   /* ── 品牌 / 強調 ────────────────────────── */
   --color-brand: #2dd4bf;
   --color-brand-hover: #5eead4;
@@ -81,6 +87,12 @@
   --color-border: rgba(14, 22, 32, 0.12);
   --color-border-strong: rgba(14, 22, 32, 0.22);
   --color-focus: #0d9488;
+
+  /* ── B 立體層次:淺色對應 ── */
+  /* 淺色卡片維持純白(已是最亮),靠陰影 + 高光邊做層次 */
+  --color-card: #ffffff;
+  /* 頂部 1px 高光邊(淺色:用對應暗色細邊取代白色高光) */
+  --color-card-highlight: rgba(14, 22, 32, 0.06);
 
   --color-brand: #0d9488;
   --color-brand-hover: #0f766e;
@@ -158,6 +170,38 @@
 
   .mono {
     font-family: var(--font-mono);
+  }
+
+  /* ── B 立體層次卡片基底 ──────────────────────
+     提亮表面 + 頂部 1px 高光邊(用 inset box-shadow 疊在邊框上,
+     不佔版面、深淺色各取對應變數)。 */
+  .card-surface {
+    background: var(--color-card);
+    box-shadow: inset 0 1px 0 0 var(--color-card-highlight);
+  }
+  /* 左側 3px teal/violet 強調條(Featured / Notable 用)。
+     用 ::before 疊一條,避免動到內距與版面。 */
+  .card-accent-bar::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--color-brand);
+    z-index: 1;
+  }
+  .card-accent-bar-accent::before {
+    background: var(--color-accent);
+  }
+
+  /* ── 文字連結可點指示:hover 底線(不只靠顏色,符合 WCAG)── */
+  .link-underline {
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+  .link-underline:hover {
+    text-decoration: underline;
   }
 
   .container {

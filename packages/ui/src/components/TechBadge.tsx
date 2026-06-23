@@ -86,7 +86,8 @@ export function TechBadge({
   return (
     <span
       className={cn(
-        "inline-block font-mono text-xs leading-[1.4] border rounded-sm px-[10px] py-1",
+        // 展示性(非觸控):padding 對稱、對齊 8px 柵格。
+        "inline-block font-mono text-xs leading-[1.4] border rounded-sm px-2 py-1",
         categoryClass[resolved],
         className,
       )}

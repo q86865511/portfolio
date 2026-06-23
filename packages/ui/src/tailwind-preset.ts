@@ -16,6 +16,9 @@ const preset: Config = {
         "surface-2": "var(--color-surface-2)",
         elevated: "var(--color-elevated)",
         overlay: "var(--color-overlay)",
+        // B 立體層次:卡片提亮表面 + 頂部高光邊色
+        card: "var(--color-card)",
+        "card-highlight": "var(--color-card-highlight)",
         text: {
           DEFAULT: "var(--color-text)",
           muted: "var(--color-text-muted)",

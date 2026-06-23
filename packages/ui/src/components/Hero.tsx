@@ -49,13 +49,12 @@ export function Hero(props: HeroProps) {
 
   return (
     <section
-      className="py-9 lg:pt-9 lg:pb-8"
+      className="pt-9 pb-8 lg:pt-10"
       aria-labelledby="hero-h1"
-      style={{ paddingTop: "96px", paddingBottom: "64px" }}
     >
       <div className="container grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-7 lg:gap-8 items-center">
         <div>
-          <span className="inline-flex items-center gap-2 font-mono text-sm text-brand bg-brand-dim px-3 py-[5px] rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 font-mono text-sm text-brand bg-brand-dim px-3 py-2 rounded-full mb-5">
             <span
               aria-hidden="true"
               className="w-[7px] h-[7px] rounded-full bg-success shadow-[0_0_0_3px_var(--color-success-dim)]"
@@ -65,7 +64,7 @@ export function Hero(props: HeroProps) {
 
           <h1
             id="hero-h1"
-            className="mb-[14px]"
+            className="mb-3"
             style={{ fontSize: "clamp(38px,7vw,49px)" }}
           >
             {props.name}
@@ -78,85 +77,101 @@ export function Hero(props: HeroProps) {
             {props.role}
           </p>
 
-          <p className="text-[17px] text-text-muted max-w-[54ch] mb-7">
+          <p className="text-base text-text-muted max-w-[54ch] mb-7">
             {t(props.ledeZh, props.ledeEn)}
           </p>
 
-          <div className="flex flex-wrap gap-3 mb-6">
-            <Button as="a" variant="primary" href="#projects">
+          {/* 統一 CTA 列:文字按鈕與圖示按鈕同為 44px 高、底線對齊;
+              手機版文字按鈕全寬堆疊、圖示按鈕並排,排列收齊一致。 */}
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
+            <Button
+              as="a"
+              variant="primary"
+              href="#projects"
+              className="w-full sm:w-auto"
+            >
               {t("看專案", "View projects")}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
-            <Button as="a" variant="secondary" href={props.pdfHref} rel="noopener">
+            <Button
+              as="a"
+              variant="secondary"
+              href={props.pdfHref}
+              rel="noopener"
+              className="w-full sm:w-auto"
+            >
               <Download className="h-4 w-4" aria-hidden="true" />
               {t("下載 PDF 履歷", "Download résumé")}
             </Button>
-            <Button
-              as="a"
-              variant="icon"
-              href={props.githubUrl}
-              aria-label={t(
-                "GitHub 個人頁(另開新視窗)",
-                "GitHub profile (opens in new tab)",
-              )}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <Github className="h-[18px] w-[18px]" aria-hidden="true" />
-            </Button>
-            <Button
-              as="a"
-              variant="icon"
-              href={props.linkedinUrl}
-              aria-label={t(
-                "LinkedIn(另開新視窗)",
-                "LinkedIn (opens in new tab)",
-              )}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              <Linkedin className="h-[18px] w-[18px]" aria-hidden="true" />
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                as="a"
+                variant="icon"
+                href={props.githubUrl}
+                aria-label={t(
+                  "GitHub 個人頁(另開新視窗)",
+                  "GitHub profile (opens in new tab)",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Github className="h-5 w-5" aria-hidden="true" />
+              </Button>
+              <Button
+                as="a"
+                variant="icon"
+                href={props.linkedinUrl}
+                aria-label={t(
+                  "LinkedIn(另開新視窗)",
+                  "LinkedIn (opens in new tab)",
+                )}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Linkedin className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-[18px] md:gap-6 text-sm text-text-subtle">
-            <span className="inline-flex items-center gap-[7px]">
-              <MapPin className="h-[15px] w-[15px] opacity-80" aria-hidden="true" />
+          <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-text-subtle">
+            <span className="inline-flex items-center gap-2">
+              <MapPin className="h-4 w-4 opacity-80" aria-hidden="true" />
               {t(props.locationZh, props.locationEn)}
             </span>
-            <span className="inline-flex items-center gap-[7px]">
+            <span className="inline-flex items-center gap-2">
               <GraduationCap
-                className="h-[15px] w-[15px] opacity-80"
+                className="h-4 w-4 opacity-80"
                 aria-hidden="true"
               />
               {t(props.eduZh, props.eduEn)}
             </span>
-            <span className="inline-flex items-center gap-[7px]">
-              <Mail className="h-[15px] w-[15px] opacity-80" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2">
+              <Mail className="h-4 w-4 opacity-80" aria-hidden="true" />
               {props.email}
             </span>
           </div>
         </div>
 
-        {/* 終端機卡片裝飾 */}
+        {/* 終端機卡片裝飾(B 立體層次:提亮表面 + 頂部高光邊) */}
         <div
-          className="bg-surface border border-border rounded-lg overflow-hidden shadow-lg"
+          className="card-surface border border-border rounded-lg overflow-hidden shadow-lg"
           role="img"
           aria-label={t(
             "模擬終端機:顯示技術定位與主力技術棧",
             "Mock terminal showing positioning and core tech stack",
           )}
         >
-          <div className="flex items-center gap-[7px] px-4 py-3 bg-surface-2 border-b border-border">
+          <div className="flex items-center gap-2 px-4 py-3 bg-surface-2 border-b border-border">
             <span className="w-[11px] h-[11px] rounded-full bg-[#FF5F56]" />
             <span className="w-[11px] h-[11px] rounded-full bg-[#FFBD2E]" />
             <span className="w-[11px] h-[11px] rounded-full bg-[#27C93F]" />
-            <span className="ml-2 font-mono text-xs text-text-subtle">
+            <span className="ml-2 font-mono text-xs text-text-subtle truncate">
               {props.termTitle ?? "terry@portfolio: ~"}
             </span>
           </div>
           <div
-            className="px-5 py-[18px] font-mono text-[13.5px] leading-[1.9]"
+            className="px-4 py-4 sm:px-5 font-mono leading-[1.9]"
+            style={{ fontSize: "clamp(12px,3vw,13.5px)" }}
             aria-hidden="true"
           >
             {props.termLines.map((line, i) => {
