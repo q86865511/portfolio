@@ -1,6 +1,7 @@
 # Resume Portal — 周暐倫 (Terry Chou) 履歷入口網站
 
-> 🌐 線上:**https://terrychou.com** ｜ 部署於 Oracle Cloud A1 (ARM64),經 Cloudflare Tunnel 對外(零入站),GitHub Actions 兩段式 CI/CD 自動部署。
+> 🌐 線上:**https://terrychou.com**(主站)· **https://soulshard.terrychou.com**(Soulshard live demo)
+> ｜ 部署於 Oracle Cloud A1 (ARM64),經 Cloudflare Tunnel 對外(零入站);`portfolio` 與 `Soulshard-Hunter` 各有獨立 self-hosted runner 與 CI/CD pipeline,push 即自動部署。
 
 把既有的 GitHub 專案重新包裝成一個**對外的履歷門面網站**:主站是履歷門面,底下掛多個可獨立訪問的專案子站(能跑的做 live demo、其餘做 showcase),部署在 Oracle Cloud Always Free A1 (ARM64),透過 Cloudflare Tunnel 對外,並以獨立 CI/CD 管線各自建置與部署。
 
