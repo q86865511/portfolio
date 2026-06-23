@@ -30,6 +30,9 @@ export interface Project {
   demoFeasibility: DemoFeasibility;
   githubUrl: string;
   liveUrl?: string;
+  /** 學術/來源標籤(如 碩士論文 / 大學專題 / 課程專案),可選。 */
+  kindZh?: string;
+  kindEn?: string;
 }
 
 interface RawProject extends Omit<Project, "highlights"> {
@@ -44,24 +47,24 @@ interface ProjectsFile {
 const raw = projectsJson as ProjectsFile;
 
 /**
- * Tier 對照表(依任務規格)。
- * featured = ai-deployment-pipeline / lolhelper(重點代表作)
- * notable  = soulshard / smart-pedestrian / discord-guild-keeper / discord-auto-bot / cyclepact
- * mini     = mini-moba / anime-tracker / ros-ball-chaser / pay-the-money
+ * Tier 對照表(依使用者指定)。
+ * featured = ai-deployment-pipeline(碩士論文) / smart-pedestrian-navigation(大學專題)
+ * notable  = lolhelper / soulshard-hunter / discord-auto-bot / cyclepact
+ * mini     = discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
  * academic = 其餘(放摺疊區)
+ * 註:pay-the-money 為 fork,已自 content/projects.json 移除。
  */
 const TIER_MAP: Record<string, Tier> = {
   "ai-deployment-pipeline": "featured",
-  lolhelper: "featured",
+  "smart-pedestrian-navigation": "featured",
+  lolhelper: "notable",
   "soulshard-hunter": "notable",
-  "smart-pedestrian-navigation": "notable",
-  "discord-guild-keeper": "notable",
   "discord-auto-bot": "notable",
   cyclepact: "notable",
+  "discord-guild-keeper": "mini",
   "mini-moba": "mini",
   "anime-tracker": "mini",
   "ros-ball-chaser": "mini",
-  "pay-the-money": "mini",
 };
 
 /** WIP 專案 slug(文案已含 WIP)。 */

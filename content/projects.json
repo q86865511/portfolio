@@ -1,9 +1,11 @@
 {
-  "count": 17,
+  "count": 16,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
       "repoName": "AI-Deployment-Pipeline",
+      "kindZh": "碩士論文",
+      "kindEn": "Master's thesis",
       "titleZh": "AI 模型部署與監控平台",
       "titleEn": "AI Model Deployment & Monitoring Platform",
       "oneLinerZh": "為 YOLOv8 系列模型打造的端到端部署平台:自動化 PT→ONNX→TensorRT 優化、多批次多精度效能評測,並以 Triton 推論服務與 Prometheus/Grafana 即時監控串起完整生命週期。",
@@ -153,6 +155,8 @@
     {
       "slug": "smart-pedestrian-navigation",
       "repoName": "Smart-Pedestrian-Navigation-via-Scene-Analysis-and-Traffic-Light-Detection",
+      "kindZh": "大學專題",
+      "kindEn": "Undergrad capstone",
       "titleZh": "結合街景分析與燈號辨識之智慧導航系統",
       "titleEn": "Smart Navigation via Street-Scene Analysis and Traffic-Light Detection",
       "oneLinerZh": "整合街景語意分割、手勢辨識與手機導航的輔助駕駛專題,在單一即時管線中判斷可行駛區域並做語音提示。",
@@ -419,6 +423,8 @@
     {
       "slug": "ros-ball-chaser",
       "repoName": "Ros-Ball-Chaser",
+      "kindZh": "課程專案",
+      "kindEn": "Course project",
       "titleZh": "ROS 視覺循球機器人",
       "titleEn": "ROS Vision-Based Ball Chaser",
       "oneLinerZh": "在 Gazebo/RViz 模擬中用 OpenCV 偵測紅球、以 ROS 服務驅動 TurtleBot 追球的雙節點機器人專案。",
@@ -452,45 +458,6 @@
       ],
       "challengesZh": "紅色在 HSV 色相環橫跨兩端,需用兩組區間遮罩再合併才能穩定偵測;追球策略採簡化的三分區比例控制(left/center/right),易於實作但屬開關式而非連續比例控制。",
       "challengesEn": "Red spans both ends of the HSV hue wheel, requiring two merged masks for reliable detection; the chase logic uses a simplified three-zone (left/center/right) scheme that is easy to implement but bang-bang rather than continuous proportional control."
-    },
-    {
-      "slug": "pay-the-money",
-      "repoName": "PayTheMoney-Discord_Bot",
-      "titleZh": "PayTheMoney 借還款記帳 Discord Bot",
-      "titleEn": "PayTheMoney Discord Bot",
-      "oneLinerZh": "用 discord.js 互動元件做的借還款記帳機器人,並以 GitHub Actions 自動部署到 AWS EC2。",
-      "oneLinerEn": "A loan-tracking Discord bot built with discord.js interactions, auto-deployed to AWS EC2 via GitHub Actions.",
-      "descZh": "以 Node.js 與 discord.js v14 開發的 Discord 機器人:透過 /adddebt 斜線指令彈出表單(Modal)輸入借款人、債權人、金額與用途,記錄後附上「確認已收到」按鈕來標記還款狀態。專案重點在 DevOps 串接——以 GitHub Actions 跑 Jest 測試後,經 SSH 部署到 AWS EC2 並用 PM2 重啟服務,形成完整 CI/CD 流程;記錄目前存於記憶體 Map,重啟後不保留。",
-      "descEn": "A Discord bot in Node.js with discord.js v14: an /adddebt slash command opens a Modal to enter debtor, creditor, amount, and purpose, then posts the record with a \"confirm received\" button to mark repayment. The notable part is the DevOps wiring — a GitHub Actions pipeline runs Jest tests, then SSH-deploys to an AWS EC2 instance and restarts the service via PM2. Records currently live in an in-memory Map and are not persisted across restarts.",
-      "techStack": [
-        "Node.js",
-        "JavaScript",
-        "discord.js v14",
-        "Jest",
-        "GitHub Actions",
-        "AWS EC2",
-        "PM2",
-        "dotenv"
-      ],
-      "presentation": "external",
-      "githubUrl": "https://github.com/q86865511/PayTheMoney-Discord_Bot",
-      "liveUrl": "",
-      "highlights": [
-        {
-          "zh": "完整 CI/CD:GitHub Actions 跑 npm ci 與 Jest 測試,通過後以 SSH 部署到 EC2,並用 PM2 重啟服務。",
-          "en": "End-to-end CI/CD: GitHub Actions runs npm ci and Jest tests, then SSH-deploys to EC2 and restarts via PM2."
-        },
-        {
-          "zh": "善用 discord.js v14 互動元件(Slash Command + Modal + Button)組出表單式記帳流程。",
-          "en": "Uses discord.js v14 interactions (slash command + modal + button) to build a form-style bookkeeping flow."
-        }
-      ],
-      "challengesZh": "記錄存於記憶體 Map,缺乏資料庫持久化,重啟即遺失;屬課程/個人練習等級的小型專案。",
-      "challengesEn": "State is held in an in-memory Map with no database persistence, so data is lost on restart; this is a small course/personal-practice-scale project.",
-      "demoFeasibility": {
-        "canRunInBrowser": false,
-        "notes": "無法作為 live demo。這是伺服器端 Discord bot,需 Discord Bot Token 並連上 Discord Gateway 才能運作,沒有任何前端或靜態頁面可供瀏覽器獨立執行。"
-      }
     },
     {
       "slug": "draw-julia-set",
