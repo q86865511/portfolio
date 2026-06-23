@@ -8,6 +8,7 @@ export const profile = {
   email: "q86865511@gmail.com",
   github: "https://github.com/q86865511",
   linkedin: "https://www.linkedin.com/in/weilun-chou-a7b2453b8/",
+  website: "https://terrychou.com",
   locationZh: "桃園市,台灣",
   locationEn: "Taoyuan, Taiwan",
   bioZh:
