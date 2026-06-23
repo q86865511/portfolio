@@ -112,7 +112,9 @@ jobs:
       #    所以這裡明確抓一份。產 PDF 用得到,CI 驗證階段用不到(故只在部署做)。
       - name: Install Chrome for Puppeteer
         continue-on-error: true   # PDF 非必要:Chrome 裝不起來也不該擋部署
-        run: npx puppeteer browsers install chrome
+        # 用「專案自己的 puppeteer」裝它對應版本的 Chrome。
+        # npx 會抓最新版 puppeteer、裝到不相符的 Chrome,導致 launch 找不到對應版本(131.x)。
+        run: pnpm --filter main exec puppeteer browsers install chrome
 
       # 6) 用本機靜態伺服器把剛 build 出來的 out/ 跑起來,讓 generate-pdf 有東西可載。
       #    generate-pdf.mjs 預設打 http://localhost:3000,但用 BASE_URL 可覆寫;
