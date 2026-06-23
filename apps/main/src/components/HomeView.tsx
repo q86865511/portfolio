@@ -8,7 +8,7 @@ import {
   TechBadge,
   useLang,
 } from "@resume/ui";
-import { Boxes, Cpu, GraduationCap, Layers } from "lucide-react";
+import { Boxes, Cpu, Gamepad2, GraduationCap, Layers } from "lucide-react";
 import {
   eduItems,
   heroTermLines,
@@ -24,6 +24,7 @@ const skillIcon: Record<SkillGroup["icon"], typeof Cpu> = {
   ml: Cpu,
   devops: Boxes,
   languages: Layers,
+  game: Gamepad2,
 };
 
 const skillIconClass: Record<SkillGroup["category"], string> = {
@@ -183,7 +184,7 @@ export function HomeView() {
           eyebrow="03 / EDUCATION"
           title={t("學歷", "Education")}
         >
-          <div className="flex flex-col gap-3 max-w-measure">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {eduItems.map((edu) => (
               <div
                 key={edu.period}

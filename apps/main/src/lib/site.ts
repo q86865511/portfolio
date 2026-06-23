@@ -36,7 +36,7 @@ export const eduItems = [
 export interface SkillGroup {
   titleZh: string;
   titleEn: string;
-  icon: "fullstack" | "ml" | "devops" | "languages";
+  icon: "fullstack" | "ml" | "devops" | "languages" | "game";
   category: "neutral" | "ml" | "infra";
   items: string[];
 }
@@ -84,6 +84,13 @@ export const skillGroups: SkillGroup[] = [
       "GitHub Actions",
       "Cloudflare",
     ],
+  },
+  {
+    titleZh: "遊戲 / 圖形",
+    titleEn: "Game / Graphics",
+    icon: "game",
+    category: "neutral",
+    items: ["Godot 4", "GDScript", "C#", "raylib", "HTML5 Canvas"],
   },
 ];
 

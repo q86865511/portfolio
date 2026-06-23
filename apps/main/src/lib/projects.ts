@@ -49,18 +49,18 @@ const raw = projectsJson as ProjectsFile;
 /**
  * Tier 對照表(依使用者指定)。
  * featured = ai-deployment-pipeline(碩士論文) / smart-pedestrian-navigation(大學專題)
- * notable  = lolhelper / soulshard-hunter / discord-auto-bot / cyclepact
- * mini     = discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
+ * notable  = soulshard-hunter / discord-auto-bot / cyclepact
+ * mini     = lolhelper / discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
  * academic = 其餘(放摺疊區)
  * 註:pay-the-money 為 fork,已自 content/projects.json 移除。
  */
 const TIER_MAP: Record<string, Tier> = {
   "ai-deployment-pipeline": "featured",
   "smart-pedestrian-navigation": "featured",
-  lolhelper: "notable",
   "soulshard-hunter": "notable",
   "discord-auto-bot": "notable",
   cyclepact: "notable",
+  lolhelper: "mini",
   "discord-guild-keeper": "mini",
   "mini-moba": "mini",
   "anime-tracker": "mini",
@@ -68,7 +68,7 @@ const TIER_MAP: Record<string, Tier> = {
 };
 
 /** WIP 專案 slug(文案已含 WIP)。 */
-const WIP_SLUGS = new Set(["cyclepact", "discord-guild-keeper"]);
+const WIP_SLUGS = new Set(["cyclepact"]);
 
 export function tierOf(slug: string): Tier {
   return TIER_MAP[slug] ?? "academic";
