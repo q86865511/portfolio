@@ -111,6 +111,7 @@ jobs:
       #    workspace 設定刻意「不在 install 期下載 Chromium」(allowBuilds.puppeteer=false),
       #    所以這裡明確抓一份。產 PDF 用得到,CI 驗證階段用不到(故只在部署做)。
       - name: Install Chrome for Puppeteer
+        continue-on-error: true   # PDF 非必要:Chrome 裝不起來也不該擋部署
         run: npx puppeteer browsers install chrome
 
       # 6) 用本機靜態伺服器把剛 build 出來的 out/ 跑起來,讓 generate-pdf 有東西可載。
@@ -135,6 +136,7 @@ jobs:
       #    generate-pdf.mjs 會把 PDF 寫到 apps/main/public/(resume-zh.pdf、resume-en.pdf)。
       #    BASE_URL 指向上一步的本機伺服器。
       - name: Generate resume PDFs
+        continue-on-error: true   # 同上:產 PDF 失敗不擋部署
         env:
           BASE_URL: "http://localhost:4173"
         run: pnpm --filter main run generate-pdf
@@ -142,10 +144,17 @@ jobs:
       # 8) 把產出的 PDF 併入 out/。
       #    重點:public/ 只有在「next build 當下」才會被複製進 out/;PDF 是 build 之後
       #    才產生的,所以必須手動 copy 進 apps/main/out,部署出去才有得下載。
-      - name: Merge PDFs into out/
+      - name: Merge PDFs into out/ (best-effort)
         run: |
-          cp apps/main/public/resume-zh.pdf apps/main/out/resume-zh.pdf
-          cp apps/main/public/resume-en.pdf apps/main/out/resume-en.pdf
+          # PDF 屬非必要產物:有就併入 out/,沒有(例如 Chrome 跑不動)就略過,不讓部署失敗。
+          for f in resume-zh.pdf resume-en.pdf; do
+            if [ -f "apps/main/public/$f" ]; then
+              cp "apps/main/public/$f" "apps/main/out/$f"
+              echo "已併入 $f"
+            else
+              echo "略過(未產生):$f"
+            fi
+          done
 
       # 9) 收掉背景靜態伺服器(無論前面成敗都嘗試收,避免殘留行程佔 port)。
       - name: Stop static server
