@@ -15,22 +15,6 @@ import {
   type Project,
 } from "@/lib/projects";
 
-/** 依語言取得 GitHub 短名供 mini card 顯示。 */
-function langLineFor(p: Project): string {
-  return p.techStack.slice(0, 2).join(" · ");
-}
-
-/** 語言點顏色(常見語言概略對照)。 */
-function langColor(p: Project): string {
-  const first = p.techStack[0]?.toLowerCase() ?? "";
-  if (first.includes("godot")) return "#478CBF";
-  if (first.includes("c++")) return "#F34B7D";
-  if (first.includes("ros")) return "#22314E";
-  if (first.includes("node") || first.includes("javascript")) return "#F1E05A";
-  if (first.includes("python")) return "#3572A5";
-  return "#6B7C8C";
-}
-
 /** 專案狀態徽章。 */
 function statusFor(
   p: Project,
@@ -179,8 +163,7 @@ export function ProjectsSection() {
                 titleExternal={link.external}
                 status={statusFor(p, t)}
                 kind={kindOf(p)}
-                langLine={langLineFor(p)}
-                langColor={langColor(p)}
+                techStack={p.techStack.slice(0, 4)}
                 githubUrl={p.githubUrl}
                 githubLabel={t(
                   `${p.repoName} GitHub(另開新視窗)`,

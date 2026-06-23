@@ -211,10 +211,8 @@ export interface MiniCardProps {
   status?: { status: ProjectStatus; label: string; ariaLabel?: string };
   /** 學術/來源標籤,可選。 */
   kind?: string;
-  /** 語言 / 一行說明。 */
-  langLine?: string;
-  /** 語言點顏色。 */
-  langColor?: string;
+  /** 技術徽章(精簡數量,與其他卡一致)。 */
+  techStack?: string[];
   /** 外連 GitHub 圖示連結。 */
   githubUrl?: string;
   githubLabel?: string;
@@ -227,8 +225,7 @@ export function MiniCard({
   titleExternal,
   status,
   kind,
-  langLine,
-  langColor = "#6B7C8C",
+  techStack = [],
   githubUrl,
   githubLabel,
   className,
@@ -261,14 +258,11 @@ export function MiniCard({
             <StatusBadge {...status} />
           </div>
         )}
-        {langLine && (
-          <div className="flex items-center gap-2 text-sm text-text-subtle mt-1">
-            <span
-              aria-hidden="true"
-              className="w-[9px] h-[9px] rounded-full"
-              style={{ background: langColor }}
-            />
-            {langLine}
+        {techStack.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {techStack.map((tech) => (
+              <TechBadge key={tech}>{tech}</TechBadge>
+            ))}
           </div>
         )}
       </div>
