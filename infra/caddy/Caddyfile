@@ -24,6 +24,10 @@
 	# 保險:整台 Caddy 都不要自動管理憑證(避免去搶 443 / 與邊緣 TLS 重複)。
 	auto_https off
 
+	# 讓所有 http:// 站台改聽 8080(對上 cloudflared 轉發的 127.0.0.1:8080)。
+	# 少了這行,http:// 站台會聽預設的 80,和 Tunnel 的 :8080 對不上。
+	http_port 8080
+
 	# 管理 API 也綁本機即可(預設就是 localhost:2019,這裡明示)。
 	admin localhost:2019
 
