@@ -16,13 +16,17 @@
 #   原本服務 Soulshard-Hunter 的 Caddy 改為統一聽 127.0.0.1:8080,本檔即整合後的設定。
 #   所有對外 vhost 都掛在這個 :8080 上,由 cloudflared 依 hostname 帶進來、Caddy 再依 Host 分流。
 #
-# ⚠️ 佔位符(使用者稍後以實際網域替換):YOUR_DOMAIN → 例如 example.com
+# ⚠️ 佔位符(使用者稍後以實際網域替換):terrychou.com → 例如 example.com
 # ============================================================================
 
 # --- 全域選項 --------------------------------------------------------------
 {
 	# 保險:整台 Caddy 都不要自動管理憑證(避免去搶 443 / 與邊緣 TLS 重複)。
 	auto_https off
+
+	# 讓所有 http:// 站台改聽 8080(對上 cloudflared 轉發的 127.0.0.1:8080)。
+	# 少了這行,http:// 站台會聽預設的 80,和 Tunnel 的 :8080 對不上。
+	http_port 8080
 
 	# 管理 API 也綁本機即可(預設就是 localhost:2019,這裡明示)。
 	admin localhost:2019
@@ -34,12 +38,12 @@
 }
 
 # ============================================================================
-# 主站:YOUR_DOMAIN → /srv/main 的靜態檔
+# 主站:terrychou.com → /srv/main 的靜態檔
 # ----------------------------------------------------------------------------
-# 寫成 `http://YOUR_DOMAIN` + 綁定 :8080。因為 cloudflared 進來時帶的 Host
-# 是 YOUR_DOMAIN,Caddy 以此匹配此區塊;同時關閉自動 HTTPS。
+# 寫成 `http://terrychou.com` + 綁定 :8080。因為 cloudflared 進來時帶的 Host
+# 是 terrychou.com,Caddy 以此匹配此區塊;同時關閉自動 HTTPS。
 # ============================================================================
-http://YOUR_DOMAIN {
+http://terrychou.com {
 	bind 127.0.0.1                 # 只聽本機,絕不對外
 	root * /srv/main               # 靜態檔根目錄(由 deploy 腳本 rsync 進來)
 	encode zstd gzip               # 回應壓縮
@@ -58,9 +62,9 @@ http://YOUR_DOMAIN {
 }
 
 # ============================================================================
-# live demo:soulshard.YOUR_DOMAIN → /srv/soulshard 的靜態檔
+# live demo:soulshard.terrychou.com → /srv/soulshard 的靜態檔
 # ============================================================================
-http://soulshard.YOUR_DOMAIN {
+http://soulshard.terrychou.com {
 	bind 127.0.0.1
 	root * /srv/soulshard
 	encode zstd gzip
@@ -74,11 +78,11 @@ http://soulshard.YOUR_DOMAIN {
 }
 
 # ============================================================================
-# 預留:cyclepact.YOUR_DOMAIN(未來啟用)
+# 預留:cyclepact.terrychou.com(未來啟用)
 # ----------------------------------------------------------------------------
 # 啟用時:1) 取消本區塊註解 2) config.yml 加 ingress 3) 加 DNS CNAME。
 # ============================================================================
-# http://cyclepact.YOUR_DOMAIN {
+# http://cyclepact.terrychou.com {
 # 	bind 127.0.0.1
 # 	root * /srv/cyclepact
 # 	encode zstd gzip
@@ -91,10 +95,10 @@ http://soulshard.YOUR_DOMAIN {
 # 範例:未來「動態服務」用 reverse_proxy(非靜態檔)
 # ----------------------------------------------------------------------------
 # 例如某子站是 Next.js SSR / FastAPI / Node 服務,跑在本機某個 port。
-# 這裡示範把 api.YOUR_DOMAIN 反代到本機 :3001。實際啟用時記得同步:
+# 這裡示範把 api.terrychou.com 反代到本機 :3001。實際啟用時記得同步:
 #   1) cloudflared config.yml 加 ingress  2) 加 DNS CNAME
 # ============================================================================
-# http://api.YOUR_DOMAIN {
+# http://api.terrychou.com {
 # 	bind 127.0.0.1
 # 	encode zstd gzip
 #

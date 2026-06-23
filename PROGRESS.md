@@ -22,7 +22,7 @@
 - Phase 7:上線驗證(DNS/Tunnel/HTTPS/各子站可訪問/health check)、面試講稿 `docs/30`;之後改自動 commit + PR(merge 等使用者)。
 
 ## 已知問題
-- 網域未定(設定檔用 `YOUR_DOMAIN` 佔位);未取得 Cloudflare 帳號與 Oracle SSH 連線資訊。
+- 網域已定:**`terrychou.com`**(Cloudflare Registrar 直接註冊,狀態 Active);infra 功能設定檔(cloudflared/Caddyfile/deploy-static.sh)已填入實際網域。待提供 Oracle SSH 連線方式以進行 Tunnel/Caddy 實機佈署(`TUNNEL_ID` 待建立 tunnel 後填)。
 - 已定:`kanto-quest` 不公開;`cyclepact` 可公開但開發中 → showcase、暫不 live demo。目前確定的 live demo 僅 Soulshard-Hunter(架構可擴充)。
 - 本機無 Godot CLI;`cyclepact` 若日後要 Web demo 需於 Godot 編輯器匯出。
 

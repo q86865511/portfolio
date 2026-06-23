@@ -8,7 +8,7 @@
 # 資料流:使用者 → Cloudflare 邊緣 → Tunnel → (本檔 ingress) → 本機 Caddy(:8080)
 #
 # ⚠️ 佔位符說明(使用者稍後以實際值替換):
-#   - YOUR_DOMAIN  : 你購買 / 託管在 Cloudflare 上的網域,例如 example.com
+#   - terrychou.com  : 你購買 / 託管在 Cloudflare 上的網域,例如 example.com
 #   - TUNNEL_ID    : 建立 tunnel 後得到的 UUID(見本目錄 README「建立 tunnel」)
 #
 # ⚠️ 真實憑證(*.json）絕不入庫;credentials-file 指向主機本地路徑即可。
@@ -35,22 +35,22 @@ loglevel: info
 # ============================================================================
 ingress:
   # --- 主站:履歷門面 ---------------------------------------------------------
-  # YOUR_DOMAIN(裸網域)→ 本機 Caddy。Caddy 再依 Host 分流到 /srv/main。
-  - hostname: YOUR_DOMAIN
+  # terrychou.com(裸網域)→ 本機 Caddy。Caddy 再依 Host 分流到 /srv/main。
+  - hostname: terrychou.com
     service: http://127.0.0.1:8080
 
   # 若希望 www 也可用,取消下行註解(同時要在 Cloudflare 加一筆 www 的 CNAME)。
-  # - hostname: www.YOUR_DOMAIN
+  # - hostname: www.terrychou.com
   #   service: http://127.0.0.1:8080
 
   # --- live demo:Soulshard-Hunter -------------------------------------------
-  # soulshard.YOUR_DOMAIN → 本機 Caddy → /srv/soulshard 靜態檔。
-  - hostname: soulshard.YOUR_DOMAIN
+  # soulshard.terrychou.com → 本機 Caddy → /srv/soulshard 靜態檔。
+  - hostname: soulshard.terrychou.com
     service: http://127.0.0.1:8080
 
   # --- 預留:cyclepact(未來,Godot 專案完成後啟用)-------------------------
   # 目前先放著當範例;真正啟用前請一併在 Cloudflare 加上 DNS CNAME(見 README)。
-  - hostname: cyclepact.YOUR_DOMAIN
+  - hostname: cyclepact.terrychou.com
     service: http://127.0.0.1:8080
 
   # --- catch-all(必須是最後一條,且不帶 hostname)---------------------------

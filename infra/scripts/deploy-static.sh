@@ -17,7 +17,7 @@
 #   [src_dir]      選填。靜態輸出目錄,預設 apps/<app_name>/out
 #   [dest_dir]     選填。Caddy 服務目錄,預設 /srv/<app_name>
 #   [health_host]  選填。健康檢查時帶的 Host 標頭(對應 Caddyfile 的 vhost)。
-#                  預設:main → YOUR_DOMAIN;其他 → <app_name>.YOUR_DOMAIN
+#                  預設:main → terrychou.com;其他 → <app_name>.terrychou.com
 #                  ⚠️ 使用者稍後以實際網域替換下方 DOMAIN 變數。
 #
 # 範例:
@@ -38,7 +38,7 @@ fi
 APP_NAME="$1"
 
 # ⚠️ 佔位符:使用者稍後以實際網域替換(也可改成由環境變數 DOMAIN 傳入)。
-DOMAIN="${DOMAIN:-YOUR_DOMAIN}"
+DOMAIN="${DOMAIN:-terrychou.com}"
 
 # 來源目錄:預設指向 monorepo 內該 app 的 out/。
 SRC_DIR="${2:-apps/${APP_NAME}/out}"
