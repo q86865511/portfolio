@@ -20,9 +20,9 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={className}
     >
       {isDark ? (
-        <Moon className="h-[18px] w-[18px]" aria-hidden="true" />
+        <Moon className="h-5 w-5" aria-hidden="true" />
       ) : (
-        <Sun className="h-[18px] w-[18px]" aria-hidden="true" />
+        <Sun className="h-5 w-5" aria-hidden="true" />
       )}
     </Button>
   );

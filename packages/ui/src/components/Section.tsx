@@ -36,19 +36,20 @@ export function Section({
         {withHeader && (
           <div className="mb-6 max-w-measure">
             {eyebrow && (
-              <p className="font-mono text-sm text-brand tracking-[0.04em] mb-[10px]">
+              <p className="font-mono text-sm text-brand tracking-[0.04em] mb-3">
                 {eyebrow}
               </p>
             )}
+            {/* 單一流體字級:避免 Tailwind 字級 class 與 inline clamp 衝突。 */}
             <h2
               id={hid}
-              className="text-2xl md:text-3xl mb-3"
+              className="mb-3 leading-[1.15]"
               style={{ fontSize: "clamp(28px,4vw,39px)" }}
             >
               {title}
             </h2>
             {intro && (
-              <p className="text-text-muted text-[17px]">{intro}</p>
+              <p className="text-text-muted text-base">{intro}</p>
             )}
           </div>
         )}

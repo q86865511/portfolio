@@ -27,7 +27,7 @@ export function StatusBadge({
     <span
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex items-center gap-[6px] text-xs font-medium px-[10px] py-1 rounded-full",
+        "inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full",
         s.wrap,
         className,
       )}

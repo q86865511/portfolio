@@ -9,10 +9,10 @@ import {
 import { cn } from "../lib/cn";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "icon";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 const base =
-  "inline-flex items-center gap-2 font-medium rounded-md border border-transparent cursor-pointer whitespace-nowrap transition-all duration-DEFAULT ease-ease active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 font-medium rounded-md border border-transparent cursor-pointer whitespace-nowrap transition-all duration-DEFAULT ease-ease active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary: "bg-brand text-text-onbrand hover:bg-brand-hover",
@@ -22,16 +22,19 @@ const variantClass: Record<ButtonVariant, string> = {
   icon: "bg-transparent text-text-muted border-border justify-center p-0 hover:bg-surface-2 hover:text-text hover:border-border-strong",
 };
 
+// 觸控目標 ≥44px:最小尺寸(sm)也保證 min-h-[44px](WCAG 2.5.5)。
 const sizeClass: Record<ButtonSize, string> = {
-  sm: "h-8 text-sm px-3",
-  md: "h-10 text-sm px-[18px]",
-  lg: "h-12 text-base px-6",
+  sm: "min-h-[44px] py-2 text-sm px-4",
+  md: "min-h-[44px] h-11 text-sm px-5",
+  lg: "min-h-[48px] h-12 text-base px-6",
+  xl: "min-h-[56px] h-14 text-base px-7",
 };
 
 const iconSizeClass: Record<ButtonSize, string> = {
-  sm: "h-8 w-8 px-0",
-  md: "h-10 w-10 px-0",
+  sm: "h-11 w-11 px-0",
+  md: "h-11 w-11 px-0",
   lg: "h-12 w-12 px-0",
+  xl: "h-14 w-14 px-0",
 };
 
 interface CommonProps {

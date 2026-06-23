@@ -109,7 +109,7 @@ export function ProjectsSection() {
         name={t("Featured · 代表作", "Featured")}
         count={groups.featured.length}
       >
-        <div className="grid gap-[18px] grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
           {groups.featured.map((p, i) => (
             <FeaturedCard
               key={p.slug}
@@ -132,7 +132,7 @@ export function ProjectsSection() {
         name={t("Notable · 值得一提", "Notable")}
         count={groups.notable.length}
       >
-        <div className="grid gap-[18px] grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {groups.notable.map((p) => (
             <NotableCard
               key={p.slug}
@@ -153,7 +153,7 @@ export function ProjectsSection() {
         name={t("Mini · 小品與工具", "Mini · tools")}
         count={groups.mini.length}
       >
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {groups.mini.map((p) => {
             const link = primaryLink(p);
             return (
@@ -179,8 +179,8 @@ export function ProjectsSection() {
       {/* ACADEMIC(摺疊) */}
       {groups.academic.length > 0 && (
         <div className="mb-0">
-          <details className="bg-surface border border-border rounded-lg overflow-hidden group/details">
-            <summary className="px-[22px] py-[18px] cursor-pointer font-medium flex items-center justify-between list-none [&::-webkit-details-marker]:hidden">
+          <details className="card-surface border border-border rounded-lg overflow-hidden group/details">
+            <summary className="px-5 py-4 min-h-[44px] cursor-pointer font-medium flex items-center justify-between list-none [&::-webkit-details-marker]:hidden">
               <span>
                 {t(
                   "Academic · 課程與學術專案(Verilog / Assembly / C++)",
@@ -188,18 +188,18 @@ export function ProjectsSection() {
                 )}
               </span>
               <ChevronDown
-                className="h-[18px] w-[18px] text-text-muted transition-transform duration-DEFAULT ease-ease group-open/details:rotate-180"
+                className="h-5 w-5 text-text-muted transition-transform duration-DEFAULT ease-ease group-open/details:rotate-180"
                 aria-hidden="true"
               />
             </summary>
-            <div className="px-[22px] pb-[18px] grid grid-cols-1 sm:grid-cols-2 gap-[10px]">
+            <div className="px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {groups.academic.map((p) => (
                 <a
                   key={p.slug}
                   href={p.githubUrl}
                   rel="noopener noreferrer"
                   target="_blank"
-                  className="flex items-center justify-between gap-[10px] px-[14px] py-3 bg-surface-2 rounded-md text-sm hover:text-brand transition-colors"
+                  className="link-underline flex items-center justify-between gap-3 min-h-[44px] px-4 py-3 bg-surface-2 rounded-md text-sm hover:text-brand transition-colors"
                 >
                   <span>{t(p.titleZh, p.titleEn)}</span>
                   <span className="font-mono text-xs text-text-subtle inline-flex items-center gap-1">
@@ -227,11 +227,11 @@ function TierBlock({
 }) {
   return (
     <div className="mb-7">
-      <div className="flex items-center gap-3 mb-[18px]">
+      <div className="flex items-center gap-3 mb-5">
         <span className="font-mono text-sm text-text-muted tracking-[0.03em] uppercase">
           {name}
         </span>
-        <span aria-hidden="true" className="flex-1 h-px bg-border" />
+        <span aria-hidden="true" className="flex-1 h-px bg-border-strong" />
         <span className="font-mono text-xs text-text-subtle">
           {String(count).padStart(2, "0")}
         </span>

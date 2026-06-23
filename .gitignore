@@ -43,3 +43,4 @@ apps/**/public/resume-*.pdf
 
 # 驗證用截圖(可重生成,不入庫;mockup-main.html 保留)
 design/shots/
+design/shots-polish/

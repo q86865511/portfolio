@@ -35,7 +35,7 @@ interface BaseCardProps {
 function ActionButtons({ actions }: { actions: CardAction[] }) {
   const { t } = useLang();
   return (
-    <div className="flex flex-wrap gap-[10px] mt-auto">
+    <div className="flex flex-wrap gap-3 mt-auto">
       {actions.map((a, i) => (
         <Button
           key={i}
@@ -47,17 +47,19 @@ function ActionButtons({ actions }: { actions: CardAction[] }) {
             ? { rel: "noopener noreferrer", target: "_blank" }
             : {})}
         >
-          {a.play && <Play className="h-[13px] w-[13px] fill-current" aria-hidden="true" />}
+          {a.play && <Play className="h-4 w-4 fill-current" aria-hidden="true" />}
           {t(a.labelZh, a.labelEn)}
-          {a.arrow && <ArrowUpRight className="h-[14px] w-[14px]" aria-hidden="true" />}
+          {a.arrow && <ArrowUpRight className="h-4 w-4" aria-hidden="true" />}
         </Button>
       ))}
     </div>
   );
 }
 
+// B 立體層次:提亮表面(card-surface) + 頂部高光邊 + hover 上浮,
+// 高光邊與表面色取自 globals.css 的 --color-card* 變數(深淺色各一)。
 const cardBase =
-  "bg-surface border border-border rounded-lg relative overflow-hidden flex flex-col transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
+  "card-surface border border-border rounded-lg relative overflow-hidden flex flex-col transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
 
 /* ─────────────── FeaturedCard ─────────────── */
 export interface FeaturedCardProps extends BaseCardProps {
@@ -83,15 +85,15 @@ export function FeaturedCard({
   className,
 }: FeaturedCardProps) {
   return (
-    <article className={cn(cardBase, "group", className)}>
-      <div className="h-[118px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
-        <span
-          aria-hidden="true"
-          className={cn(
-            "absolute left-0 top-0 bottom-0 w-1",
-            accentBar === "brand" ? "bg-brand" : "bg-accent",
-          )}
-        />
+    <article
+      className={cn(
+        cardBase,
+        "group card-accent-bar",
+        accentBar === "accent" && "card-accent-bar-accent",
+        className,
+      )}
+    >
+      <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
         {glyph && (
           <span
             aria-hidden="true"
@@ -101,7 +103,7 @@ export function FeaturedCard({
           </span>
         )}
         {floatBadges.length > 0 && (
-          <div className="absolute right-[18px] bottom-4 flex gap-[7px]">
+          <div className="absolute right-4 bottom-4 flex gap-2">
             {floatBadges.map((b, i) => (
               <TechBadge key={i} category={b.category}>
                 {b.label}
@@ -110,9 +112,9 @@ export function FeaturedCard({
           </div>
         )}
       </div>
-      <div className="p-[22px] flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-3 mb-[10px]">
-          <h3 className="text-[21px]">
+      <div className="p-5 flex flex-col flex-1">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <h3 className="text-xl">
             <CardTitle
               title={title}
               href={titleHref}
@@ -122,10 +124,10 @@ export function FeaturedCard({
           {status && <StatusBadge {...status} />}
         </div>
         {desc && (
-          <p className="text-text-muted text-[14.5px] mb-4 flex-1">{desc}</p>
+          <p className="text-text-muted text-sm mb-4 flex-1">{desc}</p>
         )}
         {techStack.length > 0 && (
-          <div className="flex flex-wrap gap-[7px] mb-[18px]">
+          <div className="flex flex-wrap gap-2 mb-5">
             {techStack.map((tech) => (
               <TechBadge key={tech}>{tech}</TechBadge>
             ))}
@@ -149,9 +151,9 @@ export function NotableCard({
   className,
 }: BaseCardProps) {
   return (
-    <article className={cn(cardBase, "group", className)}>
-      <div className="p-[22px] flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-3 mb-[10px]">
+    <article className={cn(cardBase, "group card-accent-bar", className)}>
+      <div className="p-5 pl-6 flex flex-col flex-1">
+        <div className="flex items-start justify-between gap-3 mb-3">
           <h3 className="text-lg">
             <CardTitle
               title={title}
@@ -162,10 +164,10 @@ export function NotableCard({
           {status && <StatusBadge {...status} />}
         </div>
         {desc && (
-          <p className="text-text-muted text-[14.5px] mb-4 flex-1">{desc}</p>
+          <p className="text-text-muted text-sm mb-4 flex-1">{desc}</p>
         )}
         {techStack.length > 0 && (
-          <div className="flex flex-wrap gap-[7px] mb-[18px]">
+          <div className="flex flex-wrap gap-2 mb-5">
             {techStack.map((tech) => (
               <TechBadge key={tech}>{tech}</TechBadge>
             ))}
@@ -207,18 +209,19 @@ export function MiniCard({
   return (
     <article className={cn(cardBase, "group", className)}>
       {githubUrl && (
+        // 觸控目標 ≥44px:圖示外擴 padding 撐起命中區,負 margin 抵銷視覺位移。
         <a
           href={githubUrl}
           aria-label={githubLabel ?? `${title} GitHub`}
           rel="noopener noreferrer"
           target="_blank"
-          className="absolute top-[14px] right-[14px] text-text-subtle transition-colors duration-DEFAULT ease-ease group-hover:text-brand z-10"
+          className="absolute top-2 right-2 -m-1 inline-flex h-11 w-11 items-center justify-center text-text-subtle transition-colors duration-DEFAULT ease-ease group-hover:text-brand z-10"
         >
           <Github className="h-4 w-4" aria-hidden="true" />
         </a>
       )}
-      <div className="p-4 px-[18px] flex flex-col flex-1">
-        <h3 className="text-base pr-6">
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="text-base pr-7">
           <CardTitle title={title} href={titleHref} external={titleExternal} />
         </h3>
         {status && (
@@ -227,7 +230,7 @@ export function MiniCard({
           </div>
         )}
         {langLine && (
-          <div className="flex items-center gap-2 text-sm text-text-subtle mt-[6px]">
+          <div className="flex items-center gap-2 text-sm text-text-subtle mt-1">
             <span
               aria-hidden="true"
               className="w-[9px] h-[9px] rounded-full"
@@ -253,15 +256,17 @@ function CardTitle({
 }) {
   if (!href) return <span>{title}</span>;
   return (
+    // 觸控目標 ≥44px:標題連結用 inline-flex + min-h 撐起命中區,
+    // 不改變可見字級,僅擴大可點高度。
     <a
       href={href}
       {...(external ? { rel: "noopener noreferrer", target: "_blank" } : {})}
-      className="transition-colors duration-DEFAULT ease-ease group-hover:text-brand"
+      className="link-underline inline-flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease group-hover:text-brand"
     >
       {title}
       {external && (
         <ArrowUpRight
-          className="inline h-[0.8em] w-[0.8em] ml-[2px] align-baseline"
+          className="inline h-[0.8em] w-[0.8em] ml-0.5 align-baseline shrink-0"
           aria-hidden="true"
         />
       )}

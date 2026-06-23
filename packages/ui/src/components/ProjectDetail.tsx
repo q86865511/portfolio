@@ -37,11 +37,11 @@ export function ProjectDetail(props: ProjectDetailProps) {
       {/* 麵包屑 + 返回 */}
       <nav
         aria-label={t("麵包屑", "Breadcrumb")}
-        className="flex items-center gap-2 text-sm text-text-muted mb-6"
+        className="flex items-center gap-2 text-sm text-text-muted mb-5"
       >
         <a
           href="/#projects"
-          className="inline-flex items-center gap-1 hover:text-brand transition-colors"
+          className="link-underline inline-flex items-center gap-1 min-h-[44px] hover:text-brand transition-colors"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t("專案", "Projects")}
@@ -56,7 +56,7 @@ export function ProjectDetail(props: ProjectDetailProps) {
           <h1 style={{ fontSize: "clamp(31px,5vw,39px)" }}>{props.title}</h1>
           {props.status && <StatusBadge {...props.status} />}
         </div>
-        <p className="text-[19px] text-text-muted mb-5">{props.oneLiner}</p>
+        <p className="text-lg text-text-muted mb-5">{props.oneLiner}</p>
         <div className="flex flex-wrap gap-3">
           <Button
             as="a"
@@ -67,7 +67,7 @@ export function ProjectDetail(props: ProjectDetailProps) {
           >
             <Github className="h-4 w-4" aria-hidden="true" />
             GitHub
-            <ExternalLink className="h-[14px] w-[14px]" aria-hidden="true" />
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </Button>
           {props.liveUrl && (
             <Button
@@ -78,7 +78,7 @@ export function ProjectDetail(props: ProjectDetailProps) {
               target="_blank"
             >
               {t("線上遊玩 / Live demo", "Live demo")}
-              <ExternalLink className="h-[14px] w-[14px]" aria-hidden="true" />
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
         </div>
@@ -150,14 +150,14 @@ export function ProjectDetail(props: ProjectDetailProps) {
           {props.prev ? (
             <a
               href={`/projects/${props.prev.slug}/`}
-              className="group inline-flex items-center gap-2 text-text-muted hover:text-brand transition-colors"
+              className="group inline-flex items-center gap-2 min-h-[44px] py-2 text-text-muted hover:text-brand transition-colors"
             >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="text-left">
                 <span className="block text-xs text-text-subtle">
                   {t("上一個", "Previous")}
                 </span>
-                <span className="text-sm">
+                <span className="text-sm group-hover:underline underline-offset-[3px]">
                   {t(props.prev.titleZh, props.prev.titleEn)}
                 </span>
               </span>
@@ -168,17 +168,17 @@ export function ProjectDetail(props: ProjectDetailProps) {
           {props.next ? (
             <a
               href={`/projects/${props.next.slug}/`}
-              className="group inline-flex items-center gap-2 text-text-muted hover:text-brand transition-colors text-right"
+              className="group inline-flex items-center gap-2 min-h-[44px] py-2 text-text-muted hover:text-brand transition-colors text-right"
             >
               <span className="text-right">
                 <span className="block text-xs text-text-subtle">
                   {t("下一個", "Next")}
                 </span>
-                <span className="text-sm">
+                <span className="text-sm group-hover:underline underline-offset-[3px]">
                   {t(props.next.titleZh, props.next.titleEn)}
                 </span>
               </span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
             </a>
           ) : (
             <span />
