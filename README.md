@@ -1,5 +1,7 @@
 # Resume Portal — 周暐倫 (Terry Chou) 履歷入口網站
 
+> 🌐 線上:**https://terrychou.com** ｜ 部署於 Oracle Cloud A1 (ARM64),經 Cloudflare Tunnel 對外(零入站),GitHub Actions 兩段式 CI/CD 自動部署。
+
 把既有的 GitHub 專案重新包裝成一個**對外的履歷門面網站**:主站是履歷門面,底下掛多個可獨立訪問的專案子站(能跑的做 live demo、其餘做 showcase),部署在 Oracle Cloud Always Free A1 (ARM64),透過 Cloudflare Tunnel 對外,並以獨立 CI/CD 管線各自建置與部署。
 
 > 這是一個 **monorepo**(單一倉庫裝下主站、所有子站與共用元件),用 **pnpm workspaces + Turborepo** 管理,並用 GitHub Actions 的 `paths:` 過濾器讓每個子站擁有彼此解耦的 pipeline。
@@ -62,7 +64,10 @@ pnpm typecheck        # 型別檢查
 ## CI/CD 與部署
 
 - **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build`,path-filtered,當作合併前的關卡。
-- **`deploy-main.yml`**(Oracle A1 上的 self-hosted ARM runner):push 到 `main` 且主站相關路徑(`apps/main`、`packages/ui`、`content`)變動時,build → 產 PDF → `infra/scripts/deploy-static.sh` 同步到 `/srv/main` → health check。**零 secrets**(runner 主動連出、本機寫檔,呼應 Tunnel 的零入站思路)。
+- **`deploy-main.yml`**(**兩段式**,push 到 `main` 且主站相關路徑 `apps/main`/`packages/ui`/`content` 變動時觸發):
+  - **build(GitHub-hosted amd64)**:`pnpm build` + 裝 CJK 字型 + 產雙語 PDF → 上傳 artifact。
+  - **deploy(Oracle A1 上的 self-hosted ARM runner)**:下載 artifact → `infra/scripts/deploy-static.sh` rsync 到 `/srv/main` → health check。**零 secrets、零入站**(runner 主動連出);正式機不 build、不需 Chrome。
+  - 為何兩段式:Chrome for Testing 無 Linux ARM64 版,PDF 在 amd64 產最穩;小台 ARM 正式機只做輕量部署。
 - Live demo 子站(Soulshard 等)於**各自 repo** 擁有獨立 pipeline,主站只導覽到其子網域。
 - 啟用步驟、runner 註冊與取捨:見 [`docs/20–22`](./docs/) 與 [`infra/`](./infra/)。
 

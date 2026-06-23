@@ -79,9 +79,9 @@
 ### 3.5 self-hosted ARM runner vs GitHub-hosted runner
 
 - **GitHub-hosted**(x86):免維護,但要部署到「無入站」的主機需另經 SSH(可走 `cloudflared access`)。靜態站其實 x86 build 就夠。
-- **self-hosted ARM runner(本專案採用)**:跑在 Oracle 主機上,**連出** GitHub 領工作,在本機 build 並直接寫入 Caddy 服務目錄——零入站、ARM 原生(對日後動態 app 友善)。
+- **self-hosted ARM runner(本專案採用,負責 deploy)**:跑在 Oracle 主機上、**連出** GitHub 領工作,把產物部署到 Caddy 服務目錄——零入站、與 Tunnel 同哲學。
 
-**取捨**:self-hosted 要自己維護 runner、且在 prod 主機跑 CI 有資源/安全考量(可用獨立使用者、限制權限緩解)。這部分 Phase 5 會詳談,若你不想在 prod 跑 CI,改用 GitHub-hosted + tunnel SSH。
+**最終採兩段式**(詳見 §5):**build + PDF 放 GitHub-hosted(amd64)**、self-hosted runner 只做「下載 artifact + rsync 部署」。為什麼不在 runner build:① Chrome for Testing 無 Linux ARM64 版,PDF 在 ARM 產不出來;② 正式機是小台 ARM,把 build/Chrome 移走更輕。**取捨**:多一次 artifact 傳遞,換來正式機輕量、避開 ARM-Chrome,且 deploy 仍零入站。
 
 ## 4. 各專案呈現策略(初版,Phase 2 內容研究後定案)
 
@@ -98,6 +98,14 @@
 | Mini-Moba / Ros-Ball-Chaser / PayTheMoney | C++/ROS/JS | **showcase** 或外連 |
 | 學術專案(Verilog/ASM/C++) | 課程作業 | 主站摺疊區 + 外連 |
 
-## 5. 接下來
-- Phase 1 設計系統、Phase 2 內容研究(會逐一讀真實 repo 後重寫文案並定案上表)、Phase 3 前端實作。
-- Phase 4/5 進入 Cloudflare 與 CI/CD,屆時每個步驟都對照本篇的圖。
+## 5. 上線狀態與經驗教訓(2026-06-23 已上線)
+
+**現況**:`https://terrychou.com` 已上線(主站 + 8 個 showcase 詳情頁 + 雙語 + 可下載 PDF)。鏈路:使用者 → Cloudflare 邊緣(HTTPS)→ Tunnel → 主機 Caddy(`127.0.0.1:8080`)→ `/srv/main`。CI/CD 兩段式,push 到 main 自動部署。
+
+**實作中真實解過的問題(面試素材)**:
+1. **runner 未就緒的 startup_failure**:deploy job 加 `if: vars.DEPLOY_ENABLED` 閘門,未啟用時安全跳過而非失敗。
+2. **pnpm 11 需 Node ≥ 22.13**:CI 與主機都升 Node 22(Node 20 缺 `node:sqlite` 會讓 pnpm 啟動崩潰)。
+3. **Chrome for Testing 無 Linux ARM64 版**:puppeteer 在 ARM 取得 x64 Chrome 無法執行 → 把 build + PDF 移到 GitHub-hosted(amd64),deploy-main 改兩段式。
+4. **CDN 快取住錯誤退路**:`.pdf` 是 Cloudflare 預設會快取的副檔名;PDF 還不存在時 Caddy `try_files` 回退 `index.html`(200)被邊緣快取,origin 有真 PDF 後仍服務舊快取 → 需 purge(或日後在 CI 自動 purge)。
+
+**可選強化**:Soulshard 接 `soulshard.terrychou.com`、CI 部署後自動 purge、Web Analytics、`docs/30` 面試講稿。
