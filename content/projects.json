@@ -1,5 +1,5 @@
 {
-  "count": 16,
+  "count": 17,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
@@ -150,6 +150,56 @@
       "demoFeasibility": {
         "canRunInBrowser": true,
         "notes": "前端為純 ES Modules + HTML5 Canvas,可純單機離線遊玩、無需建置(只需任一靜態伺服器,repo 內附 tools/serve.mjs)。雲端帳號、跨裝置存檔、排行榜與 1~3 人連線皆為選配,未登入或連不上會自動退回本機 localStorage 存檔,不影響核心遊玩。因此前端可獨立靜態部署,可作為候選 live demo(實際上已部署於 https://yeyesoulshard.duckdns.org/,並有 GitHub Actions push 到 main 自動部署至 Oracle Cloud + HTTPS)。完整體驗多人/排行榜需另跑 Node + Fastify + PostgreSQL 後端(docker compose 一鍵起)。"
+      }
+    },
+    {
+      "slug": "steam-sale-checker",
+      "repoName": "SteamSaleChecker",
+      "titleZh": "Steam 特價追蹤站",
+      "titleEn": "Steam Sale Checker",
+      "oneLinerZh": "自建的 Steam 特價追蹤站:後端定時抓 Steam 官方端點與 GamerPower、自建價格歷史(算「本站追蹤以來史低」)烤成靜態 JSON,前端 Astro 以深色電競風呈現;支援 Discord 登入、跨裝置願望清單與降價/目標價的 Discord 通知。",
+      "oneLinerEn": "A self-built Steam deals tracker: a cron worker pulls Steam's official endpoints and GamerPower, keeps its own price history (an all-time low since tracking began), and bakes it to static JSON served by an Astro front end — with Discord login, a cross-device wishlist, and Discord price-drop / target-price alerts.",
+      "descZh": "一套自建的 Steam 特價追蹤站,定位在「SteamDB 風的特價榜 + 自建價格歷史 + Discord 通知」。後端 worker(Node + TypeScript、cron 約每 30 分)在 server 端呼叫 Steam 官方商店端點(featuredcategories / appdetails / 特價搜尋,免金鑰、台灣區 cc=tw)與 GamerPower(永久入庫的免費遊戲/DLC),把每輪台幣價寫進 SQLite 累積成「本站追蹤以來」的價格走勢與史低(observed low),再烤成 deals / free / meta 三份靜態 JSON;可選配 IsThereAnyDeal API 以真實台幣史低校正冷啟動初值。前端是 Astro 靜態站(深色電競風、繁中/英 i18n、深淺主題、PWA),提供可排序列表與卡片雙檢視、列內價格走勢 sparkline、Steam 評價、特價即時倒數、即將結束與免費領取專區,以及每款的商品詳細頁(自建歷史走勢圖)。登入子系統採 Discord OAuth:收藏跨裝置同步(未登入用 localStorage、登入後合併)、每款可設目標價,創本站新低或跌破目標時由 Discord bot 在你的頻道 @你或私訊提醒,並有 per-user 通知偏好(降價/免費/每日每週摘要/只收特定類型/頻道 vs DM)。所有第三方呼叫都在 server 端完成,公開瀏覽永遠只吃靜態 JSON,不暴露任何金鑰。",
+      "descEn": "A self-built Steam deals site positioned as \"a SteamDB-style sale board + its own price history + Discord alerts\". A backend worker (Node + TypeScript, cron roughly every 30 min) calls Steam's official store endpoints server-side (featuredcategories / appdetails / sale search — no API key, Taiwan region cc=tw) and GamerPower (permanently-claimable free games/DLC), writes each pass's TWD price into SQLite to accumulate a \"since we started tracking\" price trend and observed low, then bakes three static JSON files (deals / free / meta); an optional IsThereAnyDeal API can seed a real TWD all-time low for cold starts. The front end is an Astro static site (dark esports theme, zh-TW/en i18n, light/dark theme, PWA) with a sortable list and card view, per-row price sparklines, Steam review scores, live sale countdowns, an \"ending soon\" and a free-to-keep section, and a per-game detail page with a self-built history chart. The login subsystem uses Discord OAuth: favourites sync across devices (localStorage when logged out, merged on login), each game can carry a target price, and a Discord bot @-mentions or DMs you when a favourite hits a new tracked low or crosses its target — all governed by per-user notification preferences (price-drop / free / daily-weekly digest / genre filter / channel vs DM). Every third-party call happens server-side, so public browsing only ever reads static JSON and never exposes a key.",
+      "techStack": [
+        "TypeScript",
+        "Astro",
+        "Node.js",
+        "Fastify",
+        "SQLite",
+        "Discord OAuth",
+        "Docker",
+        "Caddy",
+        "Cloudflare Tunnel",
+        "GitHub Actions",
+        "Vitest"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/SteamSaleChecker",
+      "liveUrl": "https://steam.terrychou.com",
+      "highlights": [
+        {
+          "zh": "自建價格歷史而非串接第三方:worker 每輪把抓到的台幣價寫進 SQLite,累積成「本站追蹤以來」的走勢與史低(observed low),並誠實標示為『追蹤以來最低』而非冒充 SteamDB/ITAD runtime;另可選配 ITAD API Key 以真實台幣史低校正冷啟動初值,只改 game_stats、不污染累積曲線。",
+          "en": "Its own price history instead of scraping a third party: each worker pass writes the TWD price into SQLite, accumulating a \"since tracking\" trend and observed low, honestly labelled \"lowest since tracked\" rather than impersonating SteamDB/ITAD runtime; an optional ITAD API key only seeds the cold-start all-time low and never pollutes the accumulated curve."
+        },
+        {
+          "zh": "「server 端抓取、前端純靜態 JSON」的架構:對 Steam / GamerPower / ITAD 的呼叫全在 worker 完成,烤成 deals / free / meta 給前端 fetch,公開瀏覽零金鑰外洩、免重 build;npm-workspaces monorepo 切成 shared 純函式+型別 / worker / Astro web / api,純邏輯以 vitest TDD(全專案 160+ 測試)。",
+          "en": "A \"fetch on the server, ship static JSON to the client\" architecture: every call to Steam / GamerPower / ITAD runs in the worker and is baked into deals / free / meta for the front end to fetch, so public browsing leaks no keys and needs no rebuild; the npm-workspaces monorepo splits into shared pure functions+types / worker / Astro web / api, with the pure logic on vitest TDD (160+ tests)."
+        },
+        {
+          "zh": "可登入的通知子系統:Discord OAuth 登入後願望清單跨裝置同步(未登入 localStorage、登入即合併)、每款可設目標價;worker 偵測「收藏且創本站新低/跌破目標」時,由 Discord bot 依 per-user 偏好以頻道 @你或私訊 DM 發送,含個人免費遊戲通知與每日/每週特價摘要;另可一鍵從公開 Steam 願望單(貼 SteamID64 或個人檔網址、免金鑰)匯入收藏。",
+          "en": "A login-gated notification subsystem: after Discord OAuth the wishlist syncs across devices (localStorage when logged out, merged on login) and each game can carry a target price; when the worker detects a favourited game hitting a new tracked low or crossing its target, the bot delivers per-user — channel @-mention or DM — alongside personal free-game alerts and daily/weekly digests; favourites can be bulk-imported from a public Steam wishlist (SteamID64 or profile URL, no key)."
+        },
+        {
+          "zh": "完整自架部署:api(Fastify + better-sqlite3 + secure-session)與 worker 以 Docker Compose 跑在 Oracle ARM 主機,Caddy 同站代理 /api、/auth 並服務 Astro 靜態檔,外接 Cloudflare Tunnel 上線到 steam.terrychou.com;push 到 main 由 GitHub Actions 經 SSH 自動 git reset + compose 重建 + health check,祕密放主機 .env 不進 CI,與既有 soulshard 子站共存。",
+          "en": "A fully self-hosted deploy: the api (Fastify + better-sqlite3 + secure-session) and worker run under Docker Compose on an Oracle ARM host, with Caddy same-origin-proxying /api and /auth while serving the Astro static files behind a Cloudflare Tunnel at steam.terrychou.com; push-to-main triggers a GitHub Actions SSH deploy (git reset + compose rebuild + health check), with secrets in the host .env outside CI, coexisting with the existing Soulshard subsite."
+        }
+      ],
+      "challengesZh": "最大的取捨是「要不要自建價格歷史」:直接串第三方(SteamDB/ITAD runtime)最省事,但有授權與穩定性風險,因此選擇自抓自存、誠實標示「追蹤以來最低」,代價是冷啟動時史低不準——再以選配 ITAD API Key 校正初值、且只寫 game_stats 不污染累積曲線來折衷。架構上堅持「server 端抓取、前端純靜態 JSON」以杜絕金鑰外洩並免重 build,代價是犧牲即時性,於是用 cron(約 30 分)加上資料新鮮度標示換取簡單與安全。通知子系統最難的是「可靠送達且不重複、不遺失」:目標價必須看現價跌破即發(不能只在創新低時觸發),個人免費通知改用 per-user 基線加完整清單 feed,避免被全域上限永久略過——這些都以多代理對抗式 review(每筆 refute-by-default 驗證)與整合測試守住。部署則完全貼合既有 soulshard 架構(Cloudflare Tunnel → Caddy → Docker),避開已佔用的 8787 埠、cookie 依環境切換 secure,確保兩個子站互不干擾。",
+      "challengesEn": "The biggest trade-off was whether to build the price history myself: wiring a third party (SteamDB/ITAD runtime) is easiest but carries licensing and stability risk, so I chose to fetch and store it myself and label it honestly as \"lowest since tracked\" — at the cost of an inaccurate all-time low on cold start, which an optional ITAD API key reconciles by seeding only game_stats without polluting the accumulated curve. Architecturally I committed to \"fetch on the server, serve static JSON on the client\" to eliminate key leakage and avoid rebuilds, trading away real-time freshness for simplicity and safety via a ~30-minute cron plus a data-freshness indicator. The hardest part of the notification subsystem was reliable, non-duplicate, non-lossy delivery: target prices must fire the moment the current price crosses them (not only on a new low), and personal free-game alerts moved to a per-user baseline plus a full-list feed so nothing is permanently skipped by a global cap — all held in place by multi-agent adversarial review (refute-by-default per finding) and integration tests. Deployment hews exactly to the existing Soulshard setup (Cloudflare Tunnel → Caddy → Docker), avoiding the already-used port 8787 and switching cookie secure by environment so the two subsites never interfere.",
+      "demoFeasibility": {
+        "canRunInBrowser": true,
+        "notes": "已正式上線 https://steam.terrychou.com(Oracle ARM 主機上 Docker:api+worker、Caddy 同站、Cloudflare Tunnel)。特價/免費/走勢/詳情頁完全免登入即可體驗;Discord 登入解鎖願望清單跨裝置同步、目標價與 Discord 降價/免費通知。push 到 main 由 GitHub Actions 自動部署,與 soulshard 子站共存。"
       }
     },
     {

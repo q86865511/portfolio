@@ -9,9 +9,9 @@ import {
 } from "@resume/ui";
 import { navLinks, profile } from "@/lib/site";
 import {
+  detailProjects,
   getProject,
   isWip,
-  showcaseProjects,
 } from "@/lib/projects";
 
 export function ProjectDetailView({ slug }: { slug: string }) {
@@ -19,10 +19,11 @@ export function ProjectDetailView({ slug }: { slug: string }) {
   const project = getProject(slug);
   if (!project) return null;
 
-  const showcase = showcaseProjects();
-  const idx = showcase.findIndex((p) => p.slug === slug);
-  const prevP = idx > 0 ? showcase[idx - 1] : undefined;
-  const nextP = idx >= 0 && idx < showcase.length - 1 ? showcase[idx + 1] : undefined;
+  const detailList = detailProjects();
+  const idx = detailList.findIndex((p) => p.slug === slug);
+  const prevP = idx > 0 ? detailList[idx - 1] : undefined;
+  const nextP =
+    idx >= 0 && idx < detailList.length - 1 ? detailList[idx + 1] : undefined;
 
   const toNav = (p: typeof project): ProjectDetailNav => ({
     slug: p.slug,
