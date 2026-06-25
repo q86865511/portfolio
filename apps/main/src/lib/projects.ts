@@ -104,14 +104,18 @@ export function projectsByTier(): Record<Tier, Project[]> {
   return groups;
 }
 
-/** presentation === 'showcase' 的專案(用於 generateStaticParams)。 */
-export function showcaseProjects(): Project[] {
-  return projects.filter((p) => p.presentation === "showcase");
+/**
+ * 是否有專屬 /projects/[slug] 詳情頁。
+ * showcase 故事頁,以及 live-demo(同樣給故事頁;卡片另有「線上遊玩/體驗」直連 liveUrl)。
+ * external / academic 不給詳情頁(卡片直連 GitHub)。
+ */
+export function hasDetailPage(p: Project): boolean {
+  return p.presentation === "showcase" || p.presentation === "live-demo";
 }
 
-/** showcase 專案的有序列表(用於上一個/下一個導覽)。 */
-export function showcaseSlugs(): string[] {
-  return showcaseProjects().map((p) => p.slug);
+/** 會產生 /projects/[slug] 詳情頁的專案(用於 generateStaticParams / sitemap / 上一個下一個導覽)。 */
+export function detailProjects(): Project[] {
+  return projects.filter(hasDetailPage);
 }
 
 /**

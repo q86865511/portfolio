@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { showcaseProjects } from "@/lib/projects";
+import { detailProjects } from "@/lib/projects";
 import { absoluteUrl } from "@/lib/seo";
 
 /**
- * 動態 sitemap:首頁 + /print + 所有 showcase 專案頁。
+ * 動態 sitemap:首頁 + /print + 所有有詳情頁的專案(showcase + live-demo)。
  * output:'export' 下,Next 於 build 時輸出靜態 sitemap.xml。
  */
 export const dynamic = "force-static";
@@ -26,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const projectPages: MetadataRoute.Sitemap = showcaseProjects().map((p) => ({
+  const projectPages: MetadataRoute.Sitemap = detailProjects().map((p) => ({
     url: absoluteUrl(`/projects/${p.slug}/`),
     lastModified: now,
     changeFrequency: "monthly",
