@@ -1,6 +1,6 @@
 # Resume Portal — 周暐倫 (Terry Chou) 履歷入口網站
 
-> 🌐 線上:**https://terrychou.com**(主站)· **https://soulshard.terrychou.com**(Soulshard live demo)
+> 🌐 線上:**https://terrychou.com**(主站)· **https://soulshard.terrychou.com**(Soulshard live demo)· **https://steam.terrychou.com**(SteamSaleChecker)
 > ｜ 部署於 Oracle Cloud A1 (ARM64),經 Cloudflare Tunnel 對外(零入站);`portfolio` 與 `Soulshard-Hunter` 各有獨立 self-hosted runner 與 CI/CD pipeline,push 即自動部署。
 
 把既有的 GitHub 專案重新包裝成一個**對外的履歷門面網站**:主站是履歷門面,底下掛多個可獨立訪問的專案子站(能跑的做 live demo、其餘做 showcase),部署在 Oracle Cloud Always Free A1 (ARM64),透過 Cloudflare Tunnel 對外,並以獨立 CI/CD 管線各自建置與部署。
@@ -18,7 +18,8 @@ Cloudflare 邊緣 (DNS / Proxy / CDN 快取 / WAF / TLS 終結)
   ▼
 Oracle Cloud A1 (ARM64) 上的 Caddy
   ├─ 你的網域            → /srv/main(apps/main:履歷門面 + /projects/[slug] showcase)
-  └─ soulshard.你的網域  → /srv/soulshard(Soulshard-Hunter,獨立 repo + 自有 pipeline 部署)
+  ├─ soulshard.你的網域  → /srv/soulshard(Soulshard-Hunter,獨立 repo + 自有 pipeline 部署)
+  └─ steam.你的網域      → /srv/steam(SteamSaleChecker,獨立 repo;api+worker 走 Docker、Caddy 同站代理 /api、/auth)
                            (未來 cyclepact 完成後比照新增子網域)
 ```
 
@@ -33,7 +34,7 @@ Oracle Cloud A1 (ARM64) 上的 Caddy
 │  └─ main/          # 主站:履歷門面、showcase 詳情頁、PDF 履歷、雙語
 ├─ packages/
 │  └─ ui/            # 共用設計系統(主題、元件、雙語基礎)
-├─ content/          # 專案資料(projects.json,16 筆雙語,內容單一真實來源)
+├─ content/          # 專案資料(projects.json,17 筆雙語,內容單一真實來源)
 ├─ infra/            # cloudflared / Caddy / 部署腳本
 ├─ docs/             # 教學文件(Cloudflare / CI/CD,繁體中文)
 ├─ .github/workflows/# 主站 path-filtered CI/CD(各 demo 子站於自有 repo)
@@ -43,6 +44,7 @@ Oracle Cloud A1 (ARM64) 上的 Caddy
 
 > **Live demo 子站採「各自 repo + 各自 CI/CD」**(最徹底的解耦):主站只負責導覽到子網域。
 > - `Soulshard-Hunter`(現有,已自帶 GitHub Actions 部署)→ `soulshard.你的網域`
+> - `SteamSaleChecker`(現有,已自帶 GitHub Actions 部署)→ `steam.你的網域`
 > - `cyclepact`(開發中)→ 未來完成後新增 `cyclepact.你的網域`
 
 ## 技術棧

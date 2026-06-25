@@ -37,6 +37,14 @@ function statusFor(
     };
   }
   if (p.presentation === "showcase") {
+    // 已上線的 showcase 專案(有 liveUrl)等同 live 待遇。
+    if (p.liveUrl) {
+      return {
+        status: "live",
+        label: "Live",
+        ariaLabel: t("狀態:可線上使用", "Status: live"),
+      };
+    }
     return { status: "showcase", label: "Showcase" };
   }
   return undefined;
@@ -63,12 +71,30 @@ function actionsFor(p: Project): CardAction[] {
       variant: "secondary",
     });
   } else if (p.presentation === "showcase") {
-    actions.push({
-      labelZh: "看詳情",
-      labelEn: "Details",
-      href: link.href,
-      variant: "secondary",
-    });
+    // 已上線的 showcase 專案:卡片直接給「線上體驗」+「看詳情」。
+    if (p.liveUrl) {
+      actions.push({
+        labelZh: "線上體驗",
+        labelEn: "Live demo",
+        href: p.liveUrl,
+        variant: "primary",
+        external: true,
+        play: true,
+      });
+      actions.push({
+        labelZh: "看詳情",
+        labelEn: "Details",
+        href: `/projects/${p.slug}/`,
+        variant: "secondary",
+      });
+    } else {
+      actions.push({
+        labelZh: "看詳情",
+        labelEn: "Details",
+        href: link.href,
+        variant: "secondary",
+      });
+    }
   }
 
   actions.push({

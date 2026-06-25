@@ -58,6 +58,7 @@ const TIER_MAP: Record<string, Tier> = {
   "ai-deployment-pipeline": "featured",
   "smart-pedestrian-navigation": "featured",
   "soulshard-hunter": "notable",
+  "steam-sale-checker": "notable",
   "discord-auto-bot": "notable",
   cyclepact: "notable",
   lolhelper: "mini",
@@ -134,6 +135,7 @@ const RESUME_ORDER = [
   "ai-deployment-pipeline",
   "smart-pedestrian-navigation",
   "soulshard-hunter",
+  "steam-sale-checker",
   "discord-auto-bot",
   "cyclepact",
 ];

@@ -77,7 +77,7 @@ export function ProjectDetail(props: ProjectDetailProps) {
               rel="noopener noreferrer"
               target="_blank"
             >
-              {t("線上遊玩 / Live demo", "Live demo")}
+              {t("線上體驗 / Live demo", "Live demo")}
               <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </Button>
           )}
