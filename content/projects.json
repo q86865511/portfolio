@@ -1,5 +1,5 @@
 {
-  "count": 17,
+  "count": 18,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
@@ -200,6 +200,57 @@
       "demoFeasibility": {
         "canRunInBrowser": true,
         "notes": "已正式上線 https://steam.terrychou.com(Oracle ARM 主機上 Docker:api+worker、Caddy 同站、Cloudflare Tunnel)。特價/免費/走勢/詳情頁完全免登入即可體驗;Discord 登入解鎖願望清單跨裝置同步、目標價與 Discord 降價/免費通知。push 到 main 由 GitHub Actions 自動部署,與 soulshard 子站共存。"
+      }
+    },
+    {
+      "slug": "erp-system",
+      "repoName": "ERPSystem",
+      "titleZh": "製造業 ERP 系統",
+      "titleEn": "Manufacturing ERP",
+      "oneLinerZh": "從零自建的製造業 ERP,核心是手寫的複式記帳總帳引擎:進貨、生產、出貨、付款等業務動作,都與對應的文件、庫存異動在同一筆資料庫交易內過帳成借貸平衡的分錄,帳永不半套、不平不可寫入。",
+      "oneLinerEn": "A from-scratch manufacturing ERP whose core is a hand-written double-entry general ledger: goods receipt, production, shipment and payment each post a balanced journal entry within the same database transaction as the document and inventory change — never half-posted, and an unbalanced entry cannot be committed.",
+      "descZh": "以 Java 21 + Spring Boot 4 + PostgreSQL 16 打造、定位為展示『架構與 ERP 領域素養』的作品集專案。核心是一套手寫複式記帳總帳:業務動作與其文件、庫存異動在同一筆 DB 交易內過帳成借貸平衡分錄,並把關鍵不變式下放到資料庫約束——強制 debit=credit、已過帳分錄不可修改或刪除。整體採模組化單體(modular monolith),模組邊界由 ArchUnit 在 CI 機械化強制(任一模組不得 import 他模組內部或直接動其資料表);金額一律以自訂 Money 值物件(BigDecimal、scale 4、HALF_UP)處理,全程不用 float。Schema 以 Flyway 版本控管、健康檢查走 Spring Boot Actuator,並以 docker compose 自動起 PostgreSQL。目前完成 Phase 0『走骨架』:總帳核心、IAM 基礎、手動分錄與試算表 REST 端點,以及 15 個通過測試(含 6 個 Testcontainers 對真實 PostgreSQL 的整合測試)。後續 Phase 1–6 規劃逐步加上庫存與移動平均成本、採購到付款、訂單到收款、製造(BOM/工單/WIP 帳務)與報表結帳;React 18 + Mantine 前端為後續階段。",
+      "descEn": "A portfolio project on Java 21 + Spring Boot 4 + PostgreSQL 16, deliberately scoped to demonstrate architecture and ERP-domain literacy. Its core is a hand-written double-entry general ledger: a business action posts a balanced journal entry within the same DB transaction as its document and inventory change, with key invariants pushed down into database constraints — enforcing debit=credit and making posted entries immutable. It is a modular monolith whose module boundaries are mechanically enforced by ArchUnit in CI (no module may import another's internals or touch its tables); money is handled exclusively through a custom Money value object (BigDecimal, scale 4, HALF_UP, never float). Schema is version-controlled with Flyway, health is exposed via Spring Boot Actuator, and PostgreSQL is auto-started via docker compose. Phase 0 (the walking skeleton) is complete: the ledger core, basic IAM, REST endpoints for manual journal entries and a trial balance, and 15 passing tests including 6 Testcontainers integration tests against real PostgreSQL. Phases 1–6 plan to add inventory with moving-average cost, procure-to-pay, order-to-cash, manufacturing (BOM / work order / WIP accounting) and reporting / period-close; a React 18 + Mantine front end is a later phase.",
+      "techStack": [
+        "Java 21",
+        "Spring Boot 4",
+        "PostgreSQL 16",
+        "Spring Data JPA",
+        "Hibernate",
+        "Flyway",
+        "Spring Security",
+        "JUnit 5",
+        "Testcontainers",
+        "ArchUnit",
+        "Maven",
+        "Docker Compose",
+        "GitHub Actions"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/ERPSystem",
+      "highlights": [
+        {
+          "zh": "手寫複式記帳總帳引擎:每筆業務動作(進貨/生產/出貨/付款)與其文件、庫存異動在同一筆 DB 交易內同步過帳成借貸平衡分錄,並以資料庫約束強制 debit=credit、已過帳分錄不可修改/刪除,從根本杜絕半套或不平的帳。",
+          "en": "A hand-written double-entry ledger engine: each business action (receipt / production / shipment / payment) atomically posts a balanced journal entry in the same DB transaction as its document and inventory change, with database constraints enforcing debit=credit and making posted entries immutable — eliminating half-posted or unbalanced books by construction."
+        },
+        {
+          "zh": "模組化單體 + 架構邊界機械化驗證:以 ArchUnit 在 CI 強制模組邊界(任一模組不得 import 他模組內部或直接動其資料表),邊界不是口頭約定而是會讓 CI 失敗的測試;設計理由記於 ADR-0001。",
+          "en": "Modular monolith with mechanically-verified boundaries: ArchUnit enforces module boundaries in CI (no module may import another's internals or touch its tables), so boundaries are CI-failing tests rather than informal conventions; the rationale is recorded in ADR-0001."
+        },
+        {
+          "zh": "金額正確性與真實整合測試:自訂 Money 值物件(BigDecimal、scale 4、HALF_UP,全程不用 float/double);以 JUnit 5 + Testcontainers 對真實 PostgreSQL 16 跑整合測試(非 mock),借貸平衡、不可竄改等不變式以實際資料庫約束驗證。",
+          "en": "Money correctness with real integration tests: a custom Money value object (BigDecimal, scale 4, HALF_UP — never float/double); JUnit 5 + Testcontainers run integration tests against a real PostgreSQL 16 (not mocks), verifying invariants like balanced-and-immutable against the actual database constraints."
+        },
+        {
+          "zh": "有意識的範圍藍圖:Phase 0 走骨架(總帳核心)已完成,後續 Phase 1–6 依序交付庫存、採購到付款、訂單到收款、製造(BOM/工單/WIP)與報表結帳,並明列延後項目(多幣別、多租戶、FIFO/標準成本差異、完整 MRP 等),呈現取捨判斷而非堆功能。",
+          "en": "A deliberate scope blueprint: Phase 0 (the ledger core walking skeleton) is done, with Phases 1–6 sequentially delivering inventory, procure-to-pay, order-to-cash, manufacturing (BOM / work order / WIP) and reporting / close — plus an explicit deferred list (multi-currency, multi-tenancy, FIFO / standard-cost variances, full MRP, etc.), showing judgment over feature-piling."
+        }
+      ],
+      "challengesZh": "最大的取捨是『自建 vs 擴充既有 ERP(Odoo/ERPNext)』:擴充能更快交付商業價值,但本專案的目的是展示架構與 ERP 領域素養,因此選擇從零手寫過帳引擎,把 debit=credit 不變式、可對帳的不可變庫存子帳與『文件→庫存→分錄』管線做到逐行可辯護。為追求正確性而非僅是會動,刻意把核心不變式下放到資料庫約束(借貸平衡、已過帳不可改),金額一律用 BigDecimal 的 Money 值物件避免浮點誤差,並以 Testcontainers 對真實 PostgreSQL 做整合測試。架構上採模組化單體並以 ArchUnit 在 CI 機械化強制邊界,保留日後拆分服務的彈性。範圍上誠實地以 Phase 切分、先交付走骨架,並明列延後項目(多幣別/多租戶/FIFO 成本差異/完整 MRP/簽核流程等)——專案仍屬早期(Phase 0 完成,商業模組與前端為後續軌)。",
+      "challengesEn": "The central trade-off was build-from-scratch vs. extending a packaged ERP (Odoo/ERPNext): extending ships business value faster, but the goal here is to demonstrate architecture and ERP-domain literacy, so the posting engine was hand-written to make the debit=credit invariant, a reconcilable immutable inventory subledger, and the document→inventory→ledger pipeline defensible line by line. To pursue correctness rather than merely 'it runs', core invariants were pushed into database constraints (balanced entries, immutable once posted), money is handled exclusively via a BigDecimal Money value object to avoid float error, and integration tests run against real PostgreSQL via Testcontainers. Architecturally it is a modular monolith with ArchUnit mechanically enforcing boundaries in CI, preserving the option to split into services later. Scope is honestly phased — the walking skeleton ships first, with an explicit deferred list (multi-currency / multi-tenancy / FIFO cost variance / full MRP / approval workflows) — and the project is still early (Phase 0 complete; business modules and the front end are on a later track).",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "無法作為瀏覽器 live demo。目前為 Spring Boot 後端 REST 服務(Phase 0 走骨架),尚無前端 UI(React 18 + Mantine 為後續階段),核心(複式過帳、試算表/對帳)需以 REST 客戶端(curl/Postman)操作,並依賴 PostgreSQL(repo 內以 docker compose 自動起 Postgres,本機 ./mvnw spring-boot:run 即可)。展示建議以架構說明、ADR、試算表/對帳輸出與 CI(含 ArchUnit 與 Testcontainers 整合測試)綠燈呈現。"
       }
     },
     {
