@@ -31,6 +31,8 @@ interface BaseCardProps {
   actions?: CardAction[];
   /** 學術/來源標籤(碩士論文 / 大學專題 / 課程專案),可選。 */
   kind?: string;
+  /** 卡片頂部封面圖(16:9);提供時取代 Featured 的 glyph 帶、並為 Notable 加頂圖。 */
+  cover?: string;
   className?: string;
 }
 
@@ -54,6 +56,23 @@ function ActionButtons({ actions }: { actions: CardAction[] }) {
           {a.arrow && <ArrowUpRight className="h-4 w-4" aria-hidden="true" />}
         </Button>
       ))}
+    </div>
+  );
+}
+
+/** 卡片頂部封面圖帶(16:9);decorative,標題等資訊另有文字呈現故 alt 留空。 */
+function CoverImage({ src }: { src: string }) {
+  return (
+    <div className="border-b border-border overflow-hidden bg-surface-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        width={1200}
+        height={675}
+        className="block w-full aspect-video object-cover"
+      />
     </div>
   );
 }
@@ -93,6 +112,7 @@ export function FeaturedCard({
   titleExternal,
   status,
   kind,
+  cover,
   desc,
   techStack = [],
   actions = [],
@@ -110,26 +130,32 @@ export function FeaturedCard({
         className,
       )}
     >
-      <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
-        {kind && <KindTag label={kind} className="absolute left-4 top-4 z-10" />}
-        {glyph && (
-          <span
-            aria-hidden="true"
-            className="font-mono font-bold text-[60px] opacity-10 tracking-[-2px]"
-          >
-            {glyph}
-          </span>
-        )}
-        {floatBadges.length > 0 && (
-          <div className="absolute right-4 bottom-4 flex gap-2">
-            {floatBadges.map((b, i) => (
-              <TechBadge key={i} category={b.category}>
-                {b.label}
-              </TechBadge>
-            ))}
-          </div>
-        )}
-      </div>
+      {cover ? (
+        <CoverImage src={cover} />
+      ) : (
+        <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
+          {kind && (
+            <KindTag label={kind} className="absolute left-4 top-4 z-10" />
+          )}
+          {glyph && (
+            <span
+              aria-hidden="true"
+              className="font-mono font-bold text-[60px] opacity-10 tracking-[-2px]"
+            >
+              {glyph}
+            </span>
+          )}
+          {floatBadges.length > 0 && (
+            <div className="absolute right-4 bottom-4 flex gap-2">
+              {floatBadges.map((b, i) => (
+                <TechBadge key={i} category={b.category}>
+                  {b.label}
+                </TechBadge>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-3">
           <h3 className="text-xl">
@@ -164,6 +190,7 @@ export function NotableCard({
   titleExternal,
   status,
   kind,
+  cover,
   desc,
   techStack = [],
   actions = [],
@@ -171,6 +198,7 @@ export function NotableCard({
 }: BaseCardProps) {
   return (
     <article className={cn(cardBase, "group card-accent-bar", className)}>
+      {cover && <CoverImage src={cover} />}
       <div className="p-5 pl-6 flex flex-col flex-1">
         {kind && (
           <div className="mb-2">

@@ -29,6 +29,7 @@
       ],
       "presentation": "showcase",
       "githubUrl": "https://github.com/q86865511/AI-Deployment-Pipeline",
+      "cover": "/covers/ai-deployment-pipeline.webp",
       "highlights": [
         {
           "zh": "設計清晰分層的服務架構:FastAPI 非同步後端(轉換/推論/評測/Triton 各自獨立 service 與 router)+ React/Ant Design 前端 + NVIDIA 推論堆疊,職責邊界明確,易於擴充與除錯。",
@@ -126,6 +127,7 @@
       ],
       "presentation": "live-demo",
       "githubUrl": "https://github.com/q86865511/Soulshard-Hunter",
+      "cover": "/covers/soulshard-hunter.webp",
       "liveUrl": "https://soulshard.terrychou.com",
       "highlights": [
         {
@@ -176,6 +178,7 @@
       ],
       "presentation": "showcase",
       "githubUrl": "https://github.com/q86865511/SteamSaleChecker",
+      "cover": "/covers/steam-sale-checker.webp",
       "liveUrl": "https://steam.terrychou.com",
       "highlights": [
         {
@@ -228,6 +231,7 @@
       ],
       "presentation": "showcase",
       "githubUrl": "https://github.com/q86865511/ERPSystem",
+      "cover": "/covers/erp-system.webp",
       "highlights": [
         {
           "zh": "手寫複式記帳總帳引擎:每筆業務動作(進貨/生產/出貨/付款)與其文件、庫存異動在同一筆 DB 交易內同步過帳成借貸平衡分錄,並以資料庫約束強制 debit=credit、已過帳分錄不可修改/刪除,從根本杜絕半套或不平的帳。",
@@ -279,6 +283,7 @@
       ],
       "presentation": "showcase",
       "githubUrl": "https://github.com/q86865511/Smart-Pedestrian-Navigation-via-Scene-Analysis-and-Traffic-Light-Detection",
+      "cover": "/covers/smart-pedestrian-navigation.webp",
       "highlights": [
         {
           "zh": "以 FC-DenseNet103 + InceptionV4 前端在 TensorFlow 1.x 上訓練街景語意分割,並採 CamVid 與自製補充資料集 1:1 混合,提升對在地街景的泛化能力;附帶資料集 label 顏色轉換工具讓兩套資料的標註對齊。",
@@ -358,6 +363,7 @@
       "slug": "discord-auto-bot",
       "repoName": "discord-auto-bot",
       "githubUrl": "https://github.com/q86865511/discord-auto-bot",
+      "cover": "/covers/discord-auto-bot.webp",
       "titleZh": "Discord 自動化機器人",
       "titleEn": "Discord Automation Bot",
       "oneLinerZh": "用 Playwright 驅動瀏覽器自動執行 Discord 斜線指令,內建 Kelly 投注、股票訊號、Rich 終端與零依賴 Web 儀表板雙介面的長時運行 asyncio 機器人。",
@@ -421,6 +427,7 @@
       ],
       "presentation": "showcase",
       "githubUrl": "https://github.com/q86865511/cyclepact",
+      "cover": "/covers/cyclepact.webp",
       "highlights": [
         {
           "zh": "資料驅動設計:500 隻精靈以 24 份地區 JSON(19 欄 schema)為權威來源,Godot autoload(MonsterDB)在執行時載入並建立 by_type/by_region/search 索引;圖鑑 Markdown 與遊戲內容皆由同一份 JSON 衍生,避免設定與程式各自漂移。",

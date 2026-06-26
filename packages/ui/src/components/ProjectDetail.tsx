@@ -22,6 +22,8 @@ export interface ProjectDetailProps {
   challenges: string;
   githubUrl: string;
   liveUrl?: string;
+  /** 封面圖路徑(16:9);提供時於頁首下方顯示。 */
+  cover?: string;
   status?: { status: ProjectStatus; label: string; ariaLabel?: string };
   /** 上一個 / 下一個專案(主站 /projects/[slug])。 */
   prev?: ProjectDetailNav;
@@ -83,6 +85,17 @@ export function ProjectDetail(props: ProjectDetailProps) {
           )}
         </div>
       </header>
+
+      {props.cover && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={props.cover}
+          alt=""
+          width={1408}
+          height={792}
+          className="block w-full rounded-lg border border-border mb-7"
+        />
+      )}
 
       {/* 概述 */}
       <section className="mb-7" aria-labelledby="pd-overview">
