@@ -73,6 +73,7 @@ export function ProjectDetailView({ slug }: { slug: string }) {
           challenges={t(project.challengesZh, project.challengesEn)}
           githubUrl={project.githubUrl}
           liveUrl={project.liveUrl}
+          cover={project.cover}
           status={status}
           prev={prevP ? toNav(prevP) : undefined}
           next={nextP ? toNav(nextP) : undefined}

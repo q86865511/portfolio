@@ -141,6 +141,7 @@ export function ProjectsSection() {
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
               kind={kindOf(p)}
+              cover={p.cover}
               desc={t(p.oneLinerZh, p.oneLinerEn)}
               techStack={p.techStack.slice(0, 5)}
               actions={actionsFor(p)}
@@ -165,6 +166,7 @@ export function ProjectsSection() {
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
               kind={kindOf(p)}
+              cover={p.cover}
               desc={t(p.oneLinerZh, p.oneLinerEn)}
               techStack={p.techStack.slice(0, 4)}
               actions={actionsFor(p)}

@@ -30,6 +30,8 @@ export interface Project {
   demoFeasibility: DemoFeasibility;
   githubUrl: string;
   liveUrl?: string;
+  /** 卡片頂部與詳情頁封面圖路徑(public 下,如 /covers/<slug>.webp),可選。 */
+  cover?: string;
   /** 學術/來源標籤(如 碩士論文 / 大學專題 / 課程專案),可選。 */
   kindZh?: string;
   kindEn?: string;
