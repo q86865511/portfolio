@@ -6,6 +6,8 @@
 - 套件管理:**pnpm**(workspaces);任務編排:**Turborepo**(`turbo.json`)。
 - 前端:Next.js 15(App Router、`output: 'export'` 靜態匯出)、React 19、TypeScript、Tailwind。
 - 共用設計系統放 `packages/ui`,各 app 透過 workspace 相依引用,**不複製貼上元件**。
+- e2e/smoke:**Playwright**(`apps/main/e2e/`),對 build 後的 `out/` 起本機 `serve` 驗證;已納入 `ci.yml`(build 後跑)。
+- pnpm 設定(`overrides`、`allowBuilds`、`verifyDepsBeforeRun` 等)放 **`pnpm-workspace.yaml`**——此版 pnpm 由 workspace yaml 讀取,寫在 `package.json` 的 `pnpm` 欄不會生效。
 
 ## 目錄約定
 - `apps/main`:履歷主站(門面 + `/projects/[slug]` showcase + PDF 履歷 + 雙語)。

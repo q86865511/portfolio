@@ -66,7 +66,7 @@ pnpm typecheck        # 型別檢查
 
 ## CI/CD 與部署
 
-- **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build`,path-filtered,當作合併前的關卡。
+- **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build → e2e smoke`,path-filtered,當作合併前的關卡。e2e 用 Playwright 對 build 出的靜態產物起本機伺服器,驗證首頁載入、專案連結與行動版不破版。
 - **`deploy-main.yml`**(**兩段式**,push 到 `main` 且主站相關路徑 `apps/main`/`packages/ui`/`content` 變動時觸發):
   - **build(GitHub-hosted amd64)**:`pnpm build` + 裝 CJK 字型 + 產雙語 PDF → 上傳 artifact。
   - **deploy(Oracle A1 上的 self-hosted ARM runner)**:下載 artifact → `infra/scripts/deploy-static.sh` rsync 到 `/srv/main` → health check。**零 secrets、零入站**(runner 主動連出);正式機不 build、不需 Chrome。
@@ -79,6 +79,10 @@ pnpm typecheck        # 型別檢查
 - 進度:[`PROGRESS.md`](./PROGRESS.md)
 - 開發約定:[`CLAUDE.md`](./CLAUDE.md)
 - 教學(Cloudflare / CI/CD,可作面試講稿):[`docs/`](./docs/)
+
+## 授權
+
+本專案採用 MIT 授權,詳見 [`LICENSE`](./LICENSE)。
 
 ---
 
