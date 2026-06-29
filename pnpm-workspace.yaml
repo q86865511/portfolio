@@ -8,3 +8,6 @@ allowBuilds:
   unrs-resolver: true
 # 不在每次 run script 前重新驗證相依(避免 ignored-builds 警告造成非 0 結束)
 verifyDepsBeforeRun: false
+# 依賴 override:強制 postcss >= 8.5.10,修補 next 內嵌的 postcss(GHSA-qx2v-qp2m-jg93)
+overrides:
+  postcss: ">=8.5.10"

@@ -12,6 +12,12 @@ build/
 # Turborepo
 .turbo/
 
+# Playwright(e2e 產物與下載的瀏覽器快取)
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # 環境變數(範例檔保留)
 .env
 .env.*

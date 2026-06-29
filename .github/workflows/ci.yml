@@ -112,3 +112,11 @@ jobs:
       #    (此處刻意「不」產 PDF——PDF 需要瀏覽器,放在部署 workflow 做,讓 CI 保持輕快。)
       - name: Build (main)
         run: pnpm --filter main run build
+
+      # 8) E2E smoke。對上一步 build 出來的靜態產物(apps/main/out)起一個本機伺服器,
+      #    用 Playwright 驗證最基本的可用性:首頁載得起來、有專案連結、行動版不破版。
+      #    typecheck/lint/build 只保證「build 得起來」;這一關保證「畫面真的正常」。
+      - name: Install Playwright browser (chromium)
+        run: pnpm --filter main exec playwright install --with-deps chromium
+      - name: E2E smoke (main)
+        run: pnpm --filter main run test:e2e
