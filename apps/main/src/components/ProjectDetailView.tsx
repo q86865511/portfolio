@@ -41,7 +41,7 @@ export function ProjectDetailView({ slug }: { slug: string }) {
       ? {
           status: "live" as const,
           label: "Live",
-          ariaLabel: t("狀態:可線上遊玩", "Status: live"),
+          ariaLabel: t("狀態:可線上使用", "Status: live"),
         }
       : { status: "showcase" as const, label: "Showcase" };
 

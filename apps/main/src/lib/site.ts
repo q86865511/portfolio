@@ -55,14 +55,14 @@ export const skillGroups: SkillGroup[] = [
     titleEn: "Frontend",
     icon: "fullstack",
     category: "neutral",
-    items: ["React", "Next.js", "Tailwind", "Electron"],
+    items: ["React", "Next.js", "Mantine", "Tailwind", "Electron"],
   },
   {
     titleZh: "後端開發",
     titleEn: "Backend",
     icon: "fullstack",
     category: "neutral",
-    items: ["FastAPI", "SQLAlchemy", "PostgreSQL", "Redis", "asyncio"],
+    items: ["FastAPI", "Spring Boot", "SQLAlchemy", "PostgreSQL", "Redis", "asyncio"],
   },
   {
     titleZh: "AI / ML 部署",
