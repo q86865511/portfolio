@@ -72,7 +72,7 @@ const TIER_MAP: Record<string, Tier> = {
 };
 
 /** WIP 專案 slug(文案已含 WIP)。 */
-const WIP_SLUGS = new Set(["cyclepact", "erp-system"]);
+const WIP_SLUGS = new Set(["cyclepact"]);
 
 export function tierOf(slug: string): Tier {
   return TIER_MAP[slug] ?? "academic";
