@@ -4,6 +4,10 @@
 **全套上線並自動化**:主站 https://terrychou.com、子站 https://soulshard.terrychou.com 皆上線。兩個 repo(portfolio、Soulshard-Hunter)各有獨立 self-hosted runner 與 CI/CD,push 即自動部署;對外經 Cloudflare Tunnel(零入站),主站部署後自動 purge 邊緣快取;Cloudflare Web Analytics 運作中(CWV 全綠)。文件齊備、SEO/分享優化完成。前端已套用 Engineer Dark「立體層次」美化與互動/無障礙修正、專案分層調整;履歷 PDF 改為 ATS 格式(並修掉產線誤渲染首頁的 bug、固定專案順序);子站加上「魂晶」favicon。已上線的 SteamSaleChecker 子站(steam.terrychou.com)以 Notable + showcase(卡片直接 Live)收入作品集(R3,PR #18 已 merge、自動部署中),並順手修掉 live-demo 卡片「看詳情」fallback 首頁的既有 bug。已完成上線的 ERPSystem(erp.terrychou.com)由早期 Phase-0/WIP 條目全面更新為**已完成全端 live app**(showcase + liveUrl、換新封面、移除 WIP 徽章、技能補 Spring Boot/Mantine)。
 
 ## 已完成
+- [2026-07-01] 🔵 **ERPSystem 改藍色(Blue Enterprise):換封面 + 描述文字同步**。ERP 前端已由 Warm Terracotta 換成藍色企業風(#2563EB)並上線,故更新作品集這一側:
+  - **封面 `public/covers/erp-system.webp`**:重拍為**藍色版** ERP 總覽儀表板(KPI + 訂單漏斗 + 庫存甜甜圈),沿用 soulshard/steam 同款卡片版式(已上線 LIVE 徽章 + 中英標題 + URL + 圓角框住的截圖 + 技術 chips),1200×675 webp。作法:以本機 ERP build(dist)+ Playwright 攔 `/api` mock 出藍色儀表板圖、Chromium canvas 轉 webp;肉眼確認版式與其他封面一致。
+  - **`content/projects.json` erp-system**:`descZh` / `descEn` 的「Warm Terracotta 設計系統」改「Blue Enterprise 設計系統」(其餘描述不動)。
+  - `out/` 為 Next.js 靜態輸出產物(不進版控),由下次 build 重生;不需手動改。
 - [2026-07-01] 🏭 **ERPSystem:WIP → 已完成全端 live app(內容 / 封面 / 呈現全面更新)**。ERPSystem 已全數完成並上線(後端 Phase 0–7 全端化 + 「Warm Terracotta」UI 重設計,https://erp.terrychou.com),故把作品集中嚴重過時的條目全面更新:
   - **`content/projects.json` erp-system**:`descZh/En` 重寫為「Java 21 + Spring Boot 4 + PostgreSQL 16 後端 + React 19 + Mantine 9 + Vite + TypeScript 前端」的**已上線全端產品**(刪除「Phase 0 走骨架 / 15 測試 / React 為後續階段」);`techStack` 補齊前端與全端項(React 19 / Mantine 9 / Vite / TanStack Query / springdoc-openapi / Micrometer / nginx …,共 19 項);第 4 條 highlight 由「Phase 0 藍圖」改為「全端交付並上線」;`challenges` 移除「仍屬早期」結尾;`demoFeasibility.canRunInBrowser` false→true、notes 改寫為線上 demo + 一鍵 docker compose。
   - **呈現改為 steam 同款**(刻意不用 `live-demo`——那會給遊戲味的「線上遊玩 / Play」CTA):`presentation:"showcase"` + `liveUrl:"https://erp.terrychou.com"` → 卡片得 **Live 徽章 + 「線上體驗」**(語意正確)、卡片主連結進 `/projects/erp-system` 故事頁,詳情頁另有「線上體驗 / Live demo」外連。與 SteamSaleChecker(同為非遊戲 live app)一致。
