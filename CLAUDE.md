@@ -4,6 +4,7 @@
 
 ## 技術與工具
 - 套件管理:**pnpm**(workspaces);任務編排:**Turborepo**(`turbo.json`)。
+- 根目錄 `content/projects.json` 由 `apps/main` 跨套件匯入,已列入 `turbo.json` 的 `globalDependencies`;日後若新增其他「套件外輸入檔」也要同步宣告,否則 turbo build 快取不會因它變更而失效。
 - 前端:Next.js 15(App Router、`output: 'export'` 靜態匯出)、React 19、TypeScript、Tailwind。
 - 共用設計系統放 `packages/ui`,各 app 透過 workspace 相依引用,**不複製貼上元件**。
 - e2e/smoke:**Playwright**(`apps/main/e2e/`),對 build 後的 `out/` 起本機 `serve` 驗證;已納入 `ci.yml`(build 後跑)。
