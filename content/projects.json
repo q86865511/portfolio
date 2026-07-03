@@ -32,16 +32,16 @@
       "cover": "/covers/ai-deployment-pipeline.webp",
       "highlights": [
         {
-          "zh": "設計清晰分層的服務架構:FastAPI 非同步後端(轉換/推論/評測/Triton 各自獨立 service 與 router)+ React/Ant Design 前端 + NVIDIA 推論堆疊,職責邊界明確,易於擴充與除錯。",
-          "en": "A cleanly layered service architecture: an async FastAPI backend (separate services and routers for conversion, inference, benchmarking, and Triton) plus a React/Ant Design frontend and the NVIDIA inference stack, with clear responsibility boundaries that keep it extensible and debuggable."
-        },
-        {
           "zh": "自動化模型優化管線:以 ultralytics 與 trtexec 完成 PT→ONNX→TensorRT 轉換,並對批次大小 1–32 × FP32/FP16 組合各做 100 次重複推論,同時量測 mAP50/mAP50-95 準確度與延遲、FPS、GPU 使用率、VRAM,並輸出平均值與標準差以評估穩定性。",
           "en": "An automated optimization pipeline that converts PT→ONNX→TensorRT via ultralytics and trtexec, then runs 100 repeated inferences for each batch-size (1–32) × precision (FP32/FP16) combination, measuring both mAP50/mAP50-95 accuracy and latency, FPS, GPU utilization, and VRAM — reporting mean and standard deviation to gauge stability."
         },
         {
           "zh": "以 NVIDIA Triton Inference Server(explicit model-control 模式)提供生產級推論,支援模型動態掛載/卸載與即時推論統計;結果分析頁可多維度比較不同精度與批次配置,並匯出 PDF/Excel 報告作為選型與硬體規劃依據。",
           "en": "Production-grade serving on NVIDIA Triton Inference Server (explicit model-control mode) with dynamic model load/unload and live inference stats; the analysis page compares precision and batch configurations across multiple dimensions and exports PDF/Excel reports to inform model selection and hardware planning."
+        },
+        {
+          "zh": "設計清晰分層的服務架構:FastAPI 非同步後端(轉換/推論/評測/Triton 各自獨立 service 與 router)+ React/Ant Design 前端 + NVIDIA 推論堆疊,職責邊界明確,易於擴充與除錯。",
+          "en": "A cleanly layered service architecture: an async FastAPI backend (separate services and routers for conversion, inference, benchmarking, and Triton) plus a React/Ant Design frontend and the NVIDIA inference stack, with clear responsibility boundaries that keep it extensible and debuggable."
         },
         {
           "zh": "完整可觀測性堆疊:Prometheus 搭配 node-exporter 與 nvidia-gpu-exporter 蒐集 CPU/記憶體/GPU 負載/VRAM 指標,Grafana 5 秒刷新視覺化儀表板,整套系統以 Docker Compose 一鍵編排成 GPU 容器堆疊。",
@@ -131,8 +131,8 @@
       "liveUrl": "https://soulshard.terrychou.com",
       "highlights": [
         {
-          "zh": "從零自製遊戲引擎:120 Hz 固定步主迴圈降低輸入延遲、自寫相機與世界↔螢幕座標轉換、純程式繪製的像素 sprite 系統(rasterise 後快取),全程零外部圖片素材、零前端框架、零建置流程。",
-          "en": "A from-scratch game engine: a 120 Hz fixed-step main loop for low input latency, a hand-written camera and world-to-screen transform, and a code-only pixel sprite system (rasterised then cached) — with zero external image assets, zero frontend framework, and zero build step."
+          "zh": "從零自製遊戲引擎:120 Hz 固定步主迴圈降低輸入延遲、自寫相機與世界↔螢幕座標轉換、純程式繪製的像素 sprite 系統(rasterise 後快取),連音效都以 WebAudio 即時合成。",
+          "en": "A from-scratch game engine: a 120 Hz fixed-step main loop for low input latency, a hand-written camera and world-to-screen transform, a code-only pixel sprite system (rasterised then cached), and even sound effects synthesized live via WebAudio."
         },
         {
           "zh": "伺服器權威排行榜:後端依 kills/stage/time/difficulty/reaper 重算分數並忽略客戶端宣稱值,搭配逐欄位上限與「依存活時間推算的合理性閘門」反作弊(如擊殺數受時間上限約束、無盡模式不可能觸發破關或死神),從源頭杜絕分數灌水。",
@@ -159,8 +159,8 @@
       "repoName": "SteamSaleChecker",
       "titleZh": "Steam 特價追蹤站",
       "titleEn": "Steam Sale Checker",
-      "oneLinerZh": "自建的 Steam 特價追蹤站:後端定時抓 Steam 官方端點與 GamerPower、自建價格歷史(算「本站追蹤以來史低」)烤成靜態 JSON,前端 Astro 以深色電競風呈現;支援 Discord 登入、跨裝置願望清單與降價/目標價的 Discord 通知。",
-      "oneLinerEn": "A self-built Steam deals tracker: a cron worker pulls Steam's official endpoints and GamerPower, keeps its own price history (an all-time low since tracking began), and bakes it to static JSON served by an Astro front end — with Discord login, a cross-device wishlist, and Discord price-drop / target-price alerts.",
+      "oneLinerZh": "自建並已上線的 Steam 特價追蹤站——SteamDB 風的特價榜 + 自建價格歷史 + Discord 降價通知:免登入即可瀏覽特價與免費遊戲,Discord 登入後解鎖跨裝置願望清單與目標價提醒。",
+      "oneLinerEn": "A self-built, live-deployed Steam deals tracker — a SteamDB-style sale board with its own price history and Discord price alerts: browse deals and free games without an account, or log in with Discord to unlock a cross-device wishlist and target-price alerts.",
       "descZh": "一套自建的 Steam 特價追蹤站,定位在「SteamDB 風的特價榜 + 自建價格歷史 + Discord 通知」。後端 worker(Node + TypeScript、cron 約每 30 分)在 server 端呼叫 Steam 官方商店端點(featuredcategories / appdetails / 特價搜尋,免金鑰、台灣區 cc=tw)與 GamerPower(永久入庫的免費遊戲/DLC),把每輪台幣價寫進 SQLite 累積成「本站追蹤以來」的價格走勢與史低(observed low),再烤成 deals / free / meta 三份靜態 JSON;可選配 IsThereAnyDeal API 以真實台幣史低校正冷啟動初值。前端是 Astro 靜態站(深色電競風、繁中/英 i18n、深淺主題、PWA),提供可排序列表與卡片雙檢視、列內價格走勢 sparkline、Steam 評價、特價即時倒數、即將結束與免費領取專區,以及每款的商品詳細頁(自建歷史走勢圖)。登入子系統採 Discord OAuth:收藏跨裝置同步(未登入用 localStorage、登入後合併)、每款可設目標價,創本站新低或跌破目標時由 Discord bot 在你的頻道 @你或私訊提醒,並有 per-user 通知偏好(降價/免費/每日每週摘要/只收特定類型/頻道 vs DM)。所有第三方呼叫都在 server 端完成,公開瀏覽永遠只吃靜態 JSON,不暴露任何金鑰。",
       "descEn": "A self-built Steam deals site positioned as \"a SteamDB-style sale board + its own price history + Discord alerts\". A backend worker (Node + TypeScript, cron roughly every 30 min) calls Steam's official store endpoints server-side (featuredcategories / appdetails / sale search — no API key, Taiwan region cc=tw) and GamerPower (permanently-claimable free games/DLC), writes each pass's TWD price into SQLite to accumulate a \"since we started tracking\" price trend and observed low, then bakes three static JSON files (deals / free / meta); an optional IsThereAnyDeal API can seed a real TWD all-time low for cold starts. The front end is an Astro static site (dark esports theme, zh-TW/en i18n, light/dark theme, PWA) with a sortable list and card view, per-row price sparklines, Steam review scores, live sale countdowns, an \"ending soon\" and a free-to-keep section, and a per-game detail page with a self-built history chart. The login subsystem uses Discord OAuth: favourites sync across devices (localStorage when logged out, merged on login), each game can carry a target price, and a Discord bot @-mentions or DMs you when a favourite hits a new tracked low or crosses its target — all governed by per-user notification preferences (price-drop / free / daily-weekly digest / genre filter / channel vs DM). Every third-party call happens server-side, so public browsing only ever reads static JSON and never exposes a key.",
       "techStack": [
@@ -274,8 +274,8 @@
       "kindEn": "Undergrad capstone",
       "titleZh": "結合街景分析與燈號辨識之智慧導航系統",
       "titleEn": "Smart Navigation via Street-Scene Analysis and Traffic-Light Detection",
-      "oneLinerZh": "整合街景語意分割、手勢辨識與手機導航的輔助駕駛專題,在單一即時管線中判斷可行駛區域並做語音提示。",
-      "oneLinerEn": "A capstone driver-assist system that fuses street-scene semantic segmentation, hand-gesture recognition, and phone navigation into one real-time pipeline with road-area awareness and voice alerts.",
+      "oneLinerZh": "整合街景語意分割、手勢辨識與手機導航的行人導航輔助專題,在單一即時管線中判斷行人所在的可通行區域並做語音提示。",
+      "oneLinerEn": "A capstone pedestrian-navigation assistant that fuses street-scene semantic segmentation, hand-gesture recognition, and phone navigation into one real-time pipeline that checks whether the walker is on a passable area and issues voice alerts.",
       "descZh": "畢業專題,將三條獨立技術線整合成單一即時管線:以 FC-DenseNet103(InceptionV4 前端)在 TensorFlow 1.x 上做街景語意分割,以 MediaPipe 做手勢辨識,並透過 Java NIO Socket 從 Android 導航 App(改自 FancyNavi / HERE SDK)接收路線資訊。主程式 Main.py 逐幀擷取攝影機或影片,跑分割推論後,以 BFS 連通域分析判斷使用者是否位於可行區域(路面像素),並把導航距離、轉向角與箭頭疊加回畫面;偵測到揮手「Stop」手勢時以 playsound 觸發語音提示。整體偏研究/概念驗證,模型與資料前處理皆可重現。",
       "descEn": "A university capstone that stitches three independent technology tracks into one real-time pipeline: street-scene semantic segmentation with FC-DenseNet103 (InceptionV4 frontend) on TensorFlow 1.x, hand-gesture recognition via MediaPipe, and route data received from an Android navigation app (adapted from FancyNavi / HERE SDK) over a Java NIO socket. The Main.py loop grabs frames from a camera or video, runs segmentation inference, then uses a BFS connected-component analysis to decide whether the user is standing on a walkable/road region (road-class pixels) and overlays navigation distance, turn angle and a direction arrow onto the frame; when a waving \"Stop\" gesture is detected it fires a voice alert via playsound. It is a research/proof-of-concept build with reproducible model training and dataset preprocessing.",
       "techStack": [
@@ -300,7 +300,7 @@
           "en": "Trained FC-DenseNet103 with an InceptionV4 frontend on TensorFlow 1.x for street-scene segmentation, using a 1:1 mix of CamVid and a self-collected dataset to improve generalization to local scenes; a custom label-recoloring tool aligns annotations across the two datasets."
         },
         {
-          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷使用者是否站在可行駛區域,並把距離、轉向角與導引箭頭即時疊加回原畫面,而不是只輸出一張遮罩。",
+          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷行人是否站在可通行區域,並把距離、轉向角與導引箭頭即時疊加回原畫面,而不是只輸出一張遮罩。",
           "en": "On top of the segmentation mask, runs a BFS connected-component pass to compute the centroid and area of road regions, infers whether the user is on a walkable/road area, and overlays distance, turn angle and a guidance arrow back onto the live frame rather than just emitting a raw mask."
         },
         {
