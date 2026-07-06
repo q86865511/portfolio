@@ -1,5 +1,5 @@
 {
-  "count": 18,
+  "count": 17,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
@@ -415,52 +415,6 @@
       "demoFeasibility": {
         "canRunInBrowser": false,
         "notes": "無法作為瀏覽器 live demo。專案本質是 Windows 桌面長時運行程式:用 Playwright 啟動 Chromium 自動化一個已登入的 Discord 使用者帳號(需手動 2FA 登入、需特定私服與目標 bot 互動),並把資料存進本機 Fernet 加密 SQLite。Web 儀表板雖然存在,但它讀取的是即時 runtime 狀態(http.server 後端 + 本機 DB),並非可獨立靜態部署的純前端,且需要 HTTP Basic Auth 與真實 bot 資料才有內容——無法用 mock 資料有意義地靜態化。建議在履歷以 showcase(README/架構圖/螢幕截圖)呈現,而非 live demo。"
-      }
-    },
-    {
-      "slug": "cyclepact",
-      "repoName": "cyclepact",
-      "titleZh": "輪迴盟約 Cyclepact",
-      "titleEn": "Cyclepact — Turn-Based Collection RPG",
-      "oneLinerZh": "用 Godot 4 打造的回合制收集養成 RPG,以資料驅動架構承載 500 隻精靈,並用 OpenAI Images API 自動化美術產線(開發中)。",
-      "oneLinerEn": "A data-driven turn-based collection RPG in Godot 4 with 500 creatures and an OpenAI-Images-API art pipeline (work in progress).",
-      "descZh": "個人開發中的回合制劇情向收集養成 RPG:玩家與精靈締結「盟約」取代捕捉,世界困於不斷重置的「輪迴」。技術核心是資料驅動架構——500 隻精靈以 24 份地區 JSON(19 欄 schema)為單一真實來源,Godot 端 autoload 載入並建索引(依屬性/地區/搜尋)。已可遊玩的垂直切片包含可走動 overworld、草叢遇敵、回合制戰鬥(屬性相剋 + Gen3 能力值/個體值/努力值公式 + 三系時間機制)、盟約捕捉、隊伍與自動存檔、500 隻圖鑑瀏覽。美術改用 OpenAI Images API 腳本化批量生成,目前正進行像素風格轉向。專案仍在開發中:核心遊戲循環已成形,劇情多周目與全套美術素材為後續軌。",
-      "descEn": "A solo, in-development turn-based story RPG where players form a \"Pact\" with creatures instead of capturing them, set in a world trapped in a resetting time loop. The technical core is a data-driven architecture: 500 creatures live in 24 region JSON files (19-column schema) as a single source of truth, loaded and indexed at runtime by a Godot autoload (by type / region / search). A playable vertical slice already covers a walkable overworld, tall-grass random encounters, a turn-based battle engine (type effectiveness + Gen-3 stat/IV/EV formulas + three time-attribute mechanics), Pact capture, party management with auto-save, and a 500-entry dex browser. Art has moved to a scripted OpenAI Images API generation pipeline and is currently mid-pivot to pixel style. Still WIP: the core gameplay loop is in place, while multi-playthrough story and the full art set remain on a later track.",
-      "techStack": [
-        "Godot 4",
-        "C#",
-        "GDScript",
-        "Python",
-        "OpenAI API",
-        "Pillow",
-        "JSON"
-      ],
-      "presentation": "showcase",
-      "githubUrl": "https://github.com/q86865511/cyclepact",
-      "cover": "/covers/cyclepact.webp",
-      "highlights": [
-        {
-          "zh": "資料驅動設計:500 隻精靈以 24 份地區 JSON(19 欄 schema)為權威來源,Godot autoload(MonsterDB)在執行時載入並建立 by_type/by_region/search 索引;圖鑑 Markdown 與遊戲內容皆由同一份 JSON 衍生,避免設定與程式各自漂移。",
-          "en": "Data-driven design: 500 creatures defined in 24 region JSON files (19-column schema) as the authoritative source; a Godot autoload (MonsterDB) loads them at runtime and builds by-type / by-region / search indexes, with both the Markdown dex and in-game content derived from the same JSON to prevent drift."
-        },
-        {
-          "zh": "以 await 協程實作的回合制戰鬥狀態機:處理屬性相剋、Gen3+ 傷害與能力值公式、狀態異常/能力階級、自創「時間三系」機制(再行動、快照、無視防禦),以及盟約捕捉與換精靈;戰鬥中刻意隱藏屬性以提高難度。",
-          "en": "A turn-based battle engine built as an await-coroutine state machine handling type effectiveness, Gen-3 damage/stat formulas, status effects and stat stages, three custom time-attribute mechanics (extra action, snapshot, defense ignore), plus Pact capture and switching — with types deliberately hidden mid-battle for difficulty."
-        },
-        {
-          "zh": "腳本化 AI 美術產線:build_manifest.py 由 docs/data 產出生成清單,gen_assets.py 呼叫 OpenAI Images API(gpt-image-1.5,透明背景)依地區批量出去背 PNG,內建成本概估/確認、並發與速率節流、進度條與 skip-existing;零手動後處理。",
-          "en": "Scripted AI art pipeline: build_manifest.py turns docs/data into a generation manifest, and gen_assets.py calls the OpenAI Images API (gpt-image-1.5, transparent background) to batch region assets into ready-to-use transparent PNGs — with cost estimation/confirmation, concurrency, rate-limit throttling, progress bar and skip-existing, and zero manual post-processing."
-        },
-        {
-          "zh": "務實的範圍取捨:先做出可走動 overworld → 草叢遇敵 → 回合制戰鬥 → 捕捉/存檔 → 圖鑑的完整可玩切片,未生成素材以程式色塊佔位,確保專案任何階段都能直接 F5 執行,劇情多周目與全美術留待後續軌。",
-          "en": "Pragmatic scoping: a complete playable slice (walkable overworld → grass encounter → turn-based battle → capture/save → dex) was built first, with ungenerated assets falling back to procedural color blocks so the project is always F5-runnable, leaving multi-playthrough story and full art on a later track."
-        }
-      ],
-      "challengesZh": "最大的挑戰是讓「設定集規模」與「可執行遊戲」不脫鉤:500 隻精靈、24 區、18 屬性的龐大設定若用硬編碼會難以維護,因此選擇以地區 JSON 作單一真實來源,讓 Godot autoload 在執行時載入建索引,圖鑑文件也由同份資料衍生。戰鬥端要在 Godot 用 await 協程把「選招→依序行動→狀態/機制結算→勝負」寫成可讀的狀態機,並正確還原 Gen3 的能力值/個體值/努力值與傷害公式,還要疊上自創的時間三系機制。美術上採務實取捨:不等素材到齊就先用程式佔位讓核心循環隨時可玩,並把美術外包給 OpenAI Images API 腳本化產線(含成本估算、並發與速率節流),近期再評估並決定轉向像素風(含整數除數降採樣、調色盤量化與第三方 CC0 地磚萃取)。專案仍在開發中,核心循環已成形,劇情多周目為後續軌。",
-      "challengesEn": "The core challenge was keeping a large design bible coupled to a runnable game: hard-coding 500 creatures across 24 regions and 18 types would be unmaintainable, so region JSON files became the single source of truth, loaded and indexed by a Godot autoload at runtime, with the Markdown dex derived from the same data. On the battle side, the turn loop (select → ordered actions → status/mechanic resolution → win/lose) was written as a readable await-coroutine state machine in Godot, faithfully reproducing Gen-3 stat/IV/EV and damage formulas while layering on custom time-attribute mechanics. Art was handled pragmatically: rather than block on finished assets, procedural color-block placeholders keep the loop always playable, and asset creation was offloaded to a scripted OpenAI Images API pipeline (with cost estimation, concurrency and rate-limit throttling), followed by a deliberate go/no-go decision to pivot toward pixel style (integer-divisor downsampling, palette quantization, third-party CC0 tile extraction). The project remains WIP: the core loop is in place, with multi-playthrough story on a later track.",
-      "demoFeasibility": {
-        "canRunInBrowser": false,
-        "notes": "這是用 Godot 4.6(.NET 版,Forward+ / D3D12 / Jolt Physics)開發的桌面遊戲,需以 Godot 編輯器開啟並按 F5 執行,或匯出原生執行檔;repo 內無瀏覽器可跑的 build,前端也並非可獨立靜態部署的純前端。不建議作為 live demo 候選。若日後要 web demo,需另行匯出 Godot 的 Web (WASM) 目標,但目前 repo 未提供該產物。較適合以截圖/錄影或原生執行檔展示。"
       }
     },
     {

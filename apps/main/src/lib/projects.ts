@@ -51,7 +51,7 @@ const raw = projectsJson as ProjectsFile;
 /**
  * Tier 對照表(依使用者指定)。
  * featured = ai-deployment-pipeline(碩士論文) / smart-pedestrian-navigation(大學專題)
- * notable  = soulshard-hunter / steam-sale-checker / cyclepact / erp-system
+ * notable  = soulshard-hunter / steam-sale-checker / erp-system
  * mini     = discord-auto-bot / lolhelper / discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
  * academic = 其餘(放摺疊區)
  * 註:pay-the-money 為 fork,已自 content/projects.json 移除。
@@ -61,7 +61,6 @@ const TIER_MAP: Record<string, Tier> = {
   "smart-pedestrian-navigation": "featured",
   "soulshard-hunter": "notable",
   "steam-sale-checker": "notable",
-  cyclepact: "notable",
   "erp-system": "notable",
   "discord-auto-bot": "mini",
   lolhelper: "mini",
@@ -72,7 +71,7 @@ const TIER_MAP: Record<string, Tier> = {
 };
 
 /** WIP 專案 slug(文案已含 WIP)。 */
-const WIP_SLUGS = new Set(["cyclepact"]);
+const WIP_SLUGS = new Set<string>([]);
 
 export function tierOf(slug: string): Tier {
   return TIER_MAP[slug] ?? "academic";
@@ -144,7 +143,6 @@ const RESUME_ORDER = [
   "soulshard-hunter",
   "steam-sale-checker",
   "erp-system",
-  "cyclepact",
 ];
 
 /** PDF 履歷會用到的 featured + notable 專案(依 RESUME_ORDER 排序)。 */
