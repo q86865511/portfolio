@@ -48,14 +48,14 @@ export const skillGroups: SkillGroup[] = [
     titleEn: "Languages",
     icon: "languages",
     category: "neutral",
-    items: ["Python", "TypeScript/JavaScript", "C++", "Java", "Assembly", "Verilog"],
+    items: ["Python", "TypeScript/JavaScript", "C++", "Java", "Rust", "Assembly", "Verilog"],
   },
   {
     titleZh: "前端開發",
     titleEn: "Frontend",
     icon: "fullstack",
     category: "neutral",
-    items: ["React", "Next.js", "Mantine", "Tailwind", "Electron"],
+    items: ["React", "Next.js", "Mantine", "Tailwind", "Electron", "Tauri"],
   },
   {
     titleZh: "後端開發",

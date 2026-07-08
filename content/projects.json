@@ -1,5 +1,5 @@
 {
-  "count": 17,
+  "count": 18,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
@@ -265,6 +265,53 @@
       "demoFeasibility": {
         "canRunInBrowser": true,
         "notes": "已部署為線上 live demo:https://erp.terrychou.com —— 登入頁預設的公開唯讀 guest 即可直接體驗完整前端(買→做→賣、對帳健康檢查、財報鑽取、庫存/總帳/人資等前端 13 個功能模組)。本機亦可一行 docker compose -f compose.demo.yaml up --build 起 postgres + 自動 seed 的後端 + 前端整套(前端 8081、Swagger UI 掛在後端);另可疊加 compose.observability.yaml 起 Prometheus + Grafana。ERP Copilot(Claude 驅動、寫入需人工確認的 AI 助手)預設關閉,線上 demo 未開啟;本機自備 ANTHROPIC_API_KEY 並開啟 APP_ASSISTANT_ENABLED 即可完整體驗側欄對話與 MCP server 直連。"
+      }
+    },
+    {
+      "slug": "usage-monitor",
+      "repoName": "UsageMonitor",
+      "titleZh": "AI 用量監控 AI Usage Monitor",
+      "titleEn": "AI Usage Monitor",
+      "oneLinerZh": "以 Tauri 2(Rust + React)打造、常駐 Windows 系統匣的 AI CLI 用量儀表——同時監控 Claude Code 與 Codex CLI 的 5 小時/週視窗額度,托盤圖示本身就是雙環量表;官方數字優先、資料源失效時優雅退化為明確標示的本機估算,跨門檻主動通知、燒速異常預警,100% 本機處理零遙測。",
+      "oneLinerEn": "A Tauri 2 (Rust + React) Windows system-tray dashboard for AI CLI usage — it watches both Claude Code's and Codex CLI's 5-hour/weekly rate-limit windows, with the tray icon itself as a dual-ring gauge; official numbers first, degrading gracefully to clearly-labelled local estimates when a source fails, with proactive threshold alerts and burn-rate warnings — 100% local, zero telemetry.",
+      "descZh": "一個以 Tauri 2 打造、常駐 Windows 系統匣的 AI CLI 用量監控工具(安裝檔約 3.4MB)。訂閱制 AI CLI 的額度藏在 /usage、/status 指令裡,燒完才發現就太遲了——這個工具把 Claude Code 與 Codex CLI 兩家的 5 小時/週視窗用量放進眼角餘光。資料以官方數字優先:Codex 直接解析 session 檔內伺服器端 rate_limits 事件、Claude 走 OAuth 用量端點,都是帳號級準確百分比而非本機猜測;token 過期或 API 限流時自動退回本機統計並明確標示「估算值」,絕不謊報。平常它只是托盤角落一枚由 tiny-skia 動態繪製的雙環圖示(內環 Claude、外環 Codex,≥80% 轉黃、≥95% 轉紅),左鍵點開是三頁籤面板:儀表板(圓環量表、重置倒數、今日 token/成本分項、每家獨立刷新)、歷史(SQLite 落地 90 天,7/30 天用量折線)、設定(人話句子式通知規則、SMTP Email、資料來源、維護工具)。通知規則引擎支援用量門檻、額度回滿與燒速異常(依 usedPercent 斜率預估「將在 N 分鐘內打滿」,抓得住失控的 agent 迴圈)三類規則,同一視窗每條只觸發一次、武裝狀態跨重啟持久化不補發;Email 通道自設 SMTP(STARTTLS/隱式 TLS),內建寄測試信與防風暴閘門(失敗退避+每小時上限)。後端是 Rust:notify 監看兩個資料目錄(2 秒 debounce+60 秒兜底輪詢),Claude 對話紀錄以 offset 增量續讀、message.id 去重、mtime 剪枝,幾百 MB 歷史也不拖慢啟動;官方端點由 HTTP 狀態分類的狀態機把關(401 才是真過期、429 尊重 Retry-After 退避、暫時性失敗沿用最後成功值並標示更新時間),CLI 憑證失效立即提醒重新登入。架構上前端只做呈現,統一資料模型 UsageSnapshot 是唯一的擴充接縫——新增一家 AI CLI 等於實作一個 provider 模組。96 項 Rust 單元測試涵蓋解析器、掃描剪枝、通知引擎(含武裝持久化與保活判定)、OAuth 狀態分類、Email 閘門、歷史 DB 與托盤繪製,fixture 為自製樣本、測試不打真實網路。100% 本機處理:憑證只讀不寫、token 不落日誌、無任何遙測。",
+      "descEn": "A Tauri 2 tool that lives in the Windows system tray and monitors AI CLI usage (installer ~3.4MB). Subscription AI CLIs hide their quota behind /usage and /status commands, and by the time you notice it's burned it's too late — this tool keeps both Claude Code's and Codex CLI's 5-hour/weekly window usage in the corner of your eye. Official numbers come first: Codex is parsed from the server-side rate_limits events inside its session files and Claude from the OAuth usage endpoint — account-level accurate percentages, not local guesses; when a token expires or the API rate-limits, it falls back to local stats explicitly labelled as estimates, never fabricating a number. Most of the time it is just a dual-ring tray icon drawn live by tiny-skia (inner ring Claude, outer Codex; amber at ≥80%, red at ≥95%); a left click opens a three-tab panel: dashboard (ring gauges, reset countdowns, today's token/cost breakdown, per-provider refresh), history (a 90-day SQLite time series with 7/30-day trend lines) and settings (plain-sentence notification rules, SMTP email, data sources, maintenance tools). The notification rule engine supports three rule kinds — usage thresholds, window-reset ('quota is back') and burn-rate anomaly (a usedPercent-slope forecast of 'full in N minutes' that catches runaway agent loops); each rule fires once per window, with armed state persisted across restarts so relaunching never re-sends; the email channel takes your own SMTP (STARTTLS or implicit TLS) with a built-in test send and an anti-storm gate (failure backoff + hourly cap). The backend is Rust: notify watches both data directories (2-second debounce + 60-second fallback polling); Claude transcripts are resumed incrementally by offset with message.id dedup and mtime pruning, so hundreds of MB of history never slow startup; the official endpoint sits behind an HTTP-status-classified state machine (only 401 means truly expired, 429 honours Retry-After backoff, transient failures keep the last good value with an 'updated N min ago' label), and a failed CLI credential triggers an immediate re-login reminder. Architecturally the frontend is presentation-only and the unified UsageSnapshot model is the single extension seam — supporting another AI CLI means implementing one provider module. 96 Rust unit tests cover the parsers, scan pruning, the notification engine (including armed-state persistence and keep-alive), OAuth status classification, the email gate, the history DB and tray drawing, on self-made fixtures with no real network calls. Processing is 100% local: credentials are read-only, tokens never reach logs, zero telemetry.",
+      "techStack": [
+        "Rust",
+        "Tauri 2",
+        "React",
+        "TypeScript",
+        "Vite",
+        "SQLite",
+        "tiny-skia",
+        "SMTP"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/UsageMonitor",
+      "cover": "/covers/usage-monitor.webp",
+      "highlights": [
+        {
+          "zh": "官方數字優先的穩健資料狀態機:Codex 直接解析 session 檔內伺服器端 rate_limits 事件、Claude 走 OAuth 用量端點,都是帳號級準確百分比而非本機猜測;失敗一律以 HTTP 狀態分類(401 才是真過期)、429 尊重 Retry-After 退避、暫時性失敗沿用最後成功值並標示「更新於 N 分前」,只有真失效才退回本機統計且明標「估算值」——資料源不可用就優雅退化,絕不謊報。",
+          "en": "Official numbers first, behind a robust data state machine: Codex is parsed from server-side rate_limits events in its session files and Claude from the OAuth usage endpoint — account-level percentages, not local guesses; failures are classified by HTTP status (only 401 means truly expired), 429 honours Retry-After backoff, transient failures keep the last good value labelled 'updated N min ago', and only a real credential failure falls back to local stats explicitly marked as estimates — graceful degradation, never a fabricated number."
+        },
+        {
+          "zh": "檔案監看+增量解析,幾百 MB 歷史也不拖慢啟動:notify 監看兩個資料目錄(2 秒 debounce+60 秒兜底輪詢);Claude 對話紀錄以 offset 續讀、message.id 去重、mtime 剪枝與游標修剪,只重讀有變動的檔尾;設定變更(含資料目錄路徑)熱重載即時生效,每家資料源各有獨立的手動刷新。",
+          "en": "File watching plus incremental parsing, so hundreds of MB of history never slow startup: notify watches both data directories (2-second debounce + 60-second fallback polling); Claude transcripts are resumed by offset with message.id dedup, mtime pruning and cursor trimming, so only changed file tails are re-read; settings changes (including data-directory paths) hot-reload instantly, and each provider has its own manual refresh."
+        },
+        {
+          "zh": "純函式通知規則引擎:用量門檻、額度回滿、燒速異常(依 usedPercent 斜率預估「將在 N 分鐘內打滿」,抓得住失控的 agent 迴圈)三類規則,通道可選 Windows toast/SMTP Email/兩者;同一視窗每條規則只觸發一次、resets_at 重置後重新武裝,武裝狀態跨重啟持久化、重開 app 不補發;Email 走獨立發送執行緒,內建防風暴閘門(失敗退避+每小時上限)與寄測試信。",
+          "en": "A pure-function notification rule engine: three rule kinds — usage thresholds, window-reset ('quota is back'), and burn-rate anomaly (a usedPercent-slope forecast of 'full in N minutes' that catches runaway agent loops) — each deliverable via Windows toast, SMTP email or both; every rule fires once per window and re-arms after resets_at, with armed state persisted across restarts so relaunching never re-sends; email runs on its own sender thread behind an anti-storm gate (failure backoff + hourly cap) with a built-in test send."
+        },
+        {
+          "zh": "托盤即儀表+隱私與品質:tiny-skia 動態繪製雙環托盤圖示(內環 Claude、外環 Codex,≥80% 轉黃、≥95% 轉紅,量化去重、必要時才重繪);SQLite 落地 90 天用量時間序列,供 7/30 天折線;100% 本機處理——憑證只讀不寫、token 不落日誌、無任何遙測;96 項 Rust 單元測試涵蓋解析器、掃描剪枝、通知引擎(含武裝持久化與保活判定)、OAuth 狀態分類、Email 閘門、歷史 DB 與托盤繪製,fixture 自製、不打真實網路。",
+          "en": "The tray icon is the dashboard, with privacy and quality built in: tiny-skia draws a dual-ring tray icon live (inner ring Claude, outer Codex; amber at ≥80%, red at ≥95%; quantised dedup so it only redraws when needed); usage snapshots land in SQLite as a 90-day time series behind 7/30-day trend charts; processing is 100% local — credentials are read-only, tokens never reach logs, zero telemetry; 96 Rust unit tests cover the parsers, scan pruning, the notification engine (including armed-state persistence and keep-alive), OAuth status classification, the email gate, the history DB and tray drawing, on self-made fixtures with no real network calls."
+        }
+      ],
+      "challengesZh": "最大的挑戰是「依賴一個非官方端點,卻要給出可信的數字」:Claude 的官方用量百分比來自未文件化的 OAuth 端點,限流極嚴(實測懲罰窗可達 1 小時)且隨時可能改版。因此把所有失敗收進一個以 HTTP 狀態分類的狀態機——401 才是真過期、429 尊重 Retry-After 退避、5xx/網路錯誤沿用最後成功值並標示「更新於 N 分前」、端點改版時顯示明確訊息並自動退回本機估算——原則是寧可標示「估算值」也絕不謊報。第二個取捨在通知的「可靠但不騷擾」:門檻通知同一視窗只該響一次,但 app 重啟不能補發、視窗重置後又要重新武裝,最後把武裝狀態持久化並以 resets_at 為重武裝邊界,引擎核心做成純函式以便測試窮舉;Email 通道再加防風暴閘門,避免規則設錯時轟炸信箱。另一個實際踩到的坑是桌面版 Claude Code 的憑證存在自己的加密儲存區、不會刷新 credentials.json,只用桌面版會讓 token 無感過期退回估算模式——為此做了 token 保活提醒:憑證失效立即通知,接近過期且官方端點久未成功時提前預警。",
+      "challengesEn": "The hardest problem was depending on an unofficial endpoint while still showing numbers you can trust: Claude's official usage percentages come from an undocumented OAuth endpoint that is aggressively rate-limited (penalty windows of up to an hour in practice) and could change shape at any time. Every failure therefore funnels into an HTTP-status-classified state machine — only 401 means truly expired, 429 honours Retry-After backoff, 5xx/network errors keep the last good value labelled 'updated N min ago', and a reshaped endpoint shows an explicit message and falls back to local estimates — on the principle that a number marked 'estimate' beats a fabricated one. The second trade-off was making notifications reliable but not noisy: a threshold should fire once per window, yet an app restart must not re-send and a window reset must re-arm it — solved by persisting armed state keyed on resets_at, with the engine core kept as pure functions so the cases can be tested exhaustively; the email channel adds an anti-storm gate so a misconfigured rule cannot flood an inbox. One pitfall actually hit along the way: the Claude Code desktop app keeps credentials in its own encrypted store and never refreshes credentials.json, so desktop-only usage silently expires the token into estimate mode — hence the token keep-alive reminders: an immediate alert on credential failure, and an early warning when expiry nears while the official endpoint has not succeeded for a while.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "Windows 桌面應用(Tauri 2,安裝檔約 3.4MB)。至 GitHub Releases 下載 NSIS(.exe)或 .msi 安裝即可體驗,啟動後常駐系統匣;開發模式 npm run tauri dev(需 Node.js 20+、Rust stable、WebView2)。僅在 Windows 11 上測試。"
       }
     },
     {
