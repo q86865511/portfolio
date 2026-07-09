@@ -108,52 +108,6 @@
       }
     },
     {
-      "slug": "mcpglass",
-      "repoName": "mcpglass",
-      "titleZh": "MCP 流量觀測與安全代理 mcpglass",
-      "titleEn": "mcpglass",
-      "oneLinerZh": "MCP 流量的 Wireshark＋防火牆——單一 Rust binary 透明代理,坐在 AI client(Claude Code/Cursor…)與 MCP server 之間:錄下每一幀 JSON-RPC、偵測工具描述被偷改的 rug-pull 與外流密鑰、估算工具 schema 的 context 成本,還能重放請求與注入故障;fail-open 鐵律保證代理自身故障絕不阻斷流量,資料 100% 留本機。",
-      "oneLinerEn": "Wireshark + firewall for MCP traffic — a transparent proxy in a single Rust binary between any AI client (Claude Code, Cursor, ...) and your MCP servers: it records every JSON-RPC frame, catches rug-pulls (silently rewritten tool descriptions) and leaking secrets, prices what each server's tool schemas cost in context, and can replay requests or inject faults; a fail-open iron law guarantees the proxy's own failures never block traffic, and all data stays 100% local.",
-      "descZh": "開源(Apache-2.0)的 MCP(Model Context Protocol)觀測與安全代理。動機:官方 MCP Inspector 是旁路測試工具,看不到真實 client↔server 對話;MCP server 可以在你核准後偷改工具描述(rug-pull);而每個 server 的工具 schema 吃掉多少 context window 無人知曉。mcpglass attach 一鍵改寫 Claude Code/Claude Desktop/Cursor 的設定檔(原子寫入+時間戳備份+detach 可還原),stdio server 包進 wrap 透明代理、url server 改指本機 gateway;兩種 transport(stdio 與 Streamable HTTP,對齊 spec 2025-06-18,SSE 逐 chunk 直通並旁路切分記錄)共用同一條 tap→SQLite→dashboard 管線。儀表板是 axum + rust-embed 內嵌的 React:session 時間軸、payload 檢視器、per-method latency,與 Security/Context/Inject 三個專屬分頁。安全層預設 monitor 只觀察告警,enforce 為 opt-in 且以協定內 -32001 合法拒絕、絕不粗暴斷線:tool 指紋(自實作 canonical-JSON SHA-256,以 server 啟動指令為跨 session 身分)抓 rug-pull 與 A→B→A 震盪,secret 偵測內建 AWS/GitHub/OpenAI/Anthropic 等 pattern 並支援自訂 regex。除錯工具箱:context bloat 估算(fat tool 排名與裁剪建議)、帶外 replay(重 spawn server/重 initialize 新 session,絕不落庫)、故障注入(delay/error/drop/truncate,可設機率與觸發上限,用於測試 client/server 韌性)。207 項 Rust 測試(含 bytes 完全一致的 passthrough 整合測試)、clippy -D warnings、Ubuntu+Windows 雙 OS CI;並誠實揭露:SQLite 存原始流量全文(含流經的密鑰)——這是流量記錄器的本質,資料不出本機,遮罩只做在稽核視圖。",
-      "descEn": "An open-source (Apache-2.0) observability and security proxy for MCP (Model Context Protocol). The itch: the official MCP Inspector is a side-channel test harness that can't see the real client-server conversation; an MCP server can silently rewrite a tool description after you approved it (a rug-pull); and nobody knows how much context window each server's tool schemas eat. mcpglass attach rewrites Claude Code / Claude Desktop / Cursor configs in one command (atomic writes, timestamped backups, detach restores): stdio servers get wrapped by a transparent proxy, url servers get repointed at a local gateway; both transports (stdio and Streamable HTTP per spec 2025-06-18, with SSE streamed through chunk-by-chunk and split for recording on the side) share one tap → SQLite → dashboard pipeline. The dashboard is an axum server with a rust-embed'ed React frontend: session timelines, a payload inspector, per-method latency, and dedicated Security / Context / Inject tabs. The security layer defaults to monitor (observe and flag only); enforce is opt-in and refuses calls with a legal in-protocol -32001 JSON-RPC error instead of severing the connection: tool fingerprints (hand-rolled canonical-JSON SHA-256, keyed to the server's launch command as its cross-session identity) catch rug-pulls including A-B-A oscillations, and secret detection ships AWS/GitHub/OpenAI/Anthropic patterns plus custom regexes. The debugging toolbox adds context-bloat estimation (fattest-tool ranking and trim hints), out-of-band replay (re-spawns the server or re-initializes a fresh HTTP session; never recorded), and fault injection (delay/error/drop/truncate with probabilities and trigger caps) for resilience testing. 207 Rust tests (including a byte-exact passthrough integration test), clippy -D warnings, and Ubuntu+Windows CI; with honest disclosure: the SQLite file stores full raw traffic verbatim (secrets included) — that is the nature of a traffic recorder, the data never leaves the machine, and masking applies to the audit view only.",
-      "techStack": [
-        "Rust",
-        "Tokio",
-        "axum",
-        "React",
-        "TypeScript",
-        "SQLite",
-        "GitHub Actions"
-      ],
-      "presentation": "showcase",
-      "githubUrl": "https://github.com/q86865511/mcpglass",
-      "cover": "/covers/mcpglass.webp",
-      "highlights": [
-        {
-          "zh": "fail-open 鐵律架構:代理自身任何錯誤(解析失敗、DB 寫入失敗、policy panic)都不得阻斷或延遲 client↔server 流量——s2c 方向是「先轉發、後記錄」的旁路 tap,c2s 方向是同步純函式決策;記錄通道 try_send 不施加背壓、channel 滿時日誌節流避免故障態的同步 I/O 回壓 wire,底線由 bytes 完全一致的 passthrough 整合測試守住。",
-          "en": "A fail-open iron law: no failure inside the proxy (parse errors, DB write failures, a panicking policy engine) may ever block or delay client-server traffic — server-to-client is a forward-first side-channel tap, client-to-server a synchronous pure-function decision; the recording channel uses non-blocking try_send with log throttling when full so a failing state never back-pressures the wire, and the floor is held by a byte-exact passthrough integration test."
-        },
-        {
-          "zh": "MCP 供應鏈安全:tools/list 回應以自實作的 canonical-JSON key 排序 SHA-256 指紋,綁 server 啟動指令為跨 session 身分,抓「核准後偷改工具描述」的 rug-pull(含 A→B→A 震盪偵測);secret 外流偵測內建八家密鑰 pattern;預設 monitor 不阻擋,enforce 命中時合成協定內 -32001 錯誤回 client——是合法拒絕,不是斷線。",
-          "en": "MCP supply-chain security: tools/list responses are fingerprinted with a hand-rolled canonical-JSON key-sorted SHA-256, keyed to the server's launch command as its cross-session identity, catching post-approval rug-pulls (including A-B-A oscillations); secret-leak detection ships eight built-in credential patterns; monitor mode never blocks, and an enforce hit answers the client with a synthesized in-protocol -32001 error — a legal refusal, not a dropped connection."
-        },
-        {
-          "zh": "兩種 transport、一條管線:stdio wrap 與 Streamable HTTP gateway(SSE 逐 chunk 直通+旁路切分、非 SSE 回應緩衝上限、Origin+Host 雙重 loopback 驗證防 DNS rebinding/CSRF-to-localhost)共用同一 tap/storage/指紋管線;attach 一鍵改寫三家 client 設定檔,原子寫入+備份+冪等+detach 精確還原,url server 的原始 upstream 記在 gateway.toml 作唯一真相。",
-          "en": "Two transports, one pipeline: the stdio wrap and the Streamable HTTP gateway (SSE streamed through chunk-by-chunk with side-channel splitting, capped buffering for non-SSE responses, and dual Origin+Host loopback validation against DNS rebinding / CSRF-to-localhost) share the same tap/storage/fingerprint pipeline; attach rewrites all three clients' configs with atomic writes, backups, idempotency and exact detach restoration, recording each url server's original upstream in gateway.toml as the single source of truth."
-        },
-        {
-          "zh": "從觀測到干預的完整除錯工具箱:context bloat 分析估算每個 server 的工具 schema 吃掉多少 token(fat tool 排名+裁剪建議,誠實標示為啟發式估算);帶外 replay 重放任一歷史請求(重 spawn/重 initialize,唯讀開庫、絕不落庫);故障注入以 TOML 規則對活流量模擬 delay/error/drop/truncate(機率+觸發上限),注入層自身仍 fail-open;三者都有對應的儀表板分頁,demo 與 README GIF 皆由 repo 內腳本全自動重現。",
-          "en": "A full observe-to-intervene debugging toolbox: context-bloat analysis estimates what each server's tool schemas cost in tokens (fattest-tool ranking plus trim hints, honestly labelled as a heuristic); out-of-band replay re-sends any recorded request (re-spawn / re-initialize, read-only DB access, never recorded); fault injection simulates delay/error/drop/truncate on live traffic via TOML rules (probabilities plus trigger caps) with the injection machinery itself still failing open — each with its own dashboard tab, and both the demo and the README GIF are fully script-reproducible from the repo."
-        }
-      ],
-      "challengesZh": "核心矛盾是「要攔截又絕不能擋路」:安全層需要在 wire 上做決策,fail-open 鐵律卻要求代理故障零影響。解法是嚴格分向——c2s 走同步純函式決策(panic 由 catch_unwind 保底放行),s2c 維持純旁路 tap 只告警不阻擋;enforce 的拒絕做成協定內合法的 -32001 錯誤而非斷線,fail-open 只留三個明確例外(啟動期設定載入失敗、enforce 明確命中、使用者要求的故障注入)。第二個坑是指紋穩定性:Cargo workspace 的 feature 統一會讓 serde_json 的 preserve_order 悄悄開啟,同一份工具定義序列化出不同 key 順序、指紋直接失穩,於是自己實作 canonical JSON(遞迴 key 排序)再雜湊,不信任序列化器的預設行為。第三是誠實的代價:流量記錄器天生要存原始明文(含密鑰),與其假裝遮罩得掉,不如在 README/SECURITY.md 大聲揭露「資料不出本機、但 sessions.db 請當機密檔案對待」,遮罩只承諾在稽核視圖。開發流程本身也是實驗:全程以多代理 pipeline(規劃→分層派工→Opus+Codex 雙重審查→逐條裁決)推進,連 CI 的 Linux 限定測試 port 競態,都是靠把 free_port 先占先放改成 --port 0 由 OS 配號+解析啟動 banner 才根治。",
-      "challengesEn": "The core contradiction: intercept without ever standing in the way. The security layer must decide on the wire, yet the fail-open iron law demands zero impact from proxy failures. The answer is strict directionality — client-to-server runs a synchronous pure-function decision (panics caught and forwarded via catch_unwind), server-to-client stays a pure side-tap that alerts but never blocks; an enforce refusal is a legal in-protocol -32001 error rather than a severed connection, and fail-open keeps exactly three deliberate exceptions (config load failure at startup, an explicit enforce hit, and user-requested fault injection). The second pit was fingerprint stability: Cargo workspace feature unification silently enables serde_json's preserve_order, so the same tool definition can serialize with different key orders and destabilize every fingerprint — hence a hand-rolled canonical JSON (recursive key sort) before hashing, trusting no serializer defaults. Third, the price of honesty: a traffic recorder inherently stores raw plaintext (secrets included), so instead of pretending to mask it, the README and SECURITY.md disclose loudly that data never leaves the machine but sessions.db must be treated as sensitive, with masking promised only in the audit view. The development process was itself an experiment — a multi-agent pipeline (plan → tiered delegation → dual Opus+Codex review → per-finding adjudication) end to end; even the Linux-only CI port race in the gateway tests was only truly fixed by replacing bind-and-release free_port with --port 0 OS assignment plus parsing the startup banner.",
-      "demoFeasibility": {
-        "canRunInBrowser": false,
-        "notes": "CLI+本機儀表板工具,非網頁應用:需從原始碼建置(Rust 1.80+ 與 pnpm,前端先 build 再 cargo build 以內嵌真 UI),attach 後配合任一 MCP client 即可觀測真實流量。repo 附 scripts/demo.ps1 可在沒有 AI client 的情況下自動產生真實 MCP 流量(對官方 filesystem server 跑兩輪:乾淨+故障注入)並開 dashboard 觀看;README 的 demo GIF 亦由 repo 內 CDP 工具鏈(scripts/record-gif/)全自動錄製。Windows 實測通過,Ubuntu+Windows CI 全綠,macOS 未實測。"
-      }
-    },
-    {
       "slug": "soulshard-hunter",
       "repoName": "Soulshard-Hunter",
       "titleZh": "魂晶獵手 Soulshard Hunter",
@@ -358,6 +312,52 @@
       "demoFeasibility": {
         "canRunInBrowser": false,
         "notes": "Windows 桌面應用(Tauri 2,安裝檔約 3.4MB)。至 GitHub Releases 下載 NSIS(.exe)或 .msi 安裝即可體驗,啟動後常駐系統匣;開發模式 npm run tauri dev(需 Node.js 20+、Rust stable、WebView2)。僅在 Windows 11 上測試。"
+      }
+    },
+    {
+      "slug": "mcpglass",
+      "repoName": "Mcpglass",
+      "titleZh": "MCP 流量觀測與安全代理 Mcpglass",
+      "titleEn": "Mcpglass",
+      "oneLinerZh": "MCP 流量的 Wireshark＋防火牆——單一 Rust binary 透明代理,坐在 AI client(Claude Code/Cursor…)與 MCP server 之間:錄下每一幀 JSON-RPC、偵測工具描述被偷改的 rug-pull 與外流密鑰、估算工具 schema 的 context 成本,還能重放請求與注入故障;fail-open 鐵律保證代理自身故障絕不阻斷流量,資料 100% 留本機。",
+      "oneLinerEn": "Wireshark + firewall for MCP traffic — a transparent proxy in a single Rust binary between any AI client (Claude Code, Cursor, ...) and your MCP servers: it records every JSON-RPC frame, catches rug-pulls (silently rewritten tool descriptions) and leaking secrets, prices what each server's tool schemas cost in context, and can replay requests or inject faults; a fail-open iron law guarantees the proxy's own failures never block traffic, and all data stays 100% local.",
+      "descZh": "開源(Apache-2.0)的 MCP(Model Context Protocol)觀測與安全代理。動機:官方 MCP Inspector 是旁路測試工具,看不到真實 client↔server 對話;MCP server 可以在你核准後偷改工具描述(rug-pull);而每個 server 的工具 schema 吃掉多少 context window 無人知曉。mcpglass attach 一鍵改寫 Claude Code/Claude Desktop/Cursor 的設定檔(原子寫入+時間戳備份+detach 可還原),stdio server 包進 wrap 透明代理、url server 改指本機 gateway;兩種 transport(stdio 與 Streamable HTTP,對齊 spec 2025-06-18,SSE 逐 chunk 直通並旁路切分記錄)共用同一條 tap→SQLite→dashboard 管線。儀表板是 axum + rust-embed 內嵌的 React:session 時間軸、payload 檢視器、per-method latency,與 Security/Context/Inject 三個專屬分頁。安全層預設 monitor 只觀察告警,enforce 為 opt-in 且以協定內 -32001 合法拒絕、絕不粗暴斷線:tool 指紋(自實作 canonical-JSON SHA-256,以 server 啟動指令為跨 session 身分)抓 rug-pull 與 A→B→A 震盪,secret 偵測內建 AWS/GitHub/OpenAI/Anthropic 等 pattern 並支援自訂 regex。除錯工具箱:context bloat 估算(fat tool 排名與裁剪建議)、帶外 replay(重 spawn server/重 initialize 新 session,絕不落庫)、故障注入(delay/error/drop/truncate,可設機率與觸發上限,用於測試 client/server 韌性)。207 項 Rust 測試(含 bytes 完全一致的 passthrough 整合測試)、clippy -D warnings、Ubuntu+Windows 雙 OS CI;並誠實揭露:SQLite 存原始流量全文(含流經的密鑰)——這是流量記錄器的本質,資料不出本機,遮罩只做在稽核視圖。",
+      "descEn": "An open-source (Apache-2.0) observability and security proxy for MCP (Model Context Protocol). The itch: the official MCP Inspector is a side-channel test harness that can't see the real client-server conversation; an MCP server can silently rewrite a tool description after you approved it (a rug-pull); and nobody knows how much context window each server's tool schemas eat. mcpglass attach rewrites Claude Code / Claude Desktop / Cursor configs in one command (atomic writes, timestamped backups, detach restores): stdio servers get wrapped by a transparent proxy, url servers get repointed at a local gateway; both transports (stdio and Streamable HTTP per spec 2025-06-18, with SSE streamed through chunk-by-chunk and split for recording on the side) share one tap → SQLite → dashboard pipeline. The dashboard is an axum server with a rust-embed'ed React frontend: session timelines, a payload inspector, per-method latency, and dedicated Security / Context / Inject tabs. The security layer defaults to monitor (observe and flag only); enforce is opt-in and refuses calls with a legal in-protocol -32001 JSON-RPC error instead of severing the connection: tool fingerprints (hand-rolled canonical-JSON SHA-256, keyed to the server's launch command as its cross-session identity) catch rug-pulls including A-B-A oscillations, and secret detection ships AWS/GitHub/OpenAI/Anthropic patterns plus custom regexes. The debugging toolbox adds context-bloat estimation (fattest-tool ranking and trim hints), out-of-band replay (re-spawns the server or re-initializes a fresh HTTP session; never recorded), and fault injection (delay/error/drop/truncate with probabilities and trigger caps) for resilience testing. 207 Rust tests (including a byte-exact passthrough integration test), clippy -D warnings, and Ubuntu+Windows CI; with honest disclosure: the SQLite file stores full raw traffic verbatim (secrets included) — that is the nature of a traffic recorder, the data never leaves the machine, and masking applies to the audit view only.",
+      "techStack": [
+        "Rust",
+        "Tokio",
+        "axum",
+        "React",
+        "TypeScript",
+        "SQLite",
+        "GitHub Actions"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/mcpglass",
+      "cover": "/covers/mcpglass.webp",
+      "highlights": [
+        {
+          "zh": "fail-open 鐵律架構:代理自身任何錯誤(解析失敗、DB 寫入失敗、policy panic)都不得阻斷或延遲 client↔server 流量——s2c 方向是「先轉發、後記錄」的旁路 tap,c2s 方向是同步純函式決策;記錄通道 try_send 不施加背壓、channel 滿時日誌節流避免故障態的同步 I/O 回壓 wire,底線由 bytes 完全一致的 passthrough 整合測試守住。",
+          "en": "A fail-open iron law: no failure inside the proxy (parse errors, DB write failures, a panicking policy engine) may ever block or delay client-server traffic — server-to-client is a forward-first side-channel tap, client-to-server a synchronous pure-function decision; the recording channel uses non-blocking try_send with log throttling when full so a failing state never back-pressures the wire, and the floor is held by a byte-exact passthrough integration test."
+        },
+        {
+          "zh": "MCP 供應鏈安全:tools/list 回應以自實作的 canonical-JSON key 排序 SHA-256 指紋,綁 server 啟動指令為跨 session 身分,抓「核准後偷改工具描述」的 rug-pull(含 A→B→A 震盪偵測);secret 外流偵測內建八家密鑰 pattern;預設 monitor 不阻擋,enforce 命中時合成協定內 -32001 錯誤回 client——是合法拒絕,不是斷線。",
+          "en": "MCP supply-chain security: tools/list responses are fingerprinted with a hand-rolled canonical-JSON key-sorted SHA-256, keyed to the server's launch command as its cross-session identity, catching post-approval rug-pulls (including A-B-A oscillations); secret-leak detection ships eight built-in credential patterns; monitor mode never blocks, and an enforce hit answers the client with a synthesized in-protocol -32001 error — a legal refusal, not a dropped connection."
+        },
+        {
+          "zh": "兩種 transport、一條管線:stdio wrap 與 Streamable HTTP gateway(SSE 逐 chunk 直通+旁路切分、非 SSE 回應緩衝上限、Origin+Host 雙重 loopback 驗證防 DNS rebinding/CSRF-to-localhost)共用同一 tap/storage/指紋管線;attach 一鍵改寫三家 client 設定檔,原子寫入+備份+冪等+detach 精確還原,url server 的原始 upstream 記在 gateway.toml 作唯一真相。",
+          "en": "Two transports, one pipeline: the stdio wrap and the Streamable HTTP gateway (SSE streamed through chunk-by-chunk with side-channel splitting, capped buffering for non-SSE responses, and dual Origin+Host loopback validation against DNS rebinding / CSRF-to-localhost) share the same tap/storage/fingerprint pipeline; attach rewrites all three clients' configs with atomic writes, backups, idempotency and exact detach restoration, recording each url server's original upstream in gateway.toml as the single source of truth."
+        },
+        {
+          "zh": "從觀測到干預的完整除錯工具箱:context bloat 分析估算每個 server 的工具 schema 吃掉多少 token(fat tool 排名+裁剪建議,誠實標示為啟發式估算);帶外 replay 重放任一歷史請求(重 spawn/重 initialize,唯讀開庫、絕不落庫);故障注入以 TOML 規則對活流量模擬 delay/error/drop/truncate(機率+觸發上限),注入層自身仍 fail-open;三者都有對應的儀表板分頁,demo 與 README GIF 皆由 repo 內腳本全自動重現。",
+          "en": "A full observe-to-intervene debugging toolbox: context-bloat analysis estimates what each server's tool schemas cost in tokens (fattest-tool ranking plus trim hints, honestly labelled as a heuristic); out-of-band replay re-sends any recorded request (re-spawn / re-initialize, read-only DB access, never recorded); fault injection simulates delay/error/drop/truncate on live traffic via TOML rules (probabilities plus trigger caps) with the injection machinery itself still failing open — each with its own dashboard tab, and both the demo and the README GIF are fully script-reproducible from the repo."
+        }
+      ],
+      "challengesZh": "核心矛盾是「要攔截又絕不能擋路」:安全層需要在 wire 上做決策,fail-open 鐵律卻要求代理故障零影響。解法是嚴格分向——c2s 走同步純函式決策(panic 由 catch_unwind 保底放行),s2c 維持純旁路 tap 只告警不阻擋;enforce 的拒絕做成協定內合法的 -32001 錯誤而非斷線,fail-open 只留三個明確例外(啟動期設定載入失敗、enforce 明確命中、使用者要求的故障注入)。第二個坑是指紋穩定性:Cargo workspace 的 feature 統一會讓 serde_json 的 preserve_order 悄悄開啟,同一份工具定義序列化出不同 key 順序、指紋直接失穩,於是自己實作 canonical JSON(遞迴 key 排序)再雜湊,不信任序列化器的預設行為。第三是誠實的代價:流量記錄器天生要存原始明文(含密鑰),與其假裝遮罩得掉,不如在 README/SECURITY.md 大聲揭露「資料不出本機、但 sessions.db 請當機密檔案對待」,遮罩只承諾在稽核視圖。開發流程本身也是實驗:全程以多代理 pipeline(規劃→分層派工→Opus+Codex 雙重審查→逐條裁決)推進,連 CI 的 Linux 限定測試 port 競態,都是靠把 free_port 先占先放改成 --port 0 由 OS 配號+解析啟動 banner 才根治。",
+      "challengesEn": "The core contradiction: intercept without ever standing in the way. The security layer must decide on the wire, yet the fail-open iron law demands zero impact from proxy failures. The answer is strict directionality — client-to-server runs a synchronous pure-function decision (panics caught and forwarded via catch_unwind), server-to-client stays a pure side-tap that alerts but never blocks; an enforce refusal is a legal in-protocol -32001 error rather than a severed connection, and fail-open keeps exactly three deliberate exceptions (config load failure at startup, an explicit enforce hit, and user-requested fault injection). The second pit was fingerprint stability: Cargo workspace feature unification silently enables serde_json's preserve_order, so the same tool definition can serialize with different key orders and destabilize every fingerprint — hence a hand-rolled canonical JSON (recursive key sort) before hashing, trusting no serializer defaults. Third, the price of honesty: a traffic recorder inherently stores raw plaintext (secrets included), so instead of pretending to mask it, the README and SECURITY.md disclose loudly that data never leaves the machine but sessions.db must be treated as sensitive, with masking promised only in the audit view. The development process was itself an experiment — a multi-agent pipeline (plan → tiered delegation → dual Opus+Codex review → per-finding adjudication) end to end; even the Linux-only CI port race in the gateway tests was only truly fixed by replacing bind-and-release free_port with --port 0 OS assignment plus parsing the startup banner.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "CLI+本機儀表板工具,非網頁應用:需從原始碼建置(Rust 1.80+ 與 pnpm,前端先 build 再 cargo build 以內嵌真 UI),attach 後配合任一 MCP client 即可觀測真實流量。repo 附 scripts/demo.ps1 可在沒有 AI client 的情況下自動產生真實 MCP 流量(對官方 filesystem server 跑兩輪:乾淨+故障注入)並開 dashboard 觀看;README 的 demo GIF 亦由 repo 內 CDP 工具鏈(scripts/record-gif/)全自動錄製。Windows 實測通過,Ubuntu+Windows CI 全綠,macOS 未實測。"
       }
     },
     {
