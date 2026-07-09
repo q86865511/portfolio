@@ -51,7 +51,7 @@ const raw = projectsJson as ProjectsFile;
 /**
  * Tier 對照表(依使用者指定)。
  * featured = ai-deployment-pipeline(碩士論文) / smart-pedestrian-navigation(大學專題)
- * notable  = soulshard-hunter / steam-sale-checker / erp-system / usage-monitor
+ * notable  = mcpglass / soulshard-hunter / steam-sale-checker / erp-system / usage-monitor
  * mini     = discord-auto-bot / lolhelper / discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
  * academic = 其餘(放摺疊區)
  * 註:pay-the-money 為 fork,已自 content/projects.json 移除。
@@ -59,6 +59,7 @@ const raw = projectsJson as ProjectsFile;
 const TIER_MAP: Record<string, Tier> = {
   "ai-deployment-pipeline": "featured",
   "smart-pedestrian-navigation": "featured",
+  mcpglass: "notable",
   "soulshard-hunter": "notable",
   "steam-sale-checker": "notable",
   "erp-system": "notable",
@@ -145,6 +146,7 @@ const RESUME_ORDER = [
   "steam-sale-checker",
   "erp-system",
   "usage-monitor",
+  "mcpglass",
 ];
 
 /** PDF 履歷會用到的 featured + notable 專案(依 RESUME_ORDER 排序)。 */
