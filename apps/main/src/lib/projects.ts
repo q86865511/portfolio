@@ -51,7 +51,7 @@ const raw = projectsJson as ProjectsFile;
 /**
  * Tier 對照表(依使用者指定)。
  * featured = ai-deployment-pipeline(碩士論文) / smart-pedestrian-navigation(大學專題)
- * notable  = mcpglass / soulshard-hunter / server-monitor / steam-sale-checker / erp-system / usage-monitor
+ * notable  = mcpglass / soulshard-hunter / steam-sale-checker / erp-system / server-monitor / usage-monitor
  * mini     = discord-auto-bot / lolhelper / discord-guild-keeper / mini-moba / anime-tracker / ros-ball-chaser(課程專案)
  * academic = 其餘(放摺疊區)
  * 註:pay-the-money 為 fork,已自 content/projects.json 移除。
@@ -61,9 +61,9 @@ const TIER_MAP: Record<string, Tier> = {
   "smart-pedestrian-navigation": "featured",
   mcpglass: "notable",
   "soulshard-hunter": "notable",
-  "server-monitor": "notable",
   "steam-sale-checker": "notable",
   "erp-system": "notable",
+  "server-monitor": "notable",
   "usage-monitor": "notable",
   "discord-auto-bot": "mini",
   lolhelper: "mini",
@@ -144,9 +144,9 @@ const RESUME_ORDER = [
   "ai-deployment-pipeline",
   "smart-pedestrian-navigation",
   "soulshard-hunter",
-  "server-monitor",
   "steam-sale-checker",
   "erp-system",
+  "server-monitor",
   "usage-monitor",
   "mcpglass",
 ];
