@@ -1,5 +1,5 @@
 {
-  "count": 19,
+  "count": 20,
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
@@ -152,6 +152,51 @@
       "demoFeasibility": {
         "canRunInBrowser": true,
         "notes": "前端為純 ES Modules + HTML5 Canvas,可純單機離線遊玩、無需建置(只需任一靜態伺服器,repo 內附 tools/serve.mjs)。雲端帳號、跨裝置存檔、排行榜與 1~3 人連線皆為選配,未登入或連不上會自動退回本機 localStorage 存檔,不影響核心遊玩。因此前端可獨立靜態部署,可作為候選 live demo(實際上已部署於 https://yeyesoulshard.duckdns.org/,並有 GitHub Actions push 到 main 自動部署至 Oracle Cloud + HTTPS)。完整體驗多人/排行榜需另跑 Node + Fastify + PostgreSQL 後端(docker compose 一鍵起)。"
+      }
+    },
+    {
+      "slug": "server-monitor",
+      "repoName": "ServerMonitor",
+      "titleZh": "ServerMonitor 遊戲伺服器管理工具",
+      "titleEn": "ServerMonitor",
+      "oneLinerZh": "可擴充的遊戲專用伺服器管理與監控桌面工具——範本驅動(新增遊戲=一份 TOML 檔)、Docker/原生 Windows 雙執行後端、多節點遠端管理,在單一 GUI 內涵蓋建立、監控、指令、備份、自動重啟到告警的完整營運循環。",
+      "oneLinerEn": "An extensible desktop manager for game dedicated servers — template-driven (a new game = one TOML file), dual Docker / native-Windows runtimes, and multi-node remote management, covering the full ops loop from provisioning and monitoring to backups, auto-restart, and alerts in one GUI.",
+      "descZh": "以 Go + Wails v2 + Svelte 5(TypeScript)打造的 Windows 桌面工具,管理 Minecraft、Palworld 等 Steam dedicated server。核心設計是「遊戲是資料,不是程式碼」:每個遊戲由一份宣告式 TOML 範本描述(埠宣告與衝突鍵、型別化參數、機密、RCON/REST 指令協定 tagged union、健康探針、生命週期 hook、模組包政策),支援新遊戲不動核心程式。伺服器可跑 Docker 容器,也可跑原生 Windows 子行程——JRE、五種 Minecraft loader 伺服器檔案、SteamCMD 全自動下載供應,資源上限以 Windows Job Objects 強制;兩後端藏在同一 RuntimeBackend 介面後,備份格式相同、可互轉。管理核心即使對本機也經 HTTP 與節點代理溝通,遠端 Linux 節點跑單一執行檔 agent(自簽 TLS + SHA-256 指紋 TOFU 釘選)。GUI 提供總覽儀表板、15 秒聚合持久化 36 小時的指標時序圖、背壓安全 fanout 的即時 log 主控台、RCON 與 Basic Auth REST 指令主控台、排程備份/還原、Discord 告警(時間窗抑制/遲滯/去重)、Modrinth 與 CurseForge 模組包安裝、Docker 資源與實例檔案管理。機密(RCON 密碼、節點 token、API 金鑰)一律存 OS 金鑰庫不落明文;所有由使用者輸入拼接的宿主路徑必經三層路徑拘束防禦。",
+      "descEn": "A Windows desktop tool built with Go + Wails v2 + Svelte 5 (TypeScript) for running Minecraft, Palworld, and other Steam dedicated servers. The core design is \"games are data, not code\": each game is described by a declarative TOML template (port claims with conflict keys, typed parameters, secrets, RCON/REST command protocols as a tagged union, health probes, lifecycle hooks, and modpack policy), so supporting a new game never touches the core. Servers run either in Docker containers or as native Windows child processes — the JRE, five Minecraft loader lines, and SteamCMD are auto-provisioned, with resource caps enforced via Windows Job Objects; both backends sit behind one RuntimeBackend interface with format-identical, interconvertible backups. The management core talks to node agents over HTTP even on localhost, and remote Linux nodes run a single-binary agent secured by self-signed TLS with SHA-256 fingerprint TOFU pinning. The GUI offers an overview dashboard, 15-second-aggregated metric time series persisted for 36 hours, a backpressure-safe live log console, RCON and Basic-Auth REST command consoles, scheduled backup/restore, Discord alerts (window suppression / hysteresis / dedup), Modrinth and CurseForge modpack installation, and Docker resource & instance file management. Secrets (RCON passwords, node tokens, API keys) live exclusively in the OS keyring, and every host path assembled from user input passes a three-layer path-confinement guard.",
+      "techStack": [
+        "Go",
+        "Wails",
+        "Svelte",
+        "TypeScript",
+        "Docker",
+        "SQLite"
+      ],
+      "presentation": "showcase",
+      "githubUrl": "https://github.com/q86865511/ServerMonitor",
+      "cover": "/covers/server-monitor.webp",
+      "highlights": [
+        {
+          "zh": "範本驅動的擴充性:帶版本的 TOML schema 宣告變體/loader、埠衝突鍵、參數、機密、RCON/REST 指令協定、健康探針與生命週期 hook,新增遊戲=加一份範本檔;內建範本以 go:embed 嵌入執行檔,自訂範本熱載入並經驗證拒載。",
+          "en": "Template-driven extensibility: a versioned TOML schema declares variants/loaders, port conflict keys, parameters, secrets, RCON/REST command protocols, health probes, and lifecycle hooks — adding a game means adding one template file; built-in templates are embedded via go:embed, user templates hot-load with validation and rejection events."
+        },
+        {
+          "zh": "同一 RuntimeBackend 介面下的雙執行後端:Docker 容器,或全自動供應(Adoptium JRE、五種 Minecraft loader、SteamCMD)的原生 Windows 行程,以 Job Objects 強制資源上限、OOM 告警與一般 crash 區分;備份為停機一致 tar 快照+checksum,可跨 docker↔native 互轉,agent 重啟自動收養仍在跑的行程。",
+          "en": "Dual runtime backends behind one RuntimeBackend interface: Docker containers, or native Windows processes with fully automated provisioning (Adoptium JRE, five Minecraft loader lines, SteamCMD), Job-Objects-enforced resource caps, and OOM alerts distinct from generic crashes; backups are stop-consistent tar snapshots with checksums, interconvertible across docker ↔ native, and a restarted agent re-adopts still-running processes."
+        },
+        {
+          "zh": "天生多節點:核心對本機也走 HTTP 節點代理,遠端 Linux 節點只需一個靜態執行檔——首啟自動生成持久 token 與自簽 TLS 憑證,GUI 以 SHA-256 指紋 TOFU 釘選,憑證被換直接拒連;節點 token 一律入 OS 金鑰庫。",
+          "en": "Multi-node by construction: the core reaches every backend through an HTTP node agent even locally, and a remote Linux node needs only one static binary — it auto-generates a persistent token and self-signed TLS certificate on first start, pinned in the GUI by SHA-256 fingerprint (TOFU) so a swapped certificate is refused outright; node tokens live in the OS keyring."
+        },
+        {
+          "zh": "路徑拘束是硬規則:任何由實例 UUID、備份 id 或使用者相對路徑拼出的宿主路徑,必經三層防禦(clean → filepath.Rel within-root → 逐段 Lstat 拒 symlink/junction),封死路徑遍歷與連結穿越——含 EvalSymlinks 不解析的 Windows junction。",
+          "en": "Path confinement as a hard rule: every host path assembled from an instance UUID, backup id, or user-supplied relative path passes a three-layer guard (clean → filepath.Rel within-root → per-segment Lstat rejecting symlinks/junctions), closing traversal and link-following attacks — including Windows junctions that EvalSymlinks fails to resolve."
+        }
+      ],
+      "challengesZh": "最核心的取捨是把「可擴充」做成架構而不是口號:核心 RuntimeBackend 介面刻意凍結,備份刪除、映像/容器管理、磁碟用量、檔案管理等可選能力一律以橫切介面表達、各後端自行實作、端點以型別斷言啟用(缺失回 ErrUnsupported)——介面不隨功能膨脹,新後端也不被迫實作全部能力。native 免 Docker 的代價是沒有容器隔離,以 Job Objects 資源上限、OOM 專屬告警與孤兒收養補足「行程級」的可管理性;Forge/NeoForge 官方安裝器產出的 run.bat 還得在啟動期橋接成腳本啟動。安全上,Windows junction 是 ModeIrregular 且 EvalSymlinks 不解析,通用的 symlink 檢查全數失效,最後以「逐段 Lstat」為主力把連結穿越擋在每一層路徑組件上。多節點採「本機也走 HTTP」預留擴充,單機情境多付一層序列化成本,但換來遠端節點零改動接入。",
+      "challengesEn": "The central trade-off was making \"extensible\" an architecture rather than a slogan: the core RuntimeBackend interface is deliberately frozen, and optional capabilities (backup deletion, image/container management, disk usage, file management) are expressed as cross-cutting interfaces implemented per backend and enabled via type assertions (returning ErrUnsupported when absent) — the interface never bloats, and a new backend is never forced to implement everything. Going Docker-free in the native backend costs container isolation, compensated with Job Objects resource caps, OOM-specific alerts, and orphan-process adoption for process-level manageability; Forge/NeoForge's official installers emit run.bat scripts that must be bridged into script-based launches at start time. On security, Windows junctions are ModeIrregular and invisible to EvalSymlinks, defeating generic symlink checks — per-segment Lstat became the main line of defense against link traversal at every path component. Multi-node adopts \"HTTP even on localhost\", paying one serialization layer in the single-machine case in exchange for remote nodes attaching with zero changes.",
+      "demoFeasibility": {
+        "canRunInBrowser": false,
+        "notes": "Wails v2 桌面應用(Windows),依賴本機 WebView2、OS 金鑰庫,以及 Docker daemon 或原生子行程執行環境,無法作為純前端 live demo;以截圖 showcase 呈現。"
       }
     },
     {
