@@ -131,7 +131,14 @@ export function FeaturedCard({
       )}
     >
       {cover ? (
-        <CoverImage src={cover} />
+        // 有封面時 kind 疊在封面左上角,位置與下方 glyph 帶的 KindTag 一致
+        // (KindTag 底色不透明,壓在圖上仍可讀)。
+        <div className="relative">
+          <CoverImage src={cover} />
+          {kind && (
+            <KindTag label={kind} className="absolute left-4 top-4 z-10" />
+          )}
+        </div>
       ) : (
         <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
           {kind && (

@@ -57,7 +57,7 @@ HEALTH_HOST="${4:-$DEFAULT_HEALTH_HOST}"
 # Caddy 在本機監聽的位址(對應 Caddyfile 的 bind 127.0.0.1 :8080)。
 ORIGIN="127.0.0.1:8080"
 
-# 健康檢查路徑(對應 Caddyfile 的 `respond /healthz 200`)。
+# 健康檢查路徑(對應 Caddyfile 主站 vhost 的獨立 `handle /healthz`)。
 HEALTH_PATH="/healthz"
 
 echo "==> 部署 app='${APP_NAME}'"
@@ -86,14 +86,45 @@ echo "==> rsync 同步中..."
 rsync -a --delete "${SRC_DIR}/" "${DEST_DIR}/"
 
 # --- 健康檢查 --------------------------------------------------------------
-# 帶上 Host 標頭,讓 Caddy 命中對應 vhost;-f 讓 HTTP >=400 視為失敗並回非零。
+# 為什麼不只打 /healthz:那只證明「Caddy 還活著」。rsync 若只同步到一半
+# (index.html 在、_next/ chunks 缺),/healthz 與 / 照樣 200,線上卻是白畫面。
+# 因此改成三段:① Caddy 存活 ② 首頁可取得 ③ 抽查剛同步過去的實體資產。
 echo "==> 健康檢查..."
-HTTP_CODE="$(curl -fsS -o /dev/null -w '%{http_code}' \
-	-H "Host: ${HEALTH_HOST}" \
-	"http://${ORIGIN}${HEALTH_PATH}")" || {
-	echo "健康檢查失敗:無法取得 200(Host=${HEALTH_HOST})" >&2
-	exit 1
+
+# 帶上 Host 標頭讓 Caddy 命中對應 vhost;逐項比對狀態碼,不符即以非零退出。
+check_path() {
+	local path="$1" expect="$2" desc="$3" code
+	code="$(curl -sS -o /dev/null -w '%{http_code}' \
+		-H "Host: ${HEALTH_HOST}" \
+		"http://${ORIGIN}${path}" 2>/dev/null)" || code="000"
+	if [[ "$code" != "$expect" ]]; then
+		echo "健康檢查失敗:${desc} ${path} 預期 ${expect},實得 ${code}(Host=${HEALTH_HOST})" >&2
+		exit 1
+	fi
+	echo "    OK  ${desc}:${path} → ${code}"
 }
 
-echo "==> 健康檢查通過(HTTP ${HTTP_CODE})"
+# ① Caddy 存活。
+check_path "$HEALTH_PATH" 200 "存活"
+
+# ② 首頁可取得。
+check_path "/" 200 "首頁"
+
+# ③ 資產抽查:清單取自「來源」而非目標——要驗的正是「來源有、線上卻取不到」。
+#    從目標挑的話,少同步的檔案本來就不會被挑到,等於自己驗自己。
+ASSET_REL="$(cd "$SRC_DIR" && find . -type f \( -name '*.js' -o -name '*.css' \) \
+	2>/dev/null | head -n 1 | sed 's|^\.||' || true)"
+if [[ -n "$ASSET_REL" ]]; then
+	check_path "$ASSET_REL" 200 "資產"
+else
+	echo "    (略過資產抽查:${SRC_DIR} 下找不到 .js/.css)"
+fi
+
+# ④ 靜態匯出站(out/ 內有 404.html)另驗該檔真的上去了——它是自訂 404 頁的來源,
+#    缺了會讓 Caddy 的 handle_errors 退回預設錯誤頁。SPA 子站沒這個檔,自動略過。
+if [[ -f "${SRC_DIR}/404.html" ]]; then
+	check_path "/404.html" 200 "404 頁"
+fi
+
+echo "==> 健康檢查通過"
 echo "==> 部署完成:${APP_NAME} → ${DEST_DIR}"

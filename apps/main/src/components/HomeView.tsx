@@ -56,7 +56,8 @@ export function HomeView() {
       external: true,
     },
     {
-      href: "/resume-zh.pdf",
+      // 依當前語言切換 PDF:英文訪客按 "Download résumé" 不該拿到中文版。
+      href: t("/resume-zh.pdf", "/resume-en.pdf"),
       labelZh: "下載 PDF 履歷",
       labelEn: "Download résumé",
       external: true,
@@ -95,7 +96,7 @@ export function HomeView() {
           locationEn={profile.locationEn}
           eduZh="資訊工程 碩士"
           eduEn="M.S. in CSIE"
-          pdfHref="/resume-zh.pdf"
+          pdfHref={t("/resume-zh.pdf", "/resume-en.pdf")}
           termLines={heroTermLines}
         />
 

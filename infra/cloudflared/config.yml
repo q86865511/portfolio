@@ -48,6 +48,17 @@ ingress:
   - hostname: soulshard.terrychou.com
     service: http://127.0.0.1:8080
 
+  # --- live app:SteamSaleChecker ---------------------------------------------
+  # steam.terrychou.com → 本機 Caddy → /srv/steam 靜態檔 + /api、/auth 反代。
+  # 站本身由 SteamSaleChecker repo 自己的 pipeline 部署,但入口仍走這條 tunnel。
+  - hostname: steam.terrychou.com
+    service: http://127.0.0.1:8080
+
+  # --- live app:ERPSystem -----------------------------------------------------
+  # erp.terrychou.com → 本機 Caddy → 反代該站自己的容器(見 caddy/Caddyfile)。
+  - hostname: erp.terrychou.com
+    service: http://127.0.0.1:8080
+
   # --- 預留:cyclepact(未來,Godot 專案完成後啟用)-------------------------
   # 目前先放著當範例;真正啟用前請一併在 Cloudflare 加上 DNS CNAME(見 README)。
   - hostname: cyclepact.terrychou.com

@@ -57,15 +57,15 @@ jobs:
         run: pnpm --filter main run build
 
       # PDF:amd64 上 Chrome for Testing 正常;另裝 CJK 字型,雙語履歷的中文才不會變方框。
+      # 不加 continue-on-error:PDF 產線失敗必須擋下部署——否則 out/ 少了 resume-*.pdf,
+      # deploy-static.sh 的 rsync --delete 會把線上舊 PDF 一併刪掉,首頁下載連結靜默壞掉。
       - name: Install CJK fonts + Chrome for Puppeteer
-        continue-on-error: true
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk
           pnpm --filter main exec puppeteer browsers install chrome
 
       - name: Generate resume PDFs
-        continue-on-error: true
         run: |
           # 注意:不可加 --single(SPA fallback 會把 /print/ 這類無副檔名路徑改寫成
           # index.html → PDF 會變成首頁。靜態匯出有真實 /print/index.html,直接靜態服務即可。
@@ -75,14 +75,16 @@ jobs:
           BASE_URL=http://localhost:4173 pnpm --filter main run generate-pdf
           kill "$SERVE_PID" 2>/dev/null || true
 
-      - name: Merge PDFs into out/ (best-effort)
+      # 上一步即使 exit 0 也可能什麼都沒產出(例如 serve 起來了但頁面空白),
+      # 所以這裡把「檔案不存在」視為失敗,不再 best-effort 略過。
+      - name: Merge PDFs into out/
         run: |
           for f in resume-zh.pdf resume-en.pdf; do
-            if [ -f "apps/main/public/$f" ]; then
-              cp "apps/main/public/$f" "apps/main/out/$f"; echo "merged $f"
-            else
-              echo "skip (not generated): $f"
+            if [ ! -f "apps/main/public/$f" ]; then
+              echo "::error::PDF 未產出:$f(產線失敗,拒絕部署以免 rsync --delete 刪掉線上舊檔)"
+              exit 1
             fi
+            cp "apps/main/public/$f" "apps/main/out/$f"; echo "merged $f"
           done
 
       - name: Upload built site (artifact)
