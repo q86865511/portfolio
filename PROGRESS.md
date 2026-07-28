@@ -64,8 +64,10 @@
 ## 進行中
 - (無)
 
+## 已完成(2026-07-28 追加)
+- **新版 Caddyfile 已套用到 Oracle A1 並驗證**:ssh 實查後以線上實際埠定稿(steam api=127.0.0.1:8788、erp=127.0.0.1:8081,取代原環境變數佔位——已非臆測,故直接寫值),備份舊檔(`Caddyfile.bak.1785236015`)後 reload。內外網複驗:隨機路徑與已下架頁回 **404**(軟 404 修復)、`/healthz` 回空 body 200、四個 vhost 與子站 API 正常、無尾斜線路徑無回歸。cloudflared ingress 經核對與線上一致,未動。
+
 ## 待辦
-- **(需主機端手動操作)套用新版 `infra/caddy/Caddyfile` 到 Oracle A1**:此檔不在任何 workflow 的部署路徑上(CI 只 rsync `apps/main/out`),所以 push 不會讓軟 404 修正生效。步驟:先確認 steam / erp 兩站的實際上游埠號,以 `STEAM_API_UPSTREAM`、`ERP_UPSTREAM` 環境變數提供給 caddy 服務(systemd `Environment=`),再 `caddy validate` → `caddy reload`;套用後複驗 `/healthz` 回空 body、隨機路徑回 404。cloudflared 的 ingress 同理需手動同步。
 - `cyclepact` 完成後接 `cyclepact.terrychou.com`(Caddy/ingress 已預留)。
 - (可選)PDF 瀏覽器快取改即時更新(`Cache-Control: must-revalidate` + ETag),免每次手動清快取才看到新版;待使用者決定(需動主機 Caddy 設定)。
 

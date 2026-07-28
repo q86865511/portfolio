@@ -8,9 +8,9 @@
 # 為什麼 http:// + auto_https off:TLS 已在 Cloudflare 邊緣終結,Tunnel 內已加密,
 #   origin 不需也不該再自簽憑證。http_port 8080 讓所有 http:// 站台改聽 8080。
 #
-# ⚠️ 套用到主機前必讀:steam / erp 兩個 vhost 的上游埠號本 repo 無從得知,以環境變數
-#   STEAM_API_UPSTREAM 與 ERP_UPSTREAM 表示(未設定時 Caddy 會載入失敗而非靜默走錯)。
-#   先與線上實際設定核對後再 `caddy validate` / `caddy reload`。
+# steam / erp 兩個 vhost 的上游埠號已與線上實際設定核對(2026-07-28,ssh 實查
+#   /etc/caddy/Caddyfile 與 ss -tlnp):steam api=127.0.0.1:8788、erp=127.0.0.1:8081,
+#   皆為各自 repo 的 docker compose publish 在 loopback 的埠。
 # ============================================================================
 
 {
@@ -81,15 +81,13 @@ http://soulshard.terrychou.com {
 # 前端為靜態站(/srv/steam);api + worker 以 docker compose 跑在本機,Caddy 同站代理
 # /api 與 /auth(結構與 soulshard 相同,故一樣用 handle 區塊隔離 try_files)。
 #
-# ⚠️ 埠號需與線上實際設定核對:本 repo 無從得知 SteamSaleChecker 容器實際 publish 的
-#    埠號,故以環境變數 STEAM_API_UPSTREAM 表示(例:127.0.0.1:xxxx),不臆測填值。
 http://steam.terrychou.com {
 	bind 127.0.0.1
 	encode zstd gzip
 
 	@backend path /api/* /auth/*
 	handle @backend {
-		reverse_proxy {$STEAM_API_UPSTREAM}
+		reverse_proxy 127.0.0.1:8788
 	}
 
 	handle {
@@ -103,11 +101,10 @@ http://steam.terrychou.com {
 # 全端應用(Spring Boot 後端 + React 前端,由該 repo 自己的 docker compose 起,
 # 站內含 nginx),因此這裡整站反代、不在本機放靜態檔。
 #
-# ⚠️ 埠號需與線上實際設定核對:同上,以環境變數 ERP_UPSTREAM 表示,不臆測填值。
 http://erp.terrychou.com {
 	bind 127.0.0.1
 	encode zstd gzip
-	reverse_proxy {$ERP_UPSTREAM}
+	reverse_proxy 127.0.0.1:8081
 }
 
 # --- 預留:cyclepact.terrychou.com(Godot 完成後啟用)----------------------
