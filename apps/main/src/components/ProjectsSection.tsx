@@ -4,6 +4,7 @@ import {
   FeaturedCard,
   MiniCard,
   NotableCard,
+  Reveal,
   useLang,
   type CardAction,
 } from "@resume/ui";
@@ -108,16 +109,6 @@ function actionsFor(p: Project): CardAction[] {
   return actions;
 }
 
-/** 代表作的水印字標與左強調條色(依 slug,穩定於排序變動)。 */
-const FEATURED_GLYPH: Record<string, string> = {
-  "ai-deployment-pipeline": "AI",
-  "smart-pedestrian-navigation": "CV",
-};
-const FEATURED_ACCENT: Record<string, "brand" | "accent"> = {
-  "ai-deployment-pipeline": "accent",
-  "smart-pedestrian-navigation": "brand",
-};
-
 export function ProjectsSection() {
   const { t } = useLang();
   const groups = projectsByTier();
@@ -134,20 +125,21 @@ export function ProjectsSection() {
       >
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
           {groups.featured.map((p, i) => (
-            <FeaturedCard
-              key={p.slug}
-              title={p.repoName}
-              titleHref={primaryLink(p).href}
-              titleExternal={primaryLink(p).external}
-              status={statusFor(p, t)}
-              kind={kindOf(p)}
-              cover={p.cover}
-              desc={t(p.oneLinerZh, p.oneLinerEn)}
-              techStack={p.techStack.slice(0, 5)}
-              actions={actionsFor(p)}
-              glyph={FEATURED_GLYPH[p.slug] ?? (i === 0 ? "AI" : "λ")}
-              accentBar={FEATURED_ACCENT[p.slug] ?? (i === 0 ? "accent" : "brand")}
-            />
+            <Reveal key={p.slug} delay={i * 80} className="h-full">
+              <FeaturedCard
+                className="h-full"
+                title={p.repoName}
+                titleHref={primaryLink(p).href}
+                titleExternal={primaryLink(p).external}
+                status={statusFor(p, t)}
+                kind={kindOf(p)}
+                cover={p.cover}
+                desc={t(p.oneLinerZh, p.oneLinerEn)}
+                techStack={p.techStack.slice(0, 5)}
+                actions={actionsFor(p)}
+                patternSeed={i}
+              />
+            </Reveal>
           ))}
         </div>
       </TierBlock>
@@ -158,19 +150,21 @@ export function ProjectsSection() {
         count={groups.notable.length}
       >
         <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {groups.notable.map((p) => (
-            <NotableCard
-              key={p.slug}
-              title={p.repoName}
-              titleHref={primaryLink(p).href}
-              titleExternal={primaryLink(p).external}
-              status={statusFor(p, t)}
-              kind={kindOf(p)}
-              cover={p.cover}
-              desc={t(p.oneLinerZh, p.oneLinerEn)}
-              techStack={p.techStack.slice(0, 4)}
-              actions={actionsFor(p)}
-            />
+          {groups.notable.map((p, i) => (
+            <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
+              <NotableCard
+                className="h-full"
+                title={p.repoName}
+                titleHref={primaryLink(p).href}
+                titleExternal={primaryLink(p).external}
+                status={statusFor(p, t)}
+                kind={kindOf(p)}
+                cover={p.cover}
+                desc={t(p.oneLinerZh, p.oneLinerEn)}
+                techStack={p.techStack.slice(0, 4)}
+                actions={actionsFor(p)}
+              />
+            </Reveal>
           ))}
         </div>
       </TierBlock>
@@ -181,23 +175,25 @@ export function ProjectsSection() {
         count={groups.mini.length}
       >
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.mini.map((p) => {
+          {groups.mini.map((p, i) => {
             const link = primaryLink(p);
             return (
-              <MiniCard
-                key={p.slug}
-                title={p.repoName}
-                titleHref={link.href}
-                titleExternal={link.external}
-                status={statusFor(p, t)}
-                kind={kindOf(p)}
-                techStack={p.techStack.slice(0, 4)}
-                githubUrl={p.githubUrl}
-                githubLabel={t(
-                  `${p.repoName} GitHub(另開新視窗)`,
-                  `${p.repoName} GitHub (opens in new tab)`,
-                )}
-              />
+              <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
+                <MiniCard
+                  className="h-full"
+                  title={p.repoName}
+                  titleHref={link.href}
+                  titleExternal={link.external}
+                  status={statusFor(p, t)}
+                  kind={kindOf(p)}
+                  techStack={p.techStack.slice(0, 4)}
+                  githubUrl={p.githubUrl}
+                  githubLabel={t(
+                    `${p.repoName} GitHub(另開新視窗)`,
+                    `${p.repoName} GitHub (opens in new tab)`,
+                  )}
+                />
+              </Reveal>
             );
           })}
         </div>

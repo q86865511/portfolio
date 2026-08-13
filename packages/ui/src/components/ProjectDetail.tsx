@@ -54,6 +54,17 @@ export function ProjectDetail(props: ProjectDetailProps) {
 
       {/* 頁首 */}
       <header className="mb-7">
+        {/* 簽名幾何回聲:與首頁 HeroGraphic 同一套三軸色面語言 */}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 96 24"
+          className="h-[20px] w-auto mb-4"
+        >
+          <path d="M0 24 A24 24 0 0 1 24 0 L24 24 Z" fill="var(--color-accent)" />
+          <circle cx="48" cy="12" r="12" fill="var(--color-brand)" />
+          <path d="M48 0 A12 12 0 0 1 48 24 Z" fill="var(--color-text)" />
+          <path d="M72 24 A12 12 0 0 1 96 24 Z" fill="var(--color-infra)" />
+        </svg>
         <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
           <h1 style={{ fontSize: "clamp(31px,5vw,39px)" }}>{props.title}</h1>
           {props.status && <StatusBadge {...props.status} />}

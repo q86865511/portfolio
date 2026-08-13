@@ -4,9 +4,9 @@ import { cn } from "../lib/cn";
 export type TechCategory = "neutral" | "ml" | "infra";
 
 const categoryClass: Record<TechCategory, string> = {
-  neutral: "bg-surface-2 text-text-muted border-border",
+  neutral: "bg-surface text-text-muted border-border",
   ml: "bg-accent-dim text-accent border-transparent",
-  infra: "bg-brand-dim text-brand border-transparent",
+  infra: "bg-infra-dim text-infra border-transparent",
 };
 
 /** AI/ML 類技術關鍵字(套 accent 色) */
@@ -31,7 +31,7 @@ const ML_TERMS = new Set(
   ].map((s) => s.toLowerCase()),
 );
 
-/** DevOps / 基礎設施類關鍵字(套 brand 色) */
+/** DevOps / 基礎設施類關鍵字(套 infra 綠) */
 const INFRA_TERMS = new Set(
   [
     "docker",
@@ -87,7 +87,7 @@ export function TechBadge({
     <span
       className={cn(
         // 展示性(非觸控):padding 對稱、對齊 8px 柵格。
-        "inline-block font-mono text-xs leading-[1.4] border rounded-sm px-2 py-1",
+        "inline-block font-mono text-xs leading-[1.4] border rounded-md px-2 py-1",
         categoryClass[resolved],
         className,
       )}

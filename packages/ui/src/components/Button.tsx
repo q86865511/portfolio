@@ -15,9 +15,9 @@ const base =
   "inline-flex items-center justify-center gap-2 font-medium rounded-md border border-transparent cursor-pointer whitespace-nowrap transition-all duration-DEFAULT ease-ease active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantClass: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-text-onbrand hover:bg-brand-hover",
+  primary: "bg-brand text-text-onbrand shadow-sm hover:bg-brand-hover",
   secondary:
-    "bg-transparent text-text border-border-strong hover:bg-surface-2 hover:border-text-subtle",
+    "bg-surface text-text border-border-strong shadow-sm hover:bg-surface-2 hover:border-text-subtle",
   ghost: "bg-transparent text-text-muted hover:bg-surface-2 hover:text-text",
   icon: "bg-transparent text-text-muted border-border justify-center p-0 hover:bg-surface-2 hover:text-text hover:border-border-strong",
 };

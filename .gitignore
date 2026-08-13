@@ -50,3 +50,12 @@ apps/**/public/resume-*.pdf
 # 驗證用截圖(可重生成,不入庫;mockup-main.html 保留)
 design/shots/
 design/shots-polish/
+
+# Impeccable 設計工具的機器本地產物(live/config.json 與未來的 config.json/design.json 保留追蹤)
+**/.impeccable/config.local.json
+**/.impeccable/hook.cache.json
+**/.impeccable/*.png
+**/.impeccable/live/*
+!**/.impeccable/live/config.json
+# 決策頁 question 伺服器的 session log(本機暫態)
+**/.impeccable/questions/

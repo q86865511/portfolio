@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-12T00:00:00+08:00",
+  "title": "Design System: 周暐倫 Terry Chou — 履歷入口網站",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "軸一・全端藍 Brand Blue",
+        "canonical": "#2563eb",
+        "tonalRamp": ["#1e3a8a", "#1e40af", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#dbeafe"]
+      },
+      "accent": {
+        "role": "secondary",
+        "displayName": "軸二・AI-ML 紫 Violet",
+        "canonical": "#7c3aed",
+        "tonalRamp": ["#4c1d95", "#5b21b6", "#6d28d9", "#7c3aed", "#8b5cf6", "#a78bfa", "#c4b5fd", "#ede9fe"]
+      },
+      "infra": {
+        "role": "secondary",
+        "displayName": "軸三・DevOps 綠 Infra Green",
+        "canonical": "#047857",
+        "tonalRamp": ["#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#6ee7b7", "#d1fae5"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "墨色 Ink",
+        "canonical": "#0b1220",
+        "tonalRamp": ["#0b1220", "#1c2b45", "#414d63", "#5b6b82", "#7c8ca6", "#a6b4cc", "#edf0f4", "#f6f7f9"]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "亮紙地 Paper",
+        "canonical": "#f6f7f9",
+        "tonalRamp": ["#0b1220", "#101a2b", "#172338", "#1c2b45", "#a6b4cc", "#e9eef7", "#edf0f4", "#f6f7f9"]
+      }
+    },
+    "darkTheme": {
+      "note": "深色主題掛 [data-theme=\"dark\"],token 同名換值:bg #0b1220 / surface #101a2b / surface-2 #172338 / card #131f33 / text #e9eef7 / text-muted #a6b4cc / text-subtle #7c8ca6 / brand #60a5fa (hover #93c5fd) / accent #a78bfa / infra #34d399 / success #34d399 / warning #fbbf24 / danger #f87171 / info #60a5fa / focus #60a5fa / border rgba(166,180,204,.14) / card-highlight rgba(255,255,255,.08);陰影換純黑 .3/.35/.45。"
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "只給 Hero 姓名一處。" },
+      "headline": { "displayName": "Headline", "purpose": "區塊 H2;頁尾宣言與 Hero 角色行用縮小 clamp 變體。" },
+      "title": { "displayName": "Title", "purpose": "卡片標題:Featured 25px/1.35、Notable 20px/1.5、Mini 16px。" },
+      "body": { "displayName": "Body", "purpose": "內文 16px/1.7,行寬 68ch。" },
+      "label": { "displayName": "Label (Mono)", "purpose": "技術徽章、Kind 標籤、頁尾技術註記;14px/500 sans 用於按鈕與導覽。" }
+    },
+    "shadows": [
+      { "name": "shadow-sm", "value": "0 1px 2px rgba(11, 18, 32, 0.06)", "purpose": "卡片與按鈕靜置態、捲動後導覽列。" },
+      { "name": "shadow-md", "value": "0 8px 24px rgba(11, 18, 32, 0.1)", "purpose": "卡片 hover 浮起態。" },
+      { "name": "shadow-lg", "value": "0 20px 48px rgba(11, 18, 32, 0.14)", "purpose": "彈層級表面保留檔位。" },
+      { "name": "card-highlight", "value": "inset 0 1px 0 0 rgba(11, 18, 32, 0.04)", "purpose": "卡片頂部 1px 內光邊(簽名細節,深色主題換白 8%)。" },
+      { "name": "focus-ring", "value": "0 0 0 3px rgba(37, 99, 235, 0.1), 0 0 0 1.5px #2563eb", "purpose": "鍵盤焦點環,只在 :focus-visible。" }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.2, 0.7, 0.2, 1)", "purpose": "全站唯一 easing。" },
+      { "name": "dur-fast", "value": "120ms", "purpose": "微反饋。" },
+      { "name": "dur", "value": "200ms", "purpose": "預設狀態轉場(hover、微浮)。" },
+      { "name": "dur-slow", "value": "320ms", "purpose": "較大位移。" },
+      { "name": "hg-plane-in", "value": "700ms, stagger 90ms, translateY(14px) scale(.96) → none", "purpose": "Hero 幾何進場——全站唯一編排性動畫時刻。" },
+      { "name": "reveal", "value": "600ms, translateY(16px) → 0, --reveal-delay stagger", "purpose": "捲動進場;初始 HTML 恆可見,reduced-motion 直接停在最終態。" }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "主行動鈕:brand 藍底白字,44px 高,hover 深化。",
+      "html": "<button class=\"ds-btn ds-btn-primary\">看專案作品</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 24px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 14px; font-weight: 500; border: 1px solid transparent; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: all 200ms cubic-bezier(0.2, 0.7, 0.2, 1); } .ds-btn:active { transform: scale(0.98); } .ds-btn-primary { background: var(--color-brand, #2563eb); color: var(--color-text-onbrand, #ffffff); box-shadow: 0 1px 2px rgba(11, 18, 32, 0.06); } .ds-btn-primary:hover { background: var(--color-brand-hover, #1d4ed8); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), 0 0 0 1.5px #2563eb; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "次要行動:白面加強邊框,hover 轉次表面。",
+      "html": "<button class=\"ds-btn ds-btn-secondary\">下載履歷</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 24px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 14px; font-weight: 500; border: 1px solid transparent; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: all 200ms cubic-bezier(0.2, 0.7, 0.2, 1); } .ds-btn:active { transform: scale(0.98); } .ds-btn-secondary { background: var(--color-surface, #ffffff); color: var(--color-text, #0b1220); border-color: var(--color-border-strong, rgba(11, 18, 32, 0.2)); box-shadow: 0 1px 2px rgba(11, 18, 32, 0.06); } .ds-btn-secondary:hover { background: var(--color-surface-2, #edf0f4); border-color: var(--color-text-subtle, #5b6b82); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), 0 0 0 1.5px #2563eb; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "低調行動:透明底,hover 才浮出表面。",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">更多專案</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 24px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 14px; font-weight: 500; border: 1px solid transparent; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: all 200ms cubic-bezier(0.2, 0.7, 0.2, 1); } .ds-btn:active { transform: scale(0.98); } .ds-btn-ghost { background: transparent; color: var(--color-text-muted, #414d63); } .ds-btn-ghost:hover { background: var(--color-surface-2, #edf0f4); color: var(--color-text, #0b1220); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), 0 0 0 1.5px #2563eb; }"
+    },
+    {
+      "name": "Project Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "卡片基底:白面＋頂部 1px 內光邊＋細邊＋柔陰影,hover 微浮。",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-band\" aria-hidden=\"true\"><svg viewBox=\"0 0 400 112\" preserveAspectRatio=\"xMidYMid slice\" style=\"position:absolute;inset:0;width:100%;height:100%\"><circle cx=\"330\" cy=\"56\" r=\"72\" fill=\"var(--color-brand, #2563eb)\" opacity=\"0.9\"/><path d=\"M330 -16 A72 72 0 0 0 258 56 L330 56 Z\" fill=\"var(--color-text, #0b1220)\"/><circle cx=\"96\" cy=\"88\" r=\"44\" fill=\"var(--color-accent, #7c3aed)\" opacity=\"0.85\"/><rect x=\"150\" y=\"64\" width=\"48\" height=\"48\" rx=\"8\" fill=\"var(--color-infra, #047857)\" opacity=\"0.8\"/></svg></div><div class=\"ds-card-body\"><h3 class=\"ds-card-title\">SoulShard 線上卡牌</h3><p class=\"ds-card-desc\">可線上遊玩的即時對戰卡牌遊戲,自架於 Oracle Cloud。</p></div></article>",
+      "css": ".ds-card { display: flex; flex-direction: column; background: var(--color-card, #ffffff); border: 1px solid var(--color-border, rgba(11, 18, 32, 0.1)); border-radius: 16px; overflow: hidden; box-shadow: inset 0 1px 0 0 var(--color-card-highlight, rgba(11, 18, 32, 0.04)), 0 1px 2px rgba(11, 18, 32, 0.06); transition: all 200ms cubic-bezier(0.2, 0.7, 0.2, 1); max-width: 360px; } .ds-card:hover { transform: translateY(-3px); border-color: var(--color-border-strong, rgba(11, 18, 32, 0.2)); box-shadow: inset 0 1px 0 0 var(--color-card-highlight, rgba(11, 18, 32, 0.04)), 0 8px 24px rgba(11, 18, 32, 0.1); } .ds-card-band { position: relative; height: 112px; background: var(--color-surface-2, #edf0f4); border-bottom: 1px solid var(--color-border, rgba(11, 18, 32, 0.1)); overflow: hidden; } .ds-card-body { padding: 24px; } .ds-card-title { margin: 0 0 12px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 20px; font-weight: 700; line-height: 1.5; letter-spacing: -0.02em; color: var(--color-text, #0b1220); } .ds-card-desc { margin: 0; font-size: 14px; line-height: 1.6; color: var(--color-text-muted, #414d63); }"
+    },
+    {
+      "name": "Tech Badge",
+      "kind": "chip",
+      "refersTo": "tech-badge",
+      "description": "mono 技術徽章:中性白面/ML 紫染/infra 綠染三態。",
+      "html": "<span class=\"ds-tech ds-tech-neutral\">Next.js</span> <span class=\"ds-tech ds-tech-ml\">TensorRT</span> <span class=\"ds-tech ds-tech-infra\">Docker</span>",
+      "css": ".ds-tech { display: inline-block; font-family: var(--font-mono, 'Chivo Mono', ui-monospace, monospace); font-size: 12px; line-height: 1.4; padding: 4px 8px; border-radius: 10px; border: 1px solid transparent; margin-right: 4px; } .ds-tech-neutral { background: var(--color-surface, #ffffff); color: var(--color-text-muted, #414d63); border-color: var(--color-border, rgba(11, 18, 32, 0.1)); } .ds-tech-ml { background: var(--color-accent-dim, rgba(124, 58, 237, 0.1)); color: var(--color-accent, #7c3aed); } .ds-tech-infra { background: var(--color-infra-dim, rgba(4, 120, 87, 0.1)); color: var(--color-infra, #047857); }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge-live",
+      "description": "膠囊狀態徽章:前置圓點,live 綠/wip 琥珀/showcase 藍。",
+      "html": "<span class=\"ds-status ds-status-live\"><span class=\"ds-status-dot\"></span>Live</span> <span class=\"ds-status ds-status-wip\"><span class=\"ds-status-dot\"></span>進行中</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 999px; margin-right: 6px; } .ds-status-dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; } .ds-status-live { background: var(--color-success-dim, rgba(5, 150, 105, 0.12)); color: var(--color-success, #047857); } .ds-status-wip { background: var(--color-warning-dim, rgba(161, 98, 7, 0.12)); color: var(--color-warning, #a16207); }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "導覽連結:muted 字 hover 轉主文字色＋底線,44px 命中區。",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">關於我</a><a class=\"ds-nav-link\" href=\"#\">專案作品</a><a class=\"ds-nav-link\" href=\"#\">技能</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 24px; } .ds-nav-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; font-family: var(--font-sans, 'Schibsted Grotesk', 'Noto Sans TC', sans-serif); font-size: 14px; font-weight: 500; color: var(--color-text-muted, #414d63); text-decoration: none; text-underline-offset: 3px; transition: color 200ms cubic-bezier(0.2, 0.7, 0.2, 1); } .ds-nav-link:hover { color: var(--color-text, #0b1220); text-decoration: underline; } .ds-nav-link:focus-visible { outline: none; border-radius: 6px; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1), 0 0 0 1.5px #2563eb; }"
+    },
+    {
+      "name": "TC 字標",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "品牌識別最小單位:32px 墨底方塊白色粗體 TC。",
+      "html": "<span class=\"ds-logo\" aria-hidden=\"true\">TC</span>",
+      "css": ".ds-logo { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 10px; background: var(--color-text, #0b1220); color: var(--color-bg, #f6f7f9); font-family: var(--font-sans, 'Schibsted Grotesk', sans-serif); font-size: 14px; font-weight: 700; letter-spacing: -0.02em; user-select: none; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "亮紙上的幾何證據(Geometric Evidence on Bright Paper)",
+    "overview": "這個系統的論點是「30 秒內建立招募者信任」——它刻意拒絕工程師作品集的預設樣貌(深色終端機底＋霓虹強調色),改走亮紙色地面(#F6F7F9)上的現代專業感:白卡、細邊、柔陰影、負字距粗標題。可信度來自克制,不來自炫技。個性由「三軸色系統」承載:藍(全端)、紫(AI-ML)、綠(DevOps)三色並列,永遠以語意出現,不做無意義裝飾。簽名圖形語言是幾何圓面構圖,出現在 Hero 面板與無封面卡片的色面帶,是整個世界唯一允許大面積使用軸色的地方。深色主題不是第二套設計,而是同一套 token 的深藍墨衍生:命名不變、只換值。",
+    "keyCharacteristics": [
+      "亮紙底預設,深藍墨深色主題為衍生(token 同名換值)",
+      "三軸色=語意色:藍全端/紫 AI-ML/綠 DevOps,各有 10% alpha 的 -dim 淡染",
+      "幾何圓面簽名圖形(circle-plane art),色彩全走 token,雙主題自動適應",
+      "Schibsted Grotesk＋Noto Sans TC 內文、Chivo Mono 標籤的三槽字型",
+      "柔環境陰影＋卡片頂部 1px 內光邊,無硬偏移陰影",
+      "可及性是底線:44px 觸控、focus 環、reduced-motion、初始 HTML 恆可見"
+    ],
+    "rules": [
+      { "name": "三軸不越位規則", "body": "藍=全端、紫=AI-ML、綠=DevOps,軸色永遠標記語意,不做裝飾;唯一例外是簽名幾何圖形(Hero 面板與卡片色面帶),那是三軸的儀式性同台。", "section": "colors" },
+      { "name": "淡染規則", "body": "任何彩色都不直接當文字底色大面積使用——彩字必配同色系 10–12% alpha 的 -dim 淡染底,實色只給主按鈕與幾何圖形。", "section": "colors" },
+      { "name": "負字距標題規則", "body": "所有 h1–h3 一律 700 權重、1.15 行高、-0.02em 字距(Display 收到 -0.03em);中文標題同樣適用,靠行高而非字距讓 CJK 呼吸。", "section": "typography" },
+      { "name": "微浮規則", "body": "hover 反饋的固定配方=上移 3px＋shadow-sm→md＋邊框轉 border-strong,200ms;按下則 scale(.98)。不做放大、不做發光。", "section": "elevation" },
+      { "name": "一次編排規則", "body": "全站只有一個編排性動畫時刻(Hero 幾何進場,90ms stagger);其餘動效皆為 200ms 級的狀態反饋。不加常駐動畫、不加視差。", "section": "components" }
+    ],
+    "dos": [
+      "Do 用三軸色標記語意:全端/中性→brand 藍、AI-ML→accent 紫、DevOps→infra 綠,並一律配 -dim 淡染底(10–12% alpha)。",
+      "Do 新表面走「白面＋1px 細邊＋shadow-sm＋16px 圓角」的卡片語彙,hover 用微浮規則(上移 3px、shadow-md、border-strong)。",
+      "Do 讓每個可點目標 ≥44px 命中區(必要時外擴 padding＋負 margin),文字連結 hover 給底線而不只變色。",
+      "Do 新增顏色時同步定義 [data-theme=\"dark\"] 對應值——token 同名換值,元件端永遠只寫 var(--color-*)/Tailwind 語意類。",
+      "Do 裝飾性圖形沿用幾何圓面詞彙(圓、四分之一圓、半圓、墨切片、點陣),色彩走 token 變數。"
+    ],
+    "donts": [
+      "Don't 回到深色終端機＋霓虹強調的工程師作品集預設——深色主題是衍生,亮紙淺色才是預設地面(方向契約明文拒絕)。",
+      "Don't 把軸色當裝飾大面積鋪底或做漸層;實色軸色只屬於主按鈕與簽名幾何圖形。",
+      "Don't 用硬偏移陰影、發光效果或 1px 以外的邊框粗細;深度只靠明度階＋柔環境陰影＋頂部內光邊。",
+      "Don't 讓內容依賴 JS 才可見(reveal 必須維持「初始 HTML 恆可見」),也不得繞過 prefers-reduced-motion kill-switch 與列印強制淺色。",
+      "Don't 虛構內容型元件(推薦語、假數據統計)——統計列數字一律由真實資料計算,這是產品原則在視覺層的延伸。"
+    ]
+  }
+}

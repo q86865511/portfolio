@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "generate-pdf": "node scripts/generate-pdf.mjs",
     "generate-og": "node scripts/generate-og.mjs",
+    "generate-covers": "node scripts/generate-covers.mjs",
     "clean": "rimraf .next out .turbo node_modules"
   },
   "dependencies": {

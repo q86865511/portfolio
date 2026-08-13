@@ -3,56 +3,58 @@
 @tailwind utilities;
 
 /* ============================================================
-   設計 token(來源:docs/01-design-system.md)
-   深色為預設(:root),淺色掛 [data-theme="light"]。
+   設計 token(視覺權威:重設計後以 DESIGN.md 為準)
+   淺色為預設(:root),深色掛 [data-theme="dark"]。
+   三軸色系統:全端=brand 藍 / AI-ML=accent 紫 / DevOps=infra 綠。
    ============================================================ */
 :root {
   /* ── 表面 / 背景(明度階)──────────────────── */
-  --color-bg: #0b0f14;
-  --color-surface: #121821;
-  --color-surface-2: #1a222d;
-  --color-elevated: #212c39;
-  --color-overlay: rgba(5, 8, 12, 0.72);
+  --color-bg: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-surface-2: #edf0f4;
+  --color-elevated: #ffffff;
+  --color-overlay: rgba(15, 23, 42, 0.45);
 
   /* ── 文字 ──────────────────────────────── */
-  --color-text: #e8edf2;
-  --color-text-muted: #9fb0c0;
-  --color-text-subtle: #6b7c8c;
-  --color-text-onbrand: #04201f;
+  --color-text: #0b1220;
+  --color-text-muted: #414d63;
+  --color-text-subtle: #5b6b82;
+  --color-text-onbrand: #ffffff;
 
   /* ── 邊框 ──────────────────────────────── */
-  --color-border: rgba(159, 176, 192, 0.14);
-  --color-border-strong: rgba(159, 176, 192, 0.28);
-  --color-focus: #5ee6d0;
+  --color-border: rgba(11, 18, 32, 0.1);
+  --color-border-strong: rgba(11, 18, 32, 0.2);
+  --color-focus: #2563eb;
 
-  /* ── B 立體層次:卡片表面提亮 + 頂部高光邊 + 左強調條 ── */
-  /* 卡片表面提亮一階(介於 surface 與 elevated 之間) */
-  --color-card: #161d27;
-  /* 頂部 1px 高光邊(深色:白色微透明) */
-  --color-card-highlight: rgba(255, 255, 255, 0.14);
+  /* ── 卡片表面 + 頂部 1px 高光邊 ── */
+  --color-card: #ffffff;
+  --color-card-highlight: rgba(11, 18, 32, 0.04);
 
-  /* ── 品牌 / 強調 ────────────────────────── */
-  --color-brand: #2dd4bf;
-  --color-brand-hover: #5eead4;
-  --color-brand-dim: rgba(45, 212, 191, 0.12);
-  --color-accent: #a78bfa;
-  --color-accent-dim: rgba(167, 139, 250, 0.14);
+  /* ── 品牌 / 三軸 ────────────────────────── */
+  --color-brand: #2563eb;
+  --color-brand-hover: #1d4ed8;
+  --color-brand-dim: rgba(37, 99, 235, 0.1);
+  --color-accent: #7c3aed;
+  --color-accent-dim: rgba(124, 58, 237, 0.1);
+  --color-infra: #047857;
+  --color-infra-dim: rgba(4, 120, 87, 0.1);
 
   /* ── 語意色 ──────────────────────────────── */
-  --color-success: #34d399;
-  --color-success-dim: rgba(52, 211, 153, 0.14);
-  --color-warning: #fbbf24;
-  --color-warning-dim: rgba(251, 191, 36, 0.14);
-  --color-danger: #f87171;
-  --color-danger-dim: rgba(248, 113, 113, 0.14);
-  --color-info: #60a5fa;
-  --color-info-dim: rgba(96, 165, 250, 0.14);
+  --color-success: #047857;
+  --color-success-dim: rgba(5, 150, 105, 0.12);
+  --color-warning: #a16207;
+  --color-warning-dim: rgba(161, 98, 7, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-dim: rgba(220, 38, 38, 0.12);
+  --color-info: #2563eb;
+  --color-info-dim: rgba(37, 99, 235, 0.12);
 
-  /* ── 字體 ──────────────────────────────── */
-  --font-sans: "Inter", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace,
-    "Noto Sans Mono CJK TC", monospace;
+  /* ── 字體(next/font 於 app 層注入變數;無注入時走系統鏈)── */
+  --font-sans: var(--font-latin, "Schibsted Grotesk"), -apple-system,
+    BlinkMacSystemFont, "Segoe UI", var(--font-tc, "Noto Sans TC"),
+    "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: var(--font-mono-loaded, "Chivo Mono"), ui-monospace,
+    "Cascadia Code", "Noto Sans Mono CJK TC", monospace;
 
   /* ── 尺度 ──────────────────────────────── */
   --container: 1120px;
@@ -62,9 +64,9 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 999px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.06);
+  --shadow-md: 0 8px 24px rgba(11, 18, 32, 0.1);
+  --shadow-lg: 0 20px 48px rgba(11, 18, 32, 0.14);
   --ring: 0 0 0 3px var(--color-brand-dim), 0 0 0 1.5px var(--color-focus);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 120ms;
@@ -72,42 +74,45 @@
   --dur-slow: 320ms;
 }
 
-[data-theme="light"] {
-  --color-bg: #f7f9fb;
-  --color-surface: #ffffff;
-  --color-surface-2: #eff3f7;
-  --color-elevated: #ffffff;
-  --color-overlay: rgba(15, 23, 32, 0.45);
+[data-theme="dark"] {
+  --color-bg: #0b1220;
+  --color-surface: #101a2b;
+  --color-surface-2: #172338;
+  --color-elevated: #1c2b45;
+  --color-overlay: rgba(3, 7, 15, 0.7);
 
-  --color-text: #0e1620;
-  --color-text-muted: #475565;
-  --color-text-subtle: #6b7888;
-  --color-text-onbrand: #04201f;
+  --color-text: #e9eef7;
+  --color-text-muted: #a6b4cc;
+  --color-text-subtle: #7c8ca6;
+  --color-text-onbrand: #0b1220;
 
-  --color-border: rgba(14, 22, 32, 0.12);
-  --color-border-strong: rgba(14, 22, 32, 0.22);
-  --color-focus: #0d9488;
+  --color-border: rgba(166, 180, 204, 0.14);
+  --color-border-strong: rgba(166, 180, 204, 0.28);
+  --color-focus: #60a5fa;
 
-  /* ── B 立體層次:淺色對應 ── */
-  /* 淺色卡片維持純白(已是最亮),靠陰影 + 高光邊做層次 */
-  --color-card: #ffffff;
-  /* 頂部 1px 高光邊(淺色:用對應暗色細邊取代白色高光) */
-  --color-card-highlight: rgba(14, 22, 32, 0.06);
+  --color-card: #131f33;
+  --color-card-highlight: rgba(255, 255, 255, 0.08);
 
-  --color-brand: #0d9488;
-  --color-brand-hover: #0f766e;
-  --color-brand-dim: rgba(13, 148, 136, 0.1);
-  --color-accent: #7c3aed;
-  --color-accent-dim: rgba(124, 58, 237, 0.1);
+  --color-brand: #60a5fa;
+  --color-brand-hover: #93c5fd;
+  --color-brand-dim: rgba(96, 165, 250, 0.14);
+  --color-accent: #a78bfa;
+  --color-accent-dim: rgba(167, 139, 250, 0.15);
+  --color-infra: #34d399;
+  --color-infra-dim: rgba(52, 211, 153, 0.14);
 
-  --color-success: #059669;
-  --color-success-dim: rgba(5, 150, 105, 0.12);
-  --color-warning: #b45309;
-  --color-warning-dim: rgba(180, 83, 9, 0.12);
-  --color-danger: #dc2626;
-  --color-danger-dim: rgba(220, 38, 38, 0.12);
-  --color-info: #2563eb;
-  --color-info-dim: rgba(37, 99, 235, 0.12);
+  --color-success: #34d399;
+  --color-success-dim: rgba(52, 211, 153, 0.14);
+  --color-warning: #fbbf24;
+  --color-warning-dim: rgba(251, 191, 36, 0.14);
+  --color-danger: #f87171;
+  --color-danger-dim: rgba(248, 113, 113, 0.14);
+  --color-info: #60a5fa;
+  --color-info-dim: rgba(96, 165, 250, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
 }
 
 @layer base {
@@ -134,7 +139,7 @@
   h3 {
     font-weight: 700;
     line-height: 1.15;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   a {
@@ -172,27 +177,10 @@
     font-family: var(--font-mono);
   }
 
-  /* ── B 立體層次卡片基底 ──────────────────────
-     提亮表面 + 頂部 1px 高光邊(用 inset box-shadow 疊在邊框上,
-     不佔版面、深淺色各取對應變數)。 */
+  /* 卡片基底:表面 + 頂部 1px 高光邊(inset,不佔版面) */
   .card-surface {
     background: var(--color-card);
     box-shadow: inset 0 1px 0 0 var(--color-card-highlight);
-  }
-  /* 左側 3px teal/violet 強調條(Featured / Notable 用)。
-     用 ::before 疊一條,避免動到內距與版面。 */
-  .card-accent-bar::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--color-brand);
-    z-index: 1;
-  }
-  .card-accent-bar-accent::before {
-    background: var(--color-accent);
   }
 
   /* ── 文字連結可點指示:hover 底線(不只靠顏色,符合 WCAG)── */
@@ -219,6 +207,36 @@
     white-space: nowrap;
     border: 0;
   }
+
+  /* ── Hero 幾何圖形進場:一次編排的單一動畫時刻 ── */
+  .hg-plane {
+    animation: hg-plane-in 700ms var(--ease) both;
+    animation-delay: var(--hg-delay, 0ms);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  /* ── 進場 reveal(JS 掛上 observer 後才隱藏,初始 HTML 恆可見)── */
+  .reveal-hidden {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .reveal-shown {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 600ms var(--ease),
+      transform 600ms var(--ease);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+}
+
+/* 只寫 from:結束態回到元素自身 computed 值(保留個別 opacity)。 */
+@keyframes hg-plane-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
 }
 
 /* 尊重使用者的減少動效偏好 */
@@ -230,10 +248,18 @@
     animation: none !important;
     scroll-behavior: auto !important;
   }
+  .reveal-hidden {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* 列印:強制淺色、移除多餘裝飾 */
 @media print {
+  .reveal-hidden {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   :root {
     --color-bg: #ffffff;
     --color-surface: #ffffff;

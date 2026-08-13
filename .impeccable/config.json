@@ -1,0 +1,32 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-color",
+        "value": "#000000",
+        "createdAt": "2026-08-13T05:41:51.734Z",
+        "reason": "使用者確認:print 區塊刻意純黑(ATS/列印對比)"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "24px",
+        "createdAt": "2026-08-13T05:41:51.786Z",
+        "reason": "使用者確認:頁尾宣言縮小變體 clamp,DESIGN.md 已記載"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "21px",
+        "createdAt": "2026-08-13T05:41:51.840Z",
+        "reason": "使用者確認:Hero 角色行 clamp,DESIGN.md 已記載"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "31px",
+        "createdAt": "2026-08-13T05:41:51.892Z",
+        "reason": "使用者確認:詳情頁標題 clamp,值在 Major Third 階上"
+      }
+    ]
+  }
+}
