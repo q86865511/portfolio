@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Menu, X } from "lucide-react";
+import { Download, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "../lib/cn";
 import { useLang } from "../providers/LangProvider";
@@ -16,14 +16,17 @@ export interface NavLink {
 
 export interface NavProps {
   links: NavLink[];
-  githubUrl: string;
+  /** 保留供相容;新版導覽不再顯示 GitHub 圖示(移至頁尾)。 */
+  githubUrl?: string;
   brandName?: string;
+  /** 下載 PDF 履歷連結(依當前語言);提供時顯示主行動鈕。 */
+  pdfHref?: string;
 }
 
 export function Nav({
   links,
-  githubUrl,
   brandName = "周暐倫 · Terry",
+  pdfHref,
 }: NavProps) {
   const { t } = useLang();
   const [scrolled, setScrolled] = useState(false);
@@ -56,19 +59,25 @@ export function Nav({
       className={cn(
         "sticky top-0 z-50 border-b border-transparent transition-all duration-DEFAULT ease-ease",
         scrolled &&
-          "bg-[color-mix(in_srgb,var(--color-elevated)_86%,transparent)] backdrop-blur-[10px] border-border shadow-md",
+          "bg-[color-mix(in_srgb,var(--color-surface)_88%,transparent)] backdrop-blur-[10px] border-border shadow-sm",
       )}
     >
       <div className="container flex items-center justify-between h-16">
         <a
           href="#main"
-          className="link-underline inline-flex items-center gap-3 min-h-[44px] font-medium"
+          className="inline-flex items-center gap-3 min-h-[44px] font-bold"
+          aria-label={brandName}
         >
+          {/* TC 字標:墨色方塊 + 白字,品牌識別的最小單位 */}
           <span
             aria-hidden="true"
-            className="w-[10px] h-[10px] rounded-full bg-brand shadow-[0_0_0_4px_var(--color-brand-dim)]"
-          />
-          {brandName}
+            className="inline-flex h-[32px] w-[32px] items-center justify-center rounded-md bg-text text-bg text-sm font-bold tracking-tight select-none"
+          >
+            TC
+          </span>
+          <span className="hidden sm:inline text-base tracking-tight">
+            {brandName}
+          </span>
         </a>
 
         <nav
@@ -79,27 +88,42 @@ export function Nav({
             <a
               key={link.href}
               href={link.href}
-              className="link-underline inline-flex items-center min-h-[44px] px-1 text-text-muted text-sm transition-colors duration-DEFAULT ease-ease hover:text-text"
+              className="link-underline inline-flex items-center min-h-[44px] px-1 text-text-muted text-sm font-medium transition-colors duration-DEFAULT ease-ease hover:text-text"
             >
               {t(link.labelZh, link.labelEn)}
             </a>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <LangToggle />
           <ThemeToggle />
-          <Button
-            as="a"
-            variant="icon"
-            href={githubUrl}
-            aria-label={t("GitHub(另開新視窗)", "GitHub (opens in new tab)")}
-            rel="noopener noreferrer"
-            target="_blank"
-            className="hidden sm:inline-flex"
-          >
-            <Github className="h-5 w-5" aria-hidden="true" />
-          </Button>
+          {pdfHref && (
+            <>
+              <Button
+                as="a"
+                variant="secondary"
+                size="sm"
+                href={pdfHref}
+                rel="noopener"
+                className="hidden md:inline-flex"
+              >
+                <Download className="h-4 w-4" aria-hidden="true" />
+                {t("下載履歷", "Download résumé")}
+              </Button>
+              {/* 行動版:履歷下載收成 icon 鈕,首屏即可觸及(HR 主要行動) */}
+              <Button
+                as="a"
+                variant="icon"
+                href={pdfHref}
+                rel="noopener"
+                className="md:hidden"
+                aria-label={t("下載 PDF 履歷", "Download résumé (PDF)")}
+              >
+                <Download className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            </>
+          )}
           <Button
             variant="icon"
             className="md:hidden"
@@ -121,7 +145,7 @@ export function Nav({
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="md:hidden border-t border-border bg-elevated"
+          className="md:hidden border-t border-border bg-surface"
         >
           <nav
             className="container flex flex-col py-4 gap-1"
@@ -137,6 +161,17 @@ export function Nav({
                 {t(link.labelZh, link.labelEn)}
               </a>
             ))}
+            {pdfHref && (
+              <a
+                href={pdfHref}
+                rel="noopener"
+                onClick={() => setMenuOpen(false)}
+                className="text-brand font-medium py-3 px-2 rounded-md hover:bg-surface-2 min-h-[44px] flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" aria-hidden="true" />
+                {t("下載 PDF 履歷", "Download résumé")}
+              </a>
+            )}
           </nav>
         </div>
       )}

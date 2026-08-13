@@ -1,4 +1,4 @@
-// 產生社群分享 OG 圖(public/og.png,1200x630,Engineer Dark 風格)。
+// 產生社群分享 OG 圖(public/og.png,1200x630,淺色紙面+三軸色幾何風格)。
 //
 // 為什麼用 Puppeteer 而非 next/og 的 ImageResponse:
 //   ImageResponse 透過 opengraph-image.tsx 會產生「需 runtime 渲染」的 route,
@@ -20,7 +20,7 @@ const OUT_FILE = resolve(OUT_DIR, "og.png");
 const WIDTH = 1200;
 const HEIGHT = 630;
 
-// 自包含 HTML(Engineer Dark 配色,對齊 packages/ui globals.css token)。
+// 自包含 HTML(新視覺:淺色紙面 + 三軸色 + 幾何色面,對齊 packages/ui globals.css token)。
 const html = `<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -30,93 +30,93 @@ const html = `<!doctype html>
   html, body { width: ${WIDTH}px; height: ${HEIGHT}px; }
   body {
     display: flex;
-    background:
-      radial-gradient(900px 500px at 82% 18%, rgba(45, 212, 191, 0.16), transparent 60%),
-      radial-gradient(800px 600px at 12% 92%, rgba(167, 139, 250, 0.14), transparent 60%),
-      #0b0f14;
-    color: #e8edf2;
-    font-family: "Inter", "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    align-items: center;
+    background: #f6f7f9;
+    color: #0b1220;
+    font-family: "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
     position: relative;
     overflow: hidden;
-  }
-  .frame {
-    position: absolute;
-    inset: 28px;
-    border: 1.5px solid rgba(159, 176, 192, 0.22);
-    border-radius: 24px;
   }
   .content {
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 88px 96px;
-    gap: 22px;
+    padding: 0 0 0 96px;
+    gap: 20px;
     z-index: 1;
+    width: 700px;
   }
-  .prompt {
-    font-family: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: #0b1220;
+    color: #ffffff;
     font-size: 30px;
-    color: #2dd4bf;
-    letter-spacing: 0.5px;
-  }
-  .prompt .caret { color: #5eead4; }
-  .name {
-    font-size: 92px;
     font-weight: 700;
-    line-height: 1.04;
     letter-spacing: -1px;
   }
-  .name .en { color: #9fb0c0; font-weight: 700; }
+  .name {
+    font-size: 88px;
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -2px;
+  }
+  .name .en { color: #5b6b82; }
   .tagline {
     display: flex;
     align-items: center;
-    gap: 18px;
-    font-family: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
-    font-size: 40px;
-    font-weight: 700;
-    color: #a78bfa;
-    margin-top: 4px;
-  }
-  .tagline .dot { color: #2dd4bf; }
-  .footer {
-    margin-top: 40px;
-    display: flex;
-    align-items: center;
     gap: 16px;
-    font-family: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
-    font-size: 28px;
-    color: #9fb0c0;
-  }
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    height: 40px;
-    padding: 0 14px;
-    border: 1.5px solid #2dd4bf;
-    border-radius: 8px;
-    color: #2dd4bf;
-    font-size: 24px;
+    font-size: 38px;
     font-weight: 700;
+    margin-top: 2px;
   }
-  .url { color: #e8edf2; }
+  .tagline .fs { color: #2563eb; }
+  .tagline .ml { color: #7c3aed; }
+  .tagline .io { color: #047857; }
+  .tagline .sep { color: #5b6b82; font-weight: 400; }
+  .url {
+    margin-top: 26px;
+    font-size: 28px;
+    color: #414d63;
+    font-weight: 500;
+  }
+  /* 右側幾何色面(與站上 HeroGraphic 同語言) */
+  .art { position: absolute; right: 0; top: 0; width: 500px; height: 100%; }
 </style>
 </head>
 <body>
-  <div class="frame"></div>
   <div class="content">
-    <div class="prompt"><span class="caret">$</span> whoami</div>
-    <div class="name">周暐倫 <span class="en">Terry Chou</span></div>
+    <div class="logo">TC</div>
+    <div class="name">周暐倫<br/><span class="en">Terry Chou</span></div>
     <div class="tagline">
-      <span>全端</span><span class="dot">·</span>
-      <span>AI-ML</span><span class="dot">·</span>
-      <span>DevOps</span>
+      <span class="fs">全端</span><span class="sep">/</span>
+      <span class="ml">AI-ML 部署</span><span class="sep">/</span>
+      <span class="io">DevOps</span>
     </div>
-    <div class="footer">
-      <span class="badge">TC</span>
-      <span class="url">terrychou.com</span>
-    </div>
+    <div class="url">terrychou.com</div>
   </div>
+  <svg class="art" viewBox="0 0 500 630" fill="none">
+    <circle cx="330" cy="220" r="150" fill="#2563eb"/>
+    <path d="M330 70 A150 150 0 0 1 330 370 Z" fill="#0b1220"/>
+    <path d="M60 480 A90 90 0 0 1 240 480 Z" fill="#047857"/>
+    <path d="M120 150 A80 80 0 0 1 200 70 L200 150 Z" fill="#7c3aed"/>
+    <circle cx="90" cy="300" r="16" fill="#2563eb"/>
+    <path d="M420 400 A70 70 0 0 1 420 540 Z" fill="#0b1220"/>
+    <g fill="#5b6b82">
+      ${Array.from({ length: 20 })
+        .map((_, i) => {
+          const cx = 350 + (i % 5) * 22;
+          const cy = 470 + Math.floor(i / 5) * 22;
+          return `<circle cx="${cx}" cy="${cy}" r="3"/>`;
+        })
+        .join("")}
+    </g>
+  </svg>
 </body>
 </html>`;
 

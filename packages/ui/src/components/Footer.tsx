@@ -28,57 +28,27 @@ export function Footer({
     <footer
       id="contact"
       aria-labelledby="foot-h"
-      className="border-t border-border pt-7 pb-6 mt-8"
+      className="border-t border-border mt-9 scroll-mt-20"
     >
-      <div className="container">
-        <h2 id="foot-h" className="sr-only">
-          {t("聯絡與頁尾", "Contact & footer")}
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-5">
+      <div className="container py-8">
+        {/* 宣言列:一句話 + 聯絡管道,參照首屏語氣收尾 */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 pb-7 border-b border-border">
           <div>
-            <a
-              href="#main"
-              className="link-underline inline-flex items-center gap-3 min-h-[44px] font-medium mb-2"
+            <h2
+              id="foot-h"
+              className="leading-[1.2] mb-2"
+              style={{ fontSize: "clamp(24px,3.2vw,31px)" }}
             >
-              <span
-                aria-hidden="true"
-                className="w-[10px] h-[10px] rounded-full bg-brand shadow-[0_0_0_4px_var(--color-brand-dim)]"
-              />
-              {brandName}
-            </a>
-            <p className="text-text-muted text-sm max-w-[42ch]">
+              {t("來做點有用的東西吧。", "Let's build something useful.")}
+            </h2>
+            <p className="text-text-muted text-sm max-w-[46ch]">
               {t(
-                "全端 / AI-ML 部署 / DevOps 工程師。開放工作機會,歡迎來信聊聊。",
-                "Full-stack / AI-ML deployment / DevOps engineer. Open to work — let's talk.",
+                "開放工作機會 — 全端 / AI-ML 部署 / DevOps。歡迎來信聊聊。",
+                "Open to opportunities — full-stack / AI-ML deployment / DevOps. Drop me a line.",
               )}
             </p>
-            <p className="text-text-subtle text-sm mt-4">
-              © {year} {brandName}
-            </p>
           </div>
-
-          <div>
-            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-3 font-medium font-mono">
-              {t("導覽", "Navigate")}
-            </h3>
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                {...(link.external
-                  ? { rel: "noopener noreferrer", target: "_blank" }
-                  : {})}
-                className="link-underline text-text-muted text-sm flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
-              >
-                {t(link.labelZh, link.labelEn)}
-              </a>
-            ))}
-          </div>
-
-          <div>
-            <h3 className="text-sm uppercase tracking-[0.05em] text-text-subtle mb-3 font-medium font-mono">
-              {t("聯絡", "Contact")}
-            </h3>
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             {contactLinks.map((link) => (
               <a
                 key={link.href}
@@ -86,7 +56,7 @@ export function Footer({
                 {...(link.external
                   ? { rel: "noopener noreferrer", target: "_blank" }
                   : {})}
-                className="link-underline text-text-muted text-sm flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease hover:text-brand"
+                className="link-underline text-sm font-medium inline-flex items-center min-h-[44px] text-text-muted transition-colors duration-DEFAULT ease-ease hover:text-brand"
               >
                 {t(link.labelZh, link.labelEn)}
               </a>
@@ -94,19 +64,31 @@ export function Footer({
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-border flex flex-wrap gap-4 justify-between items-center text-sm text-text-subtle">
-          <span className="font-mono text-xs">
-            {t("本站技術", "Built with")} ·{" "}
-            <b className="text-text-muted font-medium">Next.js</b> ·{" "}
-            <b className="text-text-muted font-medium">Tailwind</b> ·{" "}
-            <b className="text-text-muted font-medium">Cloudflare Tunnel</b> ·{" "}
-            <b className="text-text-muted font-medium">Oracle A1</b>
-          </span>
+        {/* 次要列:版權 + 站內導覽 + 技術註記 */}
+        <div className="pt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm text-text-subtle">
           <span>
-            {t(
-              "以無障礙 (WCAG AA) 與 RWD 為前提設計",
-              "Designed for accessibility (WCAG AA) and responsive layout",
-            )}
+            © {year} {brandName}
+          </span>
+          <nav
+            aria-label={t("頁尾導覽", "Footer navigation")}
+            className="flex flex-wrap gap-x-5"
+          >
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                {...(link.external
+                  ? { rel: "noopener noreferrer", target: "_blank" }
+                  : {})}
+                className="link-underline inline-flex items-center min-h-[44px] transition-colors duration-DEFAULT ease-ease hover:text-text"
+              >
+                {t(link.labelZh, link.labelEn)}
+              </a>
+            ))}
+          </nav>
+          <span className="font-mono text-xs">
+            Next.js · Tailwind · Cloudflare Tunnel · Oracle A1 ·{" "}
+            {t("自架 · WCAG AA", "self-hosted · WCAG AA")}
           </span>
         </div>
       </div>

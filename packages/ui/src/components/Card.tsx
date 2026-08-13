@@ -31,7 +31,7 @@ interface BaseCardProps {
   actions?: CardAction[];
   /** 學術/來源標籤(碩士論文 / 大學專題 / 課程專案),可選。 */
   kind?: string;
-  /** 卡片頂部封面圖(16:9);提供時取代 Featured 的 glyph 帶、並為 Notable 加頂圖。 */
+  /** 卡片頂部封面圖(16:9);Featured 無封面時改用幾何色面帶。 */
   cover?: string;
   className?: string;
 }
@@ -77,6 +77,43 @@ function CoverImage({ src }: { src: string }) {
   );
 }
 
+/** 無封面時的幾何色面帶:簽名圖形語言(三軸色平面),每張卡由 seed 變化構圖。 */
+function PlanesBand({ seed = 0 }: { seed?: number }) {
+  const palettes: [string, string, string][] = [
+    ["var(--color-brand)", "var(--color-accent)", "var(--color-infra)"],
+    ["var(--color-accent)", "var(--color-infra)", "var(--color-brand)"],
+    ["var(--color-infra)", "var(--color-brand)", "var(--color-accent)"],
+  ];
+  const [c1, c2, c3] = palettes[seed % palettes.length] ?? palettes[0]!;
+  return (
+    <div
+      aria-hidden="true"
+      className="h-[112px] border-b border-border bg-surface-2 relative overflow-hidden"
+    >
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 400 112"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <circle cx="330" cy="56" r="72" fill={c1} opacity="0.9" />
+        <path d="M330 -16 A72 72 0 0 0 258 56 L330 56 Z" fill="var(--color-text)" />
+        <circle cx="96" cy="88" r="44" fill={c2} opacity="0.85" />
+        <rect x="150" y="64" width="48" height="48" rx="8" fill={c3} opacity="0.8" />
+        <g fill="var(--color-text-subtle)">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <circle
+              key={i}
+              cx={28 + (i % 4) * 14}
+              cy={24 + Math.floor(i / 4) * 14}
+              r="2"
+            />
+          ))}
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 /** 學術/來源小標籤(碩士論文 / 大學專題 / 課程專案);中性 mono pill,與 status 徽章區隔。 */
 function KindTag({ label, className }: { label: string; className?: string }) {
   return (
@@ -91,19 +128,14 @@ function KindTag({ label, className }: { label: string; className?: string }) {
   );
 }
 
-// B 立體層次:提亮表面(card-surface) + 頂部高光邊 + hover 上浮,
-// 高光邊與表面色取自 globals.css 的 --color-card* 變數(深淺色各一)。
+// 卡片基底:白面 + 細邊 + 軟陰影,hover 微浮加深(深色主題自動取對應變數)。
 const cardBase =
-  "card-surface border border-border rounded-lg relative overflow-hidden flex flex-col transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
+  "card-surface border border-border rounded-lg relative overflow-hidden flex flex-col shadow-sm transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
 
 /* ─────────────── FeaturedCard ─────────────── */
 export interface FeaturedCardProps extends BaseCardProps {
-  /** 頂部視覺帶的 glyph(大字水印)。 */
-  glyph?: string;
-  /** 左側 accent 條顏色。 */
-  accentBar?: "brand" | "accent";
-  /** 頂部漂浮 badge。 */
-  floatBadges?: { label: string; category?: "ml" | "infra" | "neutral" }[];
+  /** 無封面時幾何色面帶的構圖變化 seed。 */
+  patternSeed?: number;
 }
 
 export function FeaturedCard({
@@ -116,23 +148,13 @@ export function FeaturedCard({
   desc,
   techStack = [],
   actions = [],
-  glyph,
-  accentBar = "brand",
-  floatBadges = [],
+  patternSeed = 0,
   className,
 }: FeaturedCardProps) {
   return (
-    <article
-      className={cn(
-        cardBase,
-        "group card-accent-bar",
-        accentBar === "accent" && "card-accent-bar-accent",
-        className,
-      )}
-    >
+    <article className={cn(cardBase, "group", className)}>
       {cover ? (
-        // 有封面時 kind 疊在封面左上角,位置與下方 glyph 帶的 KindTag 一致
-        // (KindTag 底色不透明,壓在圖上仍可讀)。
+        // 有封面時 kind 疊在封面左上角(KindTag 底色不透明,壓在圖上仍可讀)。
         <div className="relative">
           <CoverImage src={cover} />
           {kind && (
@@ -140,26 +162,10 @@ export function FeaturedCard({
           )}
         </div>
       ) : (
-        <div className="h-[120px] bg-gradient-to-br from-surface-2 to-elevated border-b border-border relative flex items-center justify-center overflow-hidden">
+        <div className="relative">
+          <PlanesBand seed={patternSeed} />
           {kind && (
             <KindTag label={kind} className="absolute left-4 top-4 z-10" />
-          )}
-          {glyph && (
-            <span
-              aria-hidden="true"
-              className="font-mono font-bold text-[60px] opacity-10 tracking-[-2px]"
-            >
-              {glyph}
-            </span>
-          )}
-          {floatBadges.length > 0 && (
-            <div className="absolute right-4 bottom-4 flex gap-2">
-              {floatBadges.map((b, i) => (
-                <TechBadge key={i} category={b.category}>
-                  {b.label}
-                </TechBadge>
-              ))}
-            </div>
           )}
         </div>
       )}
@@ -204,9 +210,9 @@ export function NotableCard({
   className,
 }: BaseCardProps) {
   return (
-    <article className={cn(cardBase, "group card-accent-bar", className)}>
+    <article className={cn(cardBase, "group", className)}>
       {cover && <CoverImage src={cover} />}
-      <div className="p-5 pl-6 flex flex-col flex-1">
+      <div className="p-5 flex flex-col flex-1">
         {kind && (
           <div className="mb-2">
             <KindTag label={kind} />

@@ -1,5 +1,9 @@
 # 01 — 設計系統(Design System)
 
+> ⚠️ **已被取代(2026-08-12)**:全站視覺已全面重設計為「淺色現代招募版」(藍/紫/綠三軸色系統)。
+> 現行視覺權威為根目錄 **`DESIGN.md`**(由建成品產出);本篇保留為 Engineer Dark 時期的歷史紀錄,
+> token 值與色彩描述已不代表現況(token *名稱* 大多仍沿用)。
+
 > 本篇定義履歷入口網站的視覺語言與元件規格。最終落地在 `packages/ui`,供主站(`apps/main`)與所有子站(`apps/soulshard` 等)共用。每個重要選擇都附「為什麼」。
 >
 > 落地形式:CSS 變數 token → Tailwind `theme.extend` → React 元件。本文件的 token 命名即為 Tailwind / CSS 變數的最終名稱。

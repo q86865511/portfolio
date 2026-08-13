@@ -39,6 +39,10 @@ const preset: Config = {
           DEFAULT: "var(--color-accent)",
           dim: "var(--color-accent-dim)",
         },
+        infra: {
+          DEFAULT: "var(--color-infra)",
+          dim: "var(--color-infra-dim)",
+        },
         success: {
           DEFAULT: "var(--color-success)",
           dim: "var(--color-success-dim)",
@@ -101,9 +105,9 @@ const preset: Config = {
         full: "999px",
       },
       boxShadow: {
-        sm: "0 1px 2px rgba(0,0,0,.30)",
-        md: "0 6px 20px rgba(0,0,0,.35)",
-        lg: "0 16px 48px rgba(0,0,0,.45)",
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
       },
       transitionTimingFunction: {
         DEFAULT: "cubic-bezier(.2,.7,.2,1)",

@@ -57,3 +57,5 @@ design/shots-polish/
 **/.impeccable/*.png
 **/.impeccable/live/*
 !**/.impeccable/live/config.json
+# 決策頁 question 伺服器的 session log(本機暫態)
+**/.impeccable/questions/

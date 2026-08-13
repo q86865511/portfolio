@@ -1,5 +1,3 @@
-import type { HeroTermLine } from "@resume/ui";
-
 /** 個人資料(真實值,單一來源)。 */
 export const profile = {
   nameZh: "周暐倫",
@@ -93,17 +91,6 @@ export const skillGroups: SkillGroup[] = [
     category: "neutral",
     items: ["Godot 4", "GDScript", "C#", "raylib", "HTML5 Canvas"],
   },
-];
-
-export const heroTermLines: HeroTermLine[] = [
-  { type: "prompt", cmd: "whoami" },
-  { type: "output", text: "周暐倫 — full-stack / ML-ops / devops engineer" },
-  { type: "prompt", cmd: "cat", text: "stack.yml" },
-  { type: "kv", k: "languages", v: "Python, TypeScript, C++" },
-  { type: "kv", k: "ml", v: "PyTorch, YOLOv8, TensorRT, Triton" },
-  { type: "kv", k: "infra", v: "Docker, Cloudflare, Oracle A1" },
-  { type: "kv", k: "web", v: "Next.js, FastAPI, Postgres, Redis" },
-  { type: "prompt", cmd: "./deploy", text: "--prod  ✓ ready" },
 ];
 
 /** 主導覽 / 頁尾連結。 */

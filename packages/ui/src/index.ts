@@ -24,7 +24,9 @@ export {
   type ProjectStatus,
 } from "./components/StatusBadge";
 export { Nav, type NavProps, type NavLink } from "./components/Nav";
-export { Hero, type HeroProps, type HeroTermLine } from "./components/Hero";
+export { Hero, type HeroProps } from "./components/Hero";
+export { HeroGraphic, type HeroGraphicProps } from "./components/HeroGraphic";
+export { Reveal, type RevealProps } from "./components/Reveal";
 export { Section, type SectionProps } from "./components/Section";
 export { LangToggle } from "./components/LangToggle";
 export { ThemeToggle } from "./components/ThemeToggle";
