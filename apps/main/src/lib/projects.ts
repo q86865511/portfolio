@@ -145,8 +145,8 @@ export function primaryLink(p: Project): { href: string; external: boolean } {
 /**
  * PDF 履歷收錄的專案、分區與顯示順序(使用者指定;只影響 PDF,不動首頁分層)。
  * 這份清單就是唯一真相——不由 tier 推導,所以 mcpglass 雖在首頁是 mini,仍能進履歷。
- * 分兩區:學術(碩士論文、大學專題)一區,其餘 side projects 一區;
- * 各區內最強、最相關(求職主攻 AI 部署 / DevOps)的放前面。
+ * 分兩區:學術(大學專題 → 碩士論文,依時間順序)一區,其餘 side projects 一區;
+ * side projects 區內最強、最相關(求職主攻 AI 部署 / DevOps)的放前面。
  */
 export interface ResumeSection {
   titleZh: string;
@@ -158,7 +158,7 @@ const RESUME_SECTIONS: ResumeSection[] = [
   {
     titleZh: "學術專案",
     titleEn: "Academic Projects",
-    slugs: ["ai-deployment-pipeline", "smart-pedestrian-navigation"],
+    slugs: ["smart-pedestrian-navigation", "ai-deployment-pipeline"],
   },
   {
     titleZh: "個人專案 (Side Projects)",
