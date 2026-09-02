@@ -1,4 +1,4 @@
-// 產生兩張代表作封面(public/covers/*.webp,1200x675,新視覺:三軸色幾何+紙面/墨底)。
+// 產生代表作封面(public/covers/*.webp,1200x675,新視覺:三軸色幾何+紙面/墨底)。
 // 與 generate-og.mjs 同一套 Puppeteer 靜態產圖流程;文案全部取自 content/projects.json 的真實欄位。
 // 用法:`pnpm --filter main run generate-covers`(或 node scripts/generate-covers.mjs)
 
@@ -101,9 +101,43 @@ const navCover = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8
   </svg>
 </body></html>`;
 
+// 封面 3:AI 用量監控(UsageMonitor)— 墨底,藍/綠主導(系統程式+可觀測性);不放任何會過期的數字。
+const usageCover = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"/><style>
+  ${baseCss}
+  body { background: #0b1220; color: #e9eef7; }
+  .kind { background: rgba(96,165,250,.14); color: #60a5fa; }
+  .sub { color: #a6b4cc; }
+  .chip { background: #172338; color: #a6b4cc; }
+  .chip.hl { background: rgba(52,211,153,.14); color: #34d399; }
+</style></head><body>
+  <div class="content">
+    <span class="kind">桌面應用 · Desktop</span>
+    <div class="title">AI 用量監控</div>
+    <div class="sub">Claude Code 與 Codex CLI 的限額儀表 · 托盤圖示即雙環量表 · 官方數字優先 · 100% 本機</div>
+    <div class="chips">
+      <span class="chip hl">Rust</span><span class="chip hl">Tauri 2</span>
+      <span class="chip">React</span><span class="chip">TypeScript</span>
+      <span class="chip">SQLite</span><span class="chip">tiny-skia</span>
+    </div>
+  </div>
+  <svg class="art" viewBox="0 0 420 675" fill="none">
+    <circle cx="270" cy="250" r="150" fill="none" stroke="#34d399" stroke-width="34"/>
+    <path d="M270 100 A150 150 0 1 1 120 250" stroke="#60a5fa" stroke-width="34" stroke-linecap="round"/>
+    <circle cx="270" cy="250" r="86" fill="none" stroke="#a78bfa" stroke-width="26"/>
+    <path d="M270 164 A86 86 0 0 1 356 250" stroke="#e9eef7" stroke-width="26" stroke-linecap="round"/>
+    <path d="M120 600 A90 90 0 0 1 300 600 Z" fill="#2563eb"/>
+    <g fill="#7c8ca6">
+      ${Array.from({ length: 16 })
+        .map((_, i) => `<circle cx="${60 + (i % 4) * 22}" cy="${420 + Math.floor(i / 4) * 22}" r="3"/>`)
+        .join("")}
+    </g>
+  </svg>
+</body></html>`;
+
 const covers = [
   { file: "ai-deployment-pipeline.webp", html: aiCover },
   { file: "smart-pedestrian-navigation.webp", html: navCover },
+  { file: "usage-monitor.webp", html: usageCover },
 ];
 
 async function main() {
