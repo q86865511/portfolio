@@ -76,10 +76,20 @@ export function PrintView() {
       <Block title={t("摘要", "Summary")}>
         <p style={{ margin: 0 }}>
           {t(
-            "國立中央大學資訊工程碩士(2025/6 畢業;2025/11–2026/2 義務役,已退伍)。專長是把 AI 模型送上生產環境:碩士論文打造 YOLOv8 的端到端部署與監控平台,涵蓋 PT→ONNX→TensorRT 自動優化、多批次 × 多精度效能評測、Triton 模型上架與生命週期管理、Prometheus/Grafana 監控。退伍後獨立完成多個作品,其中三個自架上線至今(erp / soulshard / steam.terrychou.com)——從零打造的製造業 ERP(Java 21 / Spring Boot,600+ 測試,含 239 個對真實 PostgreSQL 的 Testcontainers 整合測試),以及用 Rust 與 Go 寫的維運工具(MCP 流量觀測代理、遊戲伺服器管控平台)。習慣為每個專案記錄技術取捨、用測試守住品質,擅長把研究原型做成能跑、可維運、可被驗證的系統。",
-            "M.S. in Computer Science & Information Engineering, National Central University (graduated Jun 2025; mandatory military service Nov 2025 – Feb 2026, completed). I specialize in taking AI models to production: my thesis built an end-to-end deployment and monitoring platform for YOLOv8 — automated PT→ONNX→TensorRT optimization, multi-batch × multi-precision benchmarking, Triton model registration and lifecycle management, and Prometheus/Grafana monitoring. Since completing service I have shipped several independent projects, three of them self-hosted and live today (erp / soulshard / steam.terrychou.com): a from-scratch manufacturing ERP (Java 21 / Spring Boot, 600+ tests including 239 Testcontainers integration tests against a real PostgreSQL) and ops tooling in Rust and Go (an MCP traffic observability proxy and a game-server management platform). I record the trade-offs behind every project, guard quality with tests, and turn research prototypes into systems that run, can be operated, and can be verified.",
+            "國立中央大學資訊工程碩士(2025/6 畢業,義務役已退伍)。專長是把 AI 模型送上生產環境:碩士論文打造 YOLOv8 端到端部署與監控平台(PT→ONNX→TensorRT 自動優化、多批次 × 多精度評測、Triton 模型上架管理、Prometheus/Grafana 監控)。退伍後獨立完成多個作品,三個自架上線至今(製造業 ERP、Steam 特價追蹤站、瀏覽器遊戲),並以 Rust/Go 打造維運工具(MCP 流量觀測代理、遊戲伺服器管控平台)。重視技術取捨紀錄與測試品質。",
+            "M.S. in Computer Science & Information Engineering, National Central University (Jun 2025; military service completed). I take AI models to production: my thesis built an end-to-end YOLOv8 deployment and monitoring platform (automated PT→ONNX→TensorRT optimization, multi-batch × multi-precision benchmarking, Triton model management, Prometheus/Grafana monitoring). Since then I have shipped several independent projects, three of them self-hosted and live (a manufacturing ERP, a Steam deals tracker, a browser game), plus Rust/Go ops tooling (an MCP traffic observability proxy, a game-server management platform). I document trade-offs and guard quality with tests.",
           )}
         </p>
+      </Block>
+
+      {/* 學歷 */}
+      <Block title={t("學歷", "Education")}>
+        {eduItems.map((e) => (
+          <p key={e.period} style={{ margin: "0 0 2px" }}>
+            <b>{t(e.schoolZh, e.schoolEn)}</b> — {t(e.degreeZh, e.degreeEn)} ({e.period})
+          </p>
+        ))}
+        <p style={{ margin: "0 0 2px" }}>{t(serviceNote.zh, serviceNote.en)}</p>
       </Block>
 
       {/* 技能(線性列出,利於關鍵字比對) */}
@@ -102,6 +112,11 @@ export function PrintView() {
                 {p.periodZh ? (
                   <span style={{ fontWeight: 400 }}> · {t(p.periodZh, p.periodEn ?? p.periodZh)}</span>
                 ) : null}
+                {p.liveUrl ? (
+                  <span style={{ fontWeight: 400 }}>
+                    {" "}· {t("線上", "Live")}: <a href={p.liveUrl} style={{ color: INK }}>{p.liveUrl}</a>
+                  </span>
+                ) : null}
               </p>
               <p style={{ margin: "0 0 2px" }}>{t(p.oneLinerZh, p.oneLinerEn)}</p>
               <p style={{ margin: "0 0 2px" }}>
@@ -116,16 +131,6 @@ export function PrintView() {
           ))}
         </Block>
       ))}
-
-      {/* 學歷 */}
-      <Block title={t("學歷", "Education")}>
-        {eduItems.map((e) => (
-          <p key={e.period} style={{ margin: "0 0 2px" }}>
-            <b>{t(e.schoolZh, e.schoolEn)}</b> — {t(e.degreeZh, e.degreeEn)} ({e.period})
-          </p>
-        ))}
-        <p style={{ margin: "0 0 2px" }}>{t(serviceNote.zh, serviceNote.en)}</p>
-      </Block>
 
       <style>{`
         @media print {

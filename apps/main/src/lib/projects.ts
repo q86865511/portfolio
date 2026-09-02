@@ -192,12 +192,12 @@ export function resumeProjects(): Project[] {
   return resumeSections().flatMap((s) => s.projects);
 }
 
-/** PDF 每案印幾條 highlight:預設 2;排在後段的低優先專案只印 1 條,讓中文版守在兩頁內。 */
+/** PDF 每案印幾條 highlight:學術專案敘述多一些(碩論 3、專題 2),side projects 精簡為 1 條,中文版守在兩頁內。 */
 const RESUME_HIGHLIGHT_LIMIT: Record<string, number> = {
-  "soulshard-hunter": 1,
-  "smart-pedestrian-navigation": 1,
+  "ai-deployment-pipeline": 3,
+  "smart-pedestrian-navigation": 2,
 };
 
 export function resumeHighlights(p: Project): Highlight[] {
-  return p.highlights.slice(0, RESUME_HIGHLIGHT_LIMIT[p.slug] ?? 2);
+  return p.highlights.slice(0, RESUME_HIGHLIGHT_LIMIT[p.slug] ?? 1);
 }
