@@ -32,6 +32,12 @@ export const eduItems = [
   },
 ] as const;
 
+/** 役期(僅 PDF 履歷的學歷段列出;首頁時間軸不顯示)。 */
+export const serviceNote = {
+  zh: "兵役:義務役 2025/11 – 2026/2,已退伍",
+  en: "Military service (mandatory), Nov 2025 – Feb 2026 — completed",
+} as const;
+
 export interface SkillGroup {
   titleZh: string;
   titleEn: string;
@@ -46,7 +52,7 @@ export const skillGroups: SkillGroup[] = [
     titleEn: "Languages",
     icon: "languages",
     category: "neutral",
-    items: ["Python", "TypeScript/JavaScript", "C++", "Java", "Rust", "Assembly", "Verilog"],
+    items: ["Python", "TypeScript/JavaScript", "Go", "Rust", "C++", "Java", "Assembly", "Verilog"],
   },
   {
     titleZh: "前端開發",

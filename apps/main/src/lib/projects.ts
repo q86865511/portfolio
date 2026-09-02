@@ -35,6 +35,9 @@ export interface Project {
   /** 學術/來源標籤(如 碩士論文 / 大學專題 / 課程專案),可選。 */
   kindZh?: string;
   kindEn?: string;
+  /** 專案期間(如 2026/4 – 2026/6;進行中寫「至今」/ present),目前只在 PDF 履歷顯示,可選。 */
+  periodZh?: string;
+  periodEn?: string;
 }
 
 interface RawProject extends Omit<Project, "highlights"> {
@@ -139,26 +142,33 @@ export function primaryLink(p: Project): { href: string; external: boolean } {
   return { href: p.githubUrl, external: true };
 }
 
-/** PDF 履歷的專案顯示順序(使用者指定;只影響 PDF,不動首頁分層順序)。 */
+/**
+ * PDF 履歷收錄的專案與顯示順序(使用者指定;只影響 PDF,不動首頁分層)。
+ * 這份清單就是唯一真相——不再由 tier 推導,所以 mcpglass 雖在首頁是 mini,仍能進履歷。
+ * 順序邏輯:求職主攻 AI 部署 / DevOps,最強、最相關的放第一頁;大學專題墊底當鋪陳。
+ */
 const RESUME_ORDER = [
   "ai-deployment-pipeline",
-  "smart-pedestrian-navigation",
-  "soulshard-hunter",
-  "steam-sale-checker",
   "erp-system",
+  "mcpglass",
   "server-monitor",
   "usage-monitor",
+  "steam-sale-checker",
+  "soulshard-hunter",
+  "smart-pedestrian-navigation",
 ];
 
-/** PDF 履歷會用到的 featured + notable 專案(依 RESUME_ORDER 排序)。 */
+/** PDF 履歷會用到的專案(依 RESUME_ORDER;清單裡找不到的 slug 略過而非炸掉)。 */
 export function resumeProjects(): Project[] {
-  const inResume = projects.filter((p) => {
-    const t = tierOf(p.slug);
-    return t === "featured" || t === "notable";
-  });
-  const rank = (slug: string) => {
-    const i = RESUME_ORDER.indexOf(slug);
-    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
-  };
-  return [...inResume].sort((a, b) => rank(a.slug) - rank(b.slug));
+  return RESUME_ORDER.map(getProject).filter((p): p is Project => p !== undefined);
+}
+
+/** PDF 每案印幾條 highlight:預設 2;排在後段的低優先專案只印 1 條,讓中文版守在兩頁內。 */
+const RESUME_HIGHLIGHT_LIMIT: Record<string, number> = {
+  "soulshard-hunter": 1,
+  "smart-pedestrian-navigation": 1,
+};
+
+export function resumeHighlights(p: Project): Highlight[] {
+  return p.highlights.slice(0, RESUME_HIGHLIGHT_LIMIT[p.slug] ?? 2);
 }
