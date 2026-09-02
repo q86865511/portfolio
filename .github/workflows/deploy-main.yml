@@ -57,9 +57,10 @@ jobs:
         run: pnpm --filter main run build
 
       # PDF:amd64 上 Chrome for Testing 正常。中文字型由 generate-pdf.mjs 自己處理:抓 google/fonts 釘定
-      # commit 的 Noto Sans TC 可變 TTF(SHA-256 驗證),用 fontTools 實例化成 400/700 靜態 TTF 注入頁面——
-      # Chrome 印 PDF 對可變字型與 CFF 的 OTF 都只會輸出 Type3 點陣字(中文版曾脹到 1.4 MB),只有 glyf
-      # 靜態 TTF 會真正嵌入。系統的 fonts-noto-cjk 仍裝著,只當注入失敗前的方框保底。
+      # commit 的 Noto Sans TC 可變 TTF(SHA-256 驗證),用 fontTools 實例化成 400/700 靜態 TTF,在 Linux 裝成
+      # 使用者系統字型(~/.local/share/fonts + fc-cache)——Chrome 印 PDF 對可變字型、CFF 的 OTF、以及 Linux 上
+      # 以 @font-face 注入的網頁字型都只會輸出 Type3 點陣字(中文版曾脹到 1.4 MB),只有 glyf 靜態 TTF 走
+      # 系統字型才會真正嵌入。系統的 fonts-noto-cjk 仍裝著,只當安裝失敗前的方框保底。
       # 不加 continue-on-error:PDF 產線失敗必須擋下部署——否則 out/ 少了 resume-*.pdf,
       # deploy-static.sh 的 rsync --delete 會把線上舊 PDF 一併刪掉,首頁下載連結靜默壞掉。
       - name: Install fontTools + CJK fallback fonts + Chrome for Puppeteer

@@ -8,7 +8,7 @@
 - 前端:Next.js 15(App Router、`output: 'export'` 靜態匯出)、React 19、TypeScript、Tailwind。
 - 共用設計系統放 `packages/ui`,各 app 透過 workspace 相依引用,**不複製貼上元件**。
 - e2e/smoke:**Playwright**(`apps/main/e2e/`),對 build 後的 `out/` 起本機 `serve` 驗證;已納入 `ci.yml`(build 後跑)。
-- PDF 履歷(`apps/main/scripts/generate-pdf.mjs`)的中文字型必須是 **glyf 靜態 TTF**(Chrome 印 PDF 對可變字型與 CFF OTF 都只出 Type3):腳本自抓釘定版本的 Noto Sans TC 並用 fontTools 實例化,本機需 Python 3 + `pip install fonttools`;履歷收錄與順序只看 `projects.ts` 的 `RESUME_ORDER`,不由 tier 推導。
+- PDF 履歷(`apps/main/scripts/generate-pdf.mjs`)的中文字型必須是 **glyf 靜態 TTF**(Chrome 印 PDF 對可變字型與 CFF OTF 都只出 Type3):腳本自抓釘定版本的 Noto Sans TC 並用 fontTools 實例化為 family `Resume CJK`;Linux 裝成使用者系統字型、Windows/macOS 以 @font-face 注入(Linux 的網頁字型也會變 Type3);本機需 Python 3 + `pip install fonttools`;履歷收錄與順序只看 `projects.ts` 的 `RESUME_ORDER`,不由 tier 推導。
 - pnpm 設定(`overrides`、`allowBuilds`、`verifyDepsBeforeRun` 等)放 **`pnpm-workspace.yaml`**——此版 pnpm 由 workspace yaml 讀取,寫在 `package.json` 的 `pnpm` 欄不會生效。
 
 ## 目錄約定
