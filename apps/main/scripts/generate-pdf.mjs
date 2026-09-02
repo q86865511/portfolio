@@ -9,7 +9,7 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -119,12 +119,15 @@ async function ensureCjkInstances() {
       python ??= findPythonWithFontTools();
       const src = await ensureCjkSource();
       console.log(`[generate-pdf] 實例化 ${inst.file}(wght=${inst.weight},family "${CJK_FAMILY}")`);
-      const r = spawnSync(python, ["-c", INSTANCE_PY, src, path, String(inst.weight), CJK_FAMILY], {
+      // 先寫 .tmp 再 rename:實例化中途被中斷不會留下截斷檔讓下次靜默沿用。
+      const tmp = `${path}.tmp`;
+      const r = spawnSync(python, ["-c", INSTANCE_PY, src, tmp, String(inst.weight), CJK_FAMILY], {
         stdio: ["ignore", "ignore", "pipe"],
       });
       if (r.status !== 0) {
         throw new Error(`fontTools 實例化 ${inst.file} 失敗:${r.stderr?.toString() ?? r.error}`);
       }
+      await rename(tmp, path);
       buf = await readFile(path);
     }
     out.push({ file: inst.file, path, buf, weight: inst.weight });
@@ -211,7 +214,8 @@ async function main() {
       // 非 Linux:注入靜態 CJK 字型("Resume CJK"),並等字型真的載入完再列印;
       // 沒等到就會用系統 fallback 字型印出。Linux 走系統字型,不注入。
       if (cjkFontCss) await page.addStyleTag({ content: cjkFontCss });
-      await page.evaluate(() => document.fonts.ready);
+      // FontFaceSet 本身不可序列化,只等它 resolve、不把它傳回來。
+      await page.evaluate(() => document.fonts.ready.then(() => undefined));
       await page.emulateMediaType("print");
       const outPath = resolve(OUT_DIR, file);
       await page.pdf({
@@ -220,7 +224,13 @@ async function main() {
         printBackground: true,
         margin: { top: "12mm", bottom: "12mm", left: "12mm", right: "12mm" },
       });
-      console.log(`[generate-pdf] 已輸出 ${outPath}`);
+      // 產線斷言:Skia 的字型字典不壓縮,PDF 裡出現 "/Type3" 就代表字型嵌入退化了
+      // (可變字型 / CFF / Linux 網頁字型),寧可讓 CI 紅燈也不部署一份肥大又無真字型的履歷。
+      const pdfBytes = await readFile(outPath);
+      if (pdfBytes.includes("/Type3")) {
+        throw new Error(`${file} 含 Type3 字型——CJK 字型沒有被 Chrome 正常嵌入,拒絕產出`);
+      }
+      console.log(`[generate-pdf] 已輸出 ${outPath}(${pdfBytes.length} bytes,無 Type3)`);
       await page.close();
     }
   } finally {

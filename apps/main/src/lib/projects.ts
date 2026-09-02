@@ -158,9 +158,13 @@ const RESUME_ORDER = [
   "smart-pedestrian-navigation",
 ];
 
-/** PDF 履歷會用到的專案(依 RESUME_ORDER;清單裡找不到的 slug 略過而非炸掉)。 */
+/** PDF 履歷會用到的專案(依 RESUME_ORDER;slug 對不上就在 build 時炸掉,避免專案從履歷無聲消失)。 */
 export function resumeProjects(): Project[] {
-  return RESUME_ORDER.map(getProject).filter((p): p is Project => p !== undefined);
+  return RESUME_ORDER.map((slug) => {
+    const p = getProject(slug);
+    if (!p) throw new Error(`RESUME_ORDER 的 slug "${slug}" 在 content/projects.json 找不到`);
+    return p;
+  });
 }
 
 /** PDF 每案印幾條 highlight:預設 2;排在後段的低優先專案只印 1 條,讓中文版守在兩頁內。 */
