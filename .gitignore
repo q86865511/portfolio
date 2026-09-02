@@ -47,6 +47,9 @@ apps/**/public/godot/*.pck
 # 產生的 PDF 履歷(由 generate-pdf 腳本 / CI 重生成)
 apps/**/public/resume-*.pdf
 
+# generate-pdf 下載的靜態 CJK 字型快取(釘 SHA-256,缺了會自動重抓)
+apps/**/.fonts-cache/
+
 # 驗證用截圖(可重生成,不入庫;mockup-main.html 保留)
 design/shots/
 design/shots-polish/

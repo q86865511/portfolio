@@ -56,11 +56,15 @@ jobs:
       - name: Build (main, static export)
         run: pnpm --filter main run build
 
-      # PDF:amd64 上 Chrome for Testing 正常;另裝 CJK 字型,雙語履歷的中文才不會變方框。
+      # PDF:amd64 上 Chrome for Testing 正常。中文字型由 generate-pdf.mjs 自己處理:抓 google/fonts 釘定
+      # commit 的 Noto Sans TC 可變 TTF(SHA-256 驗證),用 fontTools 實例化成 400/700 靜態 TTF 注入頁面——
+      # Chrome 印 PDF 對可變字型與 CFF 的 OTF 都只會輸出 Type3 點陣字(中文版曾脹到 1.4 MB),只有 glyf
+      # 靜態 TTF 會真正嵌入。系統的 fonts-noto-cjk 仍裝著,只當注入失敗前的方框保底。
       # 不加 continue-on-error:PDF 產線失敗必須擋下部署——否則 out/ 少了 resume-*.pdf,
       # deploy-static.sh 的 rsync --delete 會把線上舊 PDF 一併刪掉,首頁下載連結靜默壞掉。
-      - name: Install CJK fonts + Chrome for Puppeteer
+      - name: Install fontTools + CJK fallback fonts + Chrome for Puppeteer
         run: |
+          python3 -m pip install --user --break-system-packages "fonttools>=4.60"
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk
           pnpm --filter main exec puppeteer browsers install chrome

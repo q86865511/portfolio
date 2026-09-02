@@ -68,7 +68,7 @@ pnpm typecheck        # 型別檢查
 
 - **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build → e2e smoke`,path-filtered,當作合併前的關卡。e2e 用 Playwright 對 build 出的靜態產物起本機伺服器,驗證首頁載入、專案連結與行動版不破版。
 - **`deploy-main.yml`**(**兩段式**,push 到 `main` 且主站相關路徑 `apps/main`/`packages/ui`/`content` 變動時觸發):
-  - **build(GitHub-hosted amd64)**:`pnpm build` + 裝 CJK 字型 + 產雙語 PDF → 上傳 artifact。
+  - **build(GitHub-hosted amd64)**:`pnpm build` + 產雙語 PDF → 上傳 artifact。PDF 的中文由 `generate-pdf.mjs` 自行處理:抓 google/fonts 釘定 commit 的 Noto Sans TC 可變 TTF(SHA-256 驗證),以 fontTools 實例化成 400/700 **glyf 靜態 TTF**(快取於 `apps/main/.fonts-cache/`)注入頁面;Chrome 印 PDF 對可變字型與 CFF 的 OTF 都只會輸出 Type3 點陣字,系統 `fonts-noto-cjk` 只當保底。本機產 PDF 需 Python 3 + `pip install fonttools`。
   - **deploy(Oracle A1 上的 self-hosted ARM runner)**:下載 artifact → `infra/scripts/deploy-static.sh` rsync 到 `/srv/main` → health check。**零 secrets、零入站**(runner 主動連出);正式機不 build、不需 Chrome。
   - 為何兩段式:Chrome for Testing 無 Linux ARM64 版,PDF 在 amd64 產最穩;小台 ARM 正式機只做輕量部署。
 - Live demo 子站(Soulshard 等)於**各自 repo** 擁有獨立 pipeline,主站只導覽到其子網域。
