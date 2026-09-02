@@ -143,28 +143,53 @@ export function primaryLink(p: Project): { href: string; external: boolean } {
 }
 
 /**
- * PDF 履歷收錄的專案與顯示順序(使用者指定;只影響 PDF,不動首頁分層)。
- * 這份清單就是唯一真相——不再由 tier 推導,所以 mcpglass 雖在首頁是 mini,仍能進履歷。
- * 順序邏輯:求職主攻 AI 部署 / DevOps,最強、最相關的放第一頁;大學專題墊底當鋪陳。
+ * PDF 履歷收錄的專案、分區與顯示順序(使用者指定;只影響 PDF,不動首頁分層)。
+ * 這份清單就是唯一真相——不由 tier 推導,所以 mcpglass 雖在首頁是 mini,仍能進履歷。
+ * 分兩區:學術(碩士論文、大學專題)一區,其餘 side projects 一區;
+ * 各區內最強、最相關(求職主攻 AI 部署 / DevOps)的放前面。
  */
-const RESUME_ORDER = [
-  "ai-deployment-pipeline",
-  "erp-system",
-  "mcpglass",
-  "server-monitor",
-  "usage-monitor",
-  "steam-sale-checker",
-  "soulshard-hunter",
-  "smart-pedestrian-navigation",
+export interface ResumeSection {
+  titleZh: string;
+  titleEn: string;
+  slugs: string[];
+}
+
+const RESUME_SECTIONS: ResumeSection[] = [
+  {
+    titleZh: "學術專案",
+    titleEn: "Academic Projects",
+    slugs: ["ai-deployment-pipeline", "smart-pedestrian-navigation"],
+  },
+  {
+    titleZh: "個人專案 (Side Projects)",
+    titleEn: "Side Projects",
+    slugs: [
+      "erp-system",
+      "mcpglass",
+      "server-monitor",
+      "usage-monitor",
+      "steam-sale-checker",
+      "soulshard-hunter",
+    ],
+  },
 ];
 
-/** PDF 履歷會用到的專案(依 RESUME_ORDER;slug 對不上就在 build 時炸掉,避免專案從履歷無聲消失)。 */
+/** PDF 履歷的分區與各區專案(slug 對不上就在 build 時炸掉,避免專案從履歷無聲消失)。 */
+export function resumeSections(): Array<Omit<ResumeSection, "slugs"> & { projects: Project[] }> {
+  return RESUME_SECTIONS.map(({ titleZh, titleEn, slugs }) => ({
+    titleZh,
+    titleEn,
+    projects: slugs.map((slug) => {
+      const p = getProject(slug);
+      if (!p) throw new Error(`RESUME_SECTIONS 的 slug "${slug}" 在 content/projects.json 找不到`);
+      return p;
+    }),
+  }));
+}
+
+/** 全部進履歷的專案(攤平各區,保留順序)。 */
 export function resumeProjects(): Project[] {
-  return RESUME_ORDER.map((slug) => {
-    const p = getProject(slug);
-    if (!p) throw new Error(`RESUME_ORDER 的 slug "${slug}" 在 content/projects.json 找不到`);
-    return p;
-  });
+  return resumeSections().flatMap((s) => s.projects);
 }
 
 /** PDF 每案印幾條 highlight:預設 2;排在後段的低優先專案只印 1 條,讓中文版守在兩頁內。 */

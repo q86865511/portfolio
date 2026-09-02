@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { eduItems, profile, serviceNote, skillGroups } from "@/lib/site";
-import { resumeHighlights, resumeProjects, type Project } from "@/lib/projects";
+import { resumeHighlights, resumeSections, type Project } from "@/lib/projects";
 
 type Lang = "zh" | "en";
 
@@ -37,7 +37,7 @@ export function PrintView() {
   }, []);
 
   const t = <T,>(zh: T, en: T): T => pick(lang, zh, en);
-  const projects = resumeProjects();
+  const sections = resumeSections();
 
   return (
     <div
@@ -91,29 +91,31 @@ export function PrintView() {
         ))}
       </Block>
 
-      {/* 精選專案(featured + notable);技術完整列出供 ATS 比對 */}
-      <Block title={t("精選專案", "Selected Projects")}>
-        {projects.map((p: Project) => (
-          <div key={p.slug} style={{ marginBottom: 10, breakInside: "avoid" }}>
-            <p style={{ margin: "0 0 1px", fontWeight: 700 }}>
-              {t(p.titleZh, p.titleEn)}
-              {p.kindZh ? ` (${t(p.kindZh, p.kindEn ?? p.kindZh)})` : ""}
-              {p.periodZh ? (
-                <span style={{ fontWeight: 400 }}> · {t(p.periodZh, p.periodEn ?? p.periodZh)}</span>
-              ) : null}
-            </p>
-            <p style={{ margin: "0 0 2px" }}>{t(p.oneLinerZh, p.oneLinerEn)}</p>
-            <p style={{ margin: "0 0 2px" }}>
-              <b>{t("技術", "Tech")}:</b> {p.techStack.join(", ")}
-            </p>
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {resumeHighlights(p).map((h, i) => (
-                <li key={i}>{t(h.zh, h.en)}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </Block>
+      {/* 專案分兩區(學術 / side projects),分區與順序由 RESUME_SECTIONS 決定;技術完整列出供 ATS 比對 */}
+      {sections.map((s) => (
+        <Block key={s.titleEn} title={t(s.titleZh, s.titleEn)}>
+          {s.projects.map((p: Project) => (
+            <div key={p.slug} style={{ marginBottom: 10, breakInside: "avoid" }}>
+              <p style={{ margin: "0 0 1px", fontWeight: 700 }}>
+                {t(p.titleZh, p.titleEn)}
+                {p.kindZh ? ` (${t(p.kindZh, p.kindEn ?? p.kindZh)})` : ""}
+                {p.periodZh ? (
+                  <span style={{ fontWeight: 400 }}> · {t(p.periodZh, p.periodEn ?? p.periodZh)}</span>
+                ) : null}
+              </p>
+              <p style={{ margin: "0 0 2px" }}>{t(p.oneLinerZh, p.oneLinerEn)}</p>
+              <p style={{ margin: "0 0 2px" }}>
+                <b>{t("技術", "Tech")}:</b> {p.techStack.join(", ")}
+              </p>
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {resumeHighlights(p).map((h, i) => (
+                  <li key={i}>{t(h.zh, h.en)}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </Block>
+      ))}
 
       {/* 學歷 */}
       <Block title={t("學歷", "Education")}>

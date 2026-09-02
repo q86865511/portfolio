@@ -68,10 +68,16 @@ export function HomeView() {
       external: true,
     },
     {
-      // 依當前語言切換 PDF:英文訪客按 "Download résumé" 不該拿到中文版。
-      href: pdfHref,
-      labelZh: "下載 PDF 履歷",
-      labelEn: "Download résumé",
+      // 兩種語言的履歷都給明確入口(Nav 的按鈕仍依當前語言切換)。
+      href: "/resume-zh.pdf",
+      labelZh: "下載 PDF 履歷(中文)",
+      labelEn: "Résumé PDF (Chinese)",
+      external: true,
+    },
+    {
+      href: "/resume-en.pdf",
+      labelZh: "英文履歷 PDF (English)",
+      labelEn: "Download résumé (English)",
       external: true,
     },
   ];
