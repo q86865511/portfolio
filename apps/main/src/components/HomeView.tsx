@@ -80,6 +80,13 @@ export function HomeView() {
       labelEn: "Download résumé (English)",
       external: true,
     },
+    {
+      // 作品附件:八案各一頁的圖表版(截圖 + 規模數字表),中文;靜態檔由 Work 的產生器產出後放進 public/。
+      href: "/portfolio-appendix.pdf",
+      labelZh: "作品附件 PDF(圖表版)",
+      labelEn: "Portfolio appendix PDF (Chinese)",
+      external: true,
+    },
   ];
 
   // 統計列:全部由真實資料計算,不寫死。

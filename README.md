@@ -31,7 +31,7 @@ Oracle Cloud A1 (ARM64) 上的 Caddy
 ```
 .
 ├─ apps/
-│  └─ main/          # 主站:履歷門面、showcase 詳情頁、PDF 履歷、雙語
+│  └─ main/          # 主站:履歷門面、showcase 詳情頁、PDF 履歷、雙語;public/portfolio-appendix.pdf 為作品附件靜態檔(產生器在 Work 倉,見 PROGRESS 2026-09-02)
 ├─ packages/
 │  └─ ui/            # 共用設計系統(主題、元件、雙語基礎)
 ├─ content/          # 專案資料(projects.json,20 筆雙語,內容單一真實來源)
