@@ -455,8 +455,8 @@
       "cover": "/covers/smart-pedestrian-navigation.webp",
       "highlights": [
         {
-          "zh": "以 FC-DenseNet103 在 TensorFlow 1.x 上訓練街景語意分割,並採 CamVid 與自製補充資料集 1:1 混合,提升對在地街景的泛化能力;附帶資料集 label 顏色轉換工具讓兩套資料的標註對齊。",
-          "en": "Trained FC-DenseNet103 on TensorFlow 1.x for street-scene segmentation, using a 1:1 mix of CamVid and a self-collected dataset to improve generalization to local scenes; a custom label-recoloring tool aligns annotations across the two datasets."
+          "zh": "以 FC-DenseNet103 在 TensorFlow 1.x 上訓練街景語意分割,並採 CamVid 與 BDD100K 1:1 混合,提升對在地街景的泛化能力;附帶資料集 label 顏色轉換工具讓兩套資料的標註對齊。",
+          "en": "Trained FC-DenseNet103 on TensorFlow 1.x for street-scene segmentation, using a 1:1 mix of CamVid and BDD100K to improve generalization to local scenes; a custom label-recoloring tool aligns annotations across the two datasets."
         },
         {
           "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷行人是否站在可通行區域,並把距離、轉向角與導引箭頭即時疊加回原畫面,而不是只輸出一張遮罩。",
