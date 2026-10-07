@@ -20,7 +20,8 @@ export interface ProjectDetailProps {
   highlights: string[];
   techStack: string[];
   challenges: string;
-  githubUrl: string;
+  /** 私有 repo 傳空字串或省略,不顯示 GitHub 按鈕。 */
+  githubUrl?: string;
   liveUrl?: string;
   /** 封面圖路徑(16:9);提供時於頁首下方顯示。 */
   cover?: string;
@@ -71,17 +72,19 @@ export function ProjectDetail(props: ProjectDetailProps) {
         </div>
         <p className="text-lg text-text-muted mb-5">{props.oneLiner}</p>
         <div className="flex flex-wrap gap-3">
-          <Button
-            as="a"
-            variant="secondary"
-            href={props.githubUrl}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <Github className="h-4 w-4" aria-hidden="true" />
-            GitHub
-            <ExternalLink className="h-4 w-4" aria-hidden="true" />
-          </Button>
+          {props.githubUrl && (
+            <Button
+              as="a"
+              variant="secondary"
+              href={props.githubUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <Github className="h-4 w-4" aria-hidden="true" />
+              GitHub
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
           {props.liveUrl && (
             <Button
               as="a"

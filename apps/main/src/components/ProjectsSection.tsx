@@ -98,14 +98,17 @@ function actionsFor(p: Project): CardAction[] {
     }
   }
 
-  actions.push({
-    labelZh: "GitHub",
-    labelEn: "GitHub",
-    href: p.githubUrl,
-    variant: "ghost",
-    external: true,
-    arrow: true,
-  });
+  // 私有 repo 的 githubUrl 為空字串,不給 GitHub 按鈕。
+  if (p.githubUrl) {
+    actions.push({
+      labelZh: "GitHub",
+      labelEn: "GitHub",
+      href: p.githubUrl,
+      variant: "ghost",
+      external: true,
+      arrow: true,
+    });
+  }
   return actions;
 }
 

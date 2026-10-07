@@ -76,8 +76,8 @@ export function PrintView() {
       <Block title={t("摘要", "Summary")}>
         <p style={{ margin: 0 }}>
           {t(
-            "國立中央大學資訊工程碩士(2025/6 畢業,義務役已退伍)。專長是把 AI 模型送上生產環境:碩士論文打造 YOLOv8 端到端部署與監控平台(PT→ONNX→TensorRT 自動優化、多批次 × 多精度評測、Triton 模型上架管理、Prometheus/Grafana 監控)。退伍後獨立完成多個作品,三個自架上線至今(製造業 ERP、Steam 特價追蹤站、瀏覽器遊戲),並以 Rust/Go 打造維運工具(MCP 流量觀測代理、遊戲伺服器管控平台)。重視技術取捨紀錄與測試品質。",
-            "M.S. in Computer Science & Information Engineering, National Central University (Jun 2025; military service completed). I take AI models to production: my thesis built an end-to-end YOLOv8 deployment and monitoring platform (automated PT→ONNX→TensorRT optimization, multi-batch × multi-precision benchmarking, Triton model management, Prometheus/Grafana monitoring). Since then I have shipped several independent projects, three of them self-hosted and live (a manufacturing ERP, a Steam deals tracker, a browser game), plus Rust/Go ops tooling (an MCP traffic observability proxy, a game-server management platform). I document trade-offs and guard quality with tests.",
+            "國立中央大學資訊工程碩士(2025/6 畢業,義務役已退伍)。專長是把 AI 模型送上生產環境:碩士論文打造 YOLOv8 端到端部署與監控平台(PT→ONNX→TensorRT 自動優化、多批次 × 多精度評測、Triton 模型上架管理、Prometheus/Grafana 監控)。退伍後獨立完成多個作品,四個自架上線至今(製造業 ERP、Steam 特價追蹤站、美食推薦地圖、瀏覽器遊戲),並以 Rust/Go 打造維運工具(MCP 流量觀測代理、遊戲伺服器管控平台)。重視技術取捨紀錄與測試品質。",
+            "M.S. in Computer Science & Information Engineering, National Central University (Jun 2025; military service completed). I take AI models to production: my thesis built an end-to-end YOLOv8 deployment and monitoring platform (automated PT→ONNX→TensorRT optimization, multi-batch × multi-precision benchmarking, Triton model management, Prometheus/Grafana monitoring). Since then I have shipped several independent projects, four of them self-hosted and live (a manufacturing ERP, a Steam deals tracker, a restaurant-picker map, a browser game), plus Rust/Go ops tooling (an MCP traffic observability proxy, a game-server management platform). I document trade-offs and guard quality with tests.",
           )}
         </p>
       </Block>
