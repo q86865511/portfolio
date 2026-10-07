@@ -81,7 +81,7 @@ export function HomeView() {
       external: true,
     },
     {
-      // 作品附件:八案各一頁的圖表版(截圖 + 規模數字表),中文;靜態檔由 Work 的產生器產出後放進 public/。
+      // 作品附件:十案各一頁的圖表版(截圖 + 規模數字表),中文;靜態檔由 Work 的產生器產出後放進 public/。
       href: "/portfolio-appendix.pdf",
       labelZh: "作品附件 PDF(圖表版)",
       labelEn: "Portfolio appendix PDF (Chinese)",
