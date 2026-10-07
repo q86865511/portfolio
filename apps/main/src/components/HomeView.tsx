@@ -123,8 +123,8 @@ export function HomeView() {
       period: t("現在", "Now"),
       titleZh: "開放工作機會",
       titleEn: "Open to opportunities",
-      descZh: "打磨作品集、持續出貨 side projects 與 live demo 子站。",
-      descEn: "Polishing this portfolio and shipping side projects and live demos.",
+      descZh: "開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6),並維運四個上線子站。",
+      descEn: "Building Cyclepact, a turn-based collection RPG in Unity 6, while running four live subsites.",
       now: true,
     },
     ...eduItems.map((e) => ({
@@ -137,10 +137,10 @@ export function HomeView() {
     })),
   ];
 
-  // 「本站即證據」:直接可驗證的 live demo 連結(取前三個)。
+  // 「本站即證據」:直接可驗證的 live demo 連結(取前四個)。
   const proofLinks = projects
     .filter((p) => p.liveUrl)
-    .slice(0, 3)
+    .slice(0, 4)
     .map((p) => ({
       label: p.repoName,
       href: p.liveUrl as string,

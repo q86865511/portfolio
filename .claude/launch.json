@@ -6,6 +6,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "main", "run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "main-out",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "main", "exec", "serve", "out", "-l", "4180", "--no-clipboard"],
+      "port": 4180
     }
   ]
 }
