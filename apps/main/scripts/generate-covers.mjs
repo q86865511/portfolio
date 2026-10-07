@@ -68,7 +68,7 @@ const aiCover = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"
   </svg>
 </body></html>`;
 
-// 封面 2:智慧行人導航系統(大學專題)— 紙面,綠/藍主導(視覺+導航語意)
+// 封面 2:智慧導航系統(大學專題)— 紙面,綠/藍主導(視覺+導航語意)
 const navCover = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"/><style>
   ${baseCss}
   body { background: #f6f7f9; color: #0b1220; }
@@ -79,12 +79,12 @@ const navCover = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8
 </style></head><body>
   <div class="content">
     <span class="kind">大學專題 · Capstone</span>
-    <div class="title">智慧行人導航系統</div>
-    <div class="sub">街景語意分割 · 手勢辨識 · 燈號辨識 · 語音提示</div>
+    <div class="title">智慧導航系統</div>
+    <div class="sub">ROS 2 小車 · 街景語意分割 · 招手停車 · 導航疊圖</div>
     <div class="chips">
       <span class="chip hl">FC-DenseNet103</span><span class="chip hl">OpenCV</span>
       <span class="chip hl">MediaPipe</span><span class="chip">TensorFlow 1.x</span>
-      <span class="chip">Android</span>
+      <span class="chip">ROS 2</span><span class="chip">Android</span>
     </div>
   </div>
   <svg class="art" viewBox="0 0 420 675" fill="none">

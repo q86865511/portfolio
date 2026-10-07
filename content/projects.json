@@ -532,12 +532,13 @@
       "periodEn": "2022/9 – 2023/6",
       "titleZh": "結合街景分析與燈號辨識之智慧導航系統",
       "titleEn": "Smart Navigation via Street-Scene Analysis and Traffic-Light Detection",
-      "oneLinerZh": "整合街景語意分割、手勢辨識與手機導航的行人導航輔助專題,以檔案與 Socket 鬆耦合串接三個模組的原型管線,判斷行人所在的可通行區域並做語音提示。",
-      "oneLinerEn": "A capstone pedestrian-navigation assistant that brings street-scene semantic segmentation, hand-gesture recognition, and phone navigation together in a prototype pipeline whose three modules are loosely coupled through files and a socket, checking whether the walker is on a passable area and issuing voice alerts.",
-      "descZh": "畢業專題,將三條獨立技術線以檔案與 Socket 鬆耦合串接成原型管線:以 FC-DenseNet103在 TensorFlow 1.x 上做街景語意分割,以 MediaPipe 做手勢辨識,並透過 Java NIO Socket 從 Android 導航 App(改自 FancyNavi / HERE SDK)接收路線資訊。主程式 Main.py 逐幀擷取攝影機或影片,跑分割推論後,以 BFS 連通域分析判斷使用者是否位於可行區域(路面像素),並把導航距離、轉向角與箭頭疊加回畫面;偵測到揮手「Stop」手勢時以 playsound 觸發語音提示。整體偏研究/概念驗證,模型與資料前處理皆可重現。",
-      "descEn": "A university capstone that stitches three independent technology tracks into a prototype pipeline, loosely coupled through files and a socket: street-scene semantic segmentation with FC-DenseNet103 on TensorFlow 1.x, hand-gesture recognition via MediaPipe, and route data received from an Android navigation app (adapted from FancyNavi / HERE SDK) over a Java NIO socket. The Main.py loop grabs frames from a camera or video, runs segmentation inference, then uses a BFS connected-component analysis to decide whether the user is standing on a walkable/road region (road-class pixels) and overlays navigation distance, turn angle and a direction arrow onto the frame; when a waving \"Stop\" gesture is detected it fires a voice alert via playsound. It is a research/proof-of-concept build with reproducible model training and dataset preprocessing.",
+      "oneLinerZh": "大學專題:用 ROS 2 小車模擬車輛、手機當導航,以街景語意分割找出前方可行駛的區域、以手勢辨識偵測路邊有人招手並當作停車信號,再把導航的轉向、距離與路名疊加在畫面上。",
+      "oneLinerEn": "A capstone in which a ROS 2 rover stands in for a car and a phone acts as the navigator: street-scene segmentation finds the drivable area ahead, gesture recognition treats someone waving at the roadside as a stop signal, and the navigation's turn, distance and road name are overlaid on the camera view.",
+      "descZh": "畢業專題。情境是用一台 ROS 2 小車模擬車輛,人跟在小車後面當作坐在車上,手機上的導航 App 負責提供大方向。系統把三條獨立的技術線以檔案與 Socket 鬆耦合串成原型管線:以 FC-DenseNet103 在 TensorFlow 1.x 上做街景語意分割,以 MediaPipe 做手勢辨識,並透過 Java NIO Socket 從 Android 導航 App(改自 FancyNavi / HERE SDK)接收路線資訊。主程式逐幀擷取小車鏡頭的畫面,跑完分割推論後以 BFS 連通域分析判斷前方可行駛的區域,並把導航的距離、轉向角、路名與箭頭疊加回畫面;偵測到路邊有人招手(Stop 手勢)時視為停車信號,並搭配語音提示。整體偏研究與概念驗證,模型訓練與資料前處理皆可重現。",
+      "descEn": "A university capstone. The scenario: a ROS 2 rover stands in for a car, a person follows behind as if riding in it, and a navigation app on a phone supplies the overall route. The system stitches three independent technology tracks into a prototype pipeline, loosely coupled through files and a socket: street-scene semantic segmentation with FC-DenseNet103 on TensorFlow 1.x, hand-gesture recognition with MediaPipe, and route data received from an Android navigation app (adapted from FancyNavi / HERE SDK) over a Java NIO socket. The main loop grabs frames from the rover's camera, runs segmentation inference, uses a BFS connected-component analysis to find the drivable area ahead, and overlays the navigation distance, turn angle, road name and a direction arrow back onto the frame; when someone at the roadside waves (a 'Stop' gesture), it is treated as a stop signal and accompanied by a voice alert. It is a research / proof-of-concept build with reproducible model training and dataset preprocessing.",
       "techStack": [
         "Python",
+        "ROS 2",
         "TensorFlow 1.x",
         "FC-DenseNet103",
         "OpenCV",
@@ -554,27 +555,27 @@
       "cover": "/covers/smart-pedestrian-navigation.webp",
       "highlights": [
         {
-          "zh": "以 FC-DenseNet103 在 TensorFlow 1.x 上訓練街景語意分割,並採 CamVid 與 BDD100K 1:1 混合,提升對在地街景的泛化能力;附帶資料集 label 顏色轉換工具讓兩套資料的標註對齊。",
-          "en": "Trained FC-DenseNet103 on TensorFlow 1.x for street-scene segmentation, using a 1:1 mix of CamVid and BDD100K to improve generalization to local scenes; a custom label-recoloring tool aligns annotations across the two datasets."
+          "zh": "以 FC-DenseNet103 在 TensorFlow 1.x 上訓練街景語意分割,採 CamVid 與 BDD100K 1:1 混合,只使用兩邊共有的類別(剛好涵蓋導航需要的類別);附帶 label 顏色轉換工具,讓兩套資料的標註對齊。",
+          "en": "Trained FC-DenseNet103 on TensorFlow 1.x for street-scene segmentation on a 1:1 mix of CamVid and BDD100K, using only the classes the two datasets share (which happen to cover everything navigation needs); a label-recoloring tool aligns the two datasets' annotations."
         },
         {
-          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷行人是否站在可通行區域,並把距離、轉向角與導引箭頭即時疊加回原畫面,而不是只輸出一張遮罩。",
-          "en": "On top of the segmentation mask, runs a BFS connected-component pass to compute the centroid and area of road regions, infers whether the user is on a walkable/road area, and overlays distance, turn angle and a guidance arrow back onto the live frame rather than just emitting a raw mask."
+          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷小車前方可行駛的區域,並把手機導航的距離、轉向角、路名與導引箭頭即時疊加回畫面,而不是只輸出一張遮罩。",
+          "en": "On top of the segmentation mask, a BFS connected-component pass computes the centroid and area of road regions to find the drivable area ahead of the rover, and the phone's navigation distance, turn angle, road name and a guidance arrow are overlaid on the live frame rather than emitting a bare mask."
         },
         {
-          "zh": "用 MediaPipe Hands 加上 keypoint / point-history 分類器辨識揮手「Stop」手勢,連續觸發時以語音(gTTS 預生成、playsound 播放)提示,作為人機互動的安全信號。",
-          "en": "Recognizes a waving 'Stop' gesture using MediaPipe Hands with keypoint and point-history classifiers, and on sustained detection issues a voice alert (gTTS-generated audio played via playsound) as a human-in-the-loop safety signal."
+          "zh": "用 MediaPipe Hands 加上 keypoint / point-history 分類器辨識路邊有人招手的「Stop」手勢,連續觸發時視為停車信號,並以語音(gTTS 預生成、playsound 播放)提示。",
+          "en": "MediaPipe Hands plus keypoint and point-history classifiers recognize a roadside 'Stop' wave; sustained detection is treated as a stop signal and announced with a voice alert (gTTS-generated audio played via playsound)."
         },
         {
-          "zh": "跨平台整合:Android 端(改自 FancyNavi,基於 HERE SDK)做即時導航,透過自寫的 Java NIO 非阻塞 Socket 伺服器把路線資訊串到 Python 主程式,並刻意以 Java 取代較慢的 Python socket 版本以維持吞吐。",
-          "en": "Cross-platform integration: an Android app (adapted from FancyNavi, built on the HERE SDK) handles live navigation and streams route data to the Python core through a hand-written non-blocking Java NIO socket server, deliberately chosen over a slower pure-Python socket to keep throughput up."
+          "zh": "跨裝置整合:手機端導航 App(改自 FancyNavi,基於 HERE SDK)提供大方向,透過自寫的 Java NIO 非阻塞 Socket 伺服器把路線資訊傳給小車端;TCP 是位元組串流,接收端為每條連線保留緩衝、只解碼完整的一行,避免中文路名被切半而解碼失敗。",
+          "en": "Cross-device integration: the phone's navigation app (adapted from FancyNavi on the HERE SDK) supplies the route, and a hand-written non-blocking Java NIO socket server passes it to the rover side; because TCP is a byte stream, the receiver keeps a buffer per connection and only decodes complete lines, so Chinese road names are never split mid-character."
         }
       ],
-      "challengesZh": "最大的取捨是把三套來源各異的開源元件(語意分割套件、Android 導航 App、MediaPipe 手勢專案)整合成單一即時迴圈,且要在 TensorFlow 1.x 的舊式 session/placeholder API 下維持可用幀率——做法是每隔固定幀數才送一次分割推論。可行區域判斷沒有額外標註,而是用純像素級 BFS 連通域分析在分割輸出上即時計算,簡單但對分割品質與雜訊敏感。跨裝置通訊上,Python socket 版本太慢,因此改寫成 Java NIO 非阻塞伺服器接收手機端路線字串。需要誠實說明的限制:標題雖含「燈號辨識」,但整合後的執行管線中燈號分類僅以註解形式預留、尚未實際接上,實作完成的安全信號是「可行區域判斷 + 揮手 Stop 語音提示」;系統為桌面 Python + Android 的研究原型,綁定 TF1.x 與本機攝影機/socket,無法直接於瀏覽器執行。",
-      "challengesEn": "The core trade-off was fusing three differently-sourced open-source components (a segmentation suite, an Android navigation app, and a MediaPipe gesture project) into one real-time loop while keeping a usable frame rate under TensorFlow 1.x's legacy session/placeholder API — handled by running segmentation inference only every N frames. The walkability decision uses no extra labels; it is computed on the fly from the segmentation output via a pure pixel-level BFS connected-component analysis, which is simple but sensitive to mask quality and noise. For cross-device messaging, the pure-Python socket was too slow, so route strings from the phone are received by a rewritten non-blocking Java NIO server. An honest limitation: despite 'traffic-light detection' in the title, traffic-light classification is only stubbed (left as a comment) in the integrated runtime and not wired in — the implemented safety signals are the road-area check plus the wave 'Stop' voice alert. It is a desktop Python + Android research prototype bound to TF1.x and a local camera/socket, so it cannot run in a browser.",
+      "challengesZh": "最大的取捨是把三套來源各異的開源元件(語意分割套件、Android 導航 App、MediaPipe 手勢專案)整合成單一即時迴圈,且要在 TensorFlow 1.x 的舊式 session/placeholder API 下維持可用的幀率——做法是每隔固定幀數才送一次分割推論。可行駛區域的判斷沒有額外標註,而是用像素級 BFS 連通域分析在分割輸出上即時計算,簡單但對分割品質與雜訊敏感。跨裝置通訊的難點在介面:TCP 是位元組串流,一則訊息可能被切成兩段,中文路名被切半就會解碼失敗,所以接收端改用 Java NIO 自己切幀,只解碼完整的一行。需要誠實說明的限制:標題雖含「燈號辨識」,但整合後的執行管線中燈號分類只以註解預留、尚未接上,實際完成的是「可行駛區域判斷 + 招手停車信號與語音提示」;系統是 ROS 2 小車加 Android 的研究原型,綁定 TF1.x 與本機鏡頭及 socket,無法直接在瀏覽器執行。",
+      "challengesEn": "The core trade-off was fusing three differently-sourced open-source components (a segmentation suite, an Android navigation app and a MediaPipe gesture project) into one real-time loop while keeping a usable frame rate under TensorFlow 1.x's legacy session/placeholder API — handled by running segmentation only every N frames. The drivable-area decision uses no extra labels; it is computed on the fly from the segmentation output with a pixel-level BFS connected-component analysis, which is simple but sensitive to mask quality and noise. The hard part of cross-device messaging was the interface: TCP is a byte stream, so a message can arrive in two pieces and a Chinese road name split in half fails to decode — the receiver therefore frames messages itself in Java NIO and only decodes complete lines. An honest limitation: despite 'traffic-light detection' in the title, traffic-light classification is only stubbed (left as a comment) in the integrated runtime and not wired in — what was actually built is the drivable-area check plus the roadside-wave stop signal with a voice alert. It is a ROS 2 rover + Android research prototype bound to TF1.x and a local camera and socket, so it cannot run in a browser.",
       "demoFeasibility": {
         "canRunInBrowser": false,
-        "notes": "無法作為瀏覽器 live demo。系統是桌面端 Python 即時管線(TensorFlow 1.x session/placeholder API、OpenCV 攝影機擷取、MediaPipe、playsound/gTTS)加上一支需 Android Studio 編譯、依賴 HERE SDK 的 Android App,並透過 Java NIO Socket 互通;前端並非可獨立靜態部署的網頁,且需要訓練好的模型 checkpoint 與本機攝影機/影片輸入。展示方式建議用 README 架構說明加上 output/ 內的分割疊加結果截圖或錄影,而非線上互動 demo。"
+        "notes": "無法作為瀏覽器 live demo。系統是 ROS 2 小車上的 Python 即時管線(TensorFlow 1.x session/placeholder API、OpenCV 鏡頭擷取、MediaPipe、playsound/gTTS)加上一支需 Android Studio 編譯、依賴 HERE SDK 的 Android App,透過 Java NIO Socket 互通,並需要訓練好的模型 checkpoint 與鏡頭或影片輸入。展示方式建議用 README 架構說明加上 output/ 內的分割疊加結果截圖或錄影。"
       }
     },
     {
