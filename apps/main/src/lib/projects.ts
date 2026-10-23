@@ -20,6 +20,11 @@ export interface Project {
   titleEn: string;
   oneLinerZh: string;
   oneLinerEn: string;
+  /** 首頁卡片的精簡雙語摘要;詳情頁與 PDF 仍使用完整 oneLiner。 */
+  cardSummaryZh?: string;
+  cardSummaryEn?: string;
+  /** 卡片上明確挑選的代表技術,不影響完整技術棧與 ATS 關鍵字。 */
+  cardTechStack?: string[];
   descZh: string;
   descEn: string;
   highlights: Highlight[];
@@ -178,13 +183,18 @@ const RESUME_SECTIONS: ResumeSection[] = [
 ];
 
 /** PDF 履歷的分區與各區專案(slug 對不上就在 build 時炸掉,避免專案從履歷無聲消失)。 */
-export function resumeSections(): Array<Omit<ResumeSection, "slugs"> & { projects: Project[] }> {
+export function resumeSections(): Array<
+  Omit<ResumeSection, "slugs"> & { projects: Project[] }
+> {
   return RESUME_SECTIONS.map(({ titleZh, titleEn, slugs }) => ({
     titleZh,
     titleEn,
     projects: slugs.map((slug) => {
       const p = getProject(slug);
-      if (!p) throw new Error(`RESUME_SECTIONS 的 slug "${slug}" 在 content/projects.json 找不到`);
+      if (!p)
+        throw new Error(
+          `RESUME_SECTIONS 的 slug "${slug}" 在 content/projects.json 找不到`,
+        );
       return p;
     }),
   }));

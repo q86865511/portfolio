@@ -64,9 +64,15 @@ pnpm lint             # Lint
 pnpm typecheck        # 型別檢查
 ```
 
+## 首頁與作品呈現
+
+- 首頁順序:首屏與統計 → 代表作品 → 線上體驗 → 關於我 → 技術棧 → 其他作品 → 聯絡。既有專案分層與 PDF 收錄順序不變。
+- 導覽與品牌連結使用首頁絕對路徑錨點(如 `/#projects`),從專案詳情頁也能回到正確區塊;詳情頁提供依介面語言切換的履歷下載。
+- 作品主標使用 `titleZh/titleEn`,repo 名留作次要資訊。`content/projects.json` 的 `cardSummaryZh/cardSummaryEn` 與 `cardTechStack` 控制精簡摘要及代表技術;詳情頁與 PDF 保留完整 `oneLiner` 與 `techStack`。首頁統計稱為「展示專案」,包含私有 repo 的 showcase。
+
 ## CI/CD 與部署
 
-- **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build → e2e smoke`,path-filtered,當作合併前的關卡。e2e 用 Playwright 對 build 出的靜態產物起本機伺服器,驗證首頁載入、專案連結與行動版不破版。
+- **`ci.yml`**(GitHub-hosted ubuntu):PR / push 時跑 `typecheck → lint → build → e2e smoke`,path-filtered,當作合併前的關卡。e2e 用 Playwright 對 build 出的靜態產物起本機伺服器,驗證首頁載入、專案連結、詳情頁返回導覽、雙語履歷入口、首頁區塊順序與中英文跨尺寸不破版。
 - **`deploy-main.yml`**(**兩段式**,push 到 `main` 且主站相關路徑 `apps/main`/`packages/ui`/`content` 變動時觸發):
   - **build(GitHub-hosted amd64)**:`pnpm build` + 產雙語 PDF → 上傳 artifact。PDF 的中文由 `generate-pdf.mjs` 自行處理:抓 google/fonts 釘定 commit 的 Noto Sans TC 可變 TTF(SHA-256 驗證),以 fontTools 實例化成 400/700 **glyf 靜態 TTF**(family 改名 `Resume CJK`,快取於 `apps/main/.fonts-cache/`);Linux(含 CI)裝成使用者系統字型(`~/.local/share/fonts` + `fc-cache`),Windows/macOS 以 `@font-face` 注入——Chrome 印 PDF 對可變字型、CFF 的 OTF、以及 Linux 上的網頁字型都只會輸出 Type3 點陣字,實測只有這條路徑會真正嵌入。系統 `fonts-noto-cjk` 只當保底。本機產 PDF 需 Python 3 + `pip install fonttools`。
   - **deploy(Oracle A1 上的 self-hosted ARM runner)**:下載 artifact → `infra/scripts/deploy-static.sh` rsync 到 `/srv/main` → health check。**零 secrets、零入站**(runner 主動連出);正式機不 build、不需 Chrome。

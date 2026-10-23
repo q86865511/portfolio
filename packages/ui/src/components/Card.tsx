@@ -22,6 +22,8 @@ export interface CardAction {
 
 interface BaseCardProps {
   title: string;
+  /** repo 名稱作為次要資訊,主標使用易讀名稱。 */
+  repoName?: string;
   /** 標題連結(可選);省略則純文字。 */
   titleHref?: string;
   titleExternal?: boolean;
@@ -51,7 +53,9 @@ function ActionButtons({ actions }: { actions: CardAction[] }) {
             ? { rel: "noopener noreferrer", target: "_blank" }
             : {})}
         >
-          {a.play && <Play className="h-4 w-4 fill-current" aria-hidden="true" />}
+          {a.play && (
+            <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+          )}
           {t(a.labelZh, a.labelEn)}
           {a.arrow && <ArrowUpRight className="h-4 w-4" aria-hidden="true" />}
         </Button>
@@ -96,9 +100,20 @@ function PlanesBand({ seed = 0 }: { seed?: number }) {
         preserveAspectRatio="xMidYMid slice"
       >
         <circle cx="330" cy="56" r="72" fill={c1} opacity="0.9" />
-        <path d="M330 -16 A72 72 0 0 0 258 56 L330 56 Z" fill="var(--color-text)" />
+        <path
+          d="M330 -16 A72 72 0 0 0 258 56 L330 56 Z"
+          fill="var(--color-text)"
+        />
         <circle cx="96" cy="88" r="44" fill={c2} opacity="0.85" />
-        <rect x="150" y="64" width="48" height="48" rx="8" fill={c3} opacity="0.8" />
+        <rect
+          x="150"
+          y="64"
+          width="48"
+          height="48"
+          rx="8"
+          fill={c3}
+          opacity="0.8"
+        />
         <g fill="var(--color-text-subtle)">
           {Array.from({ length: 12 }).map((_, i) => (
             <circle
@@ -130,7 +145,7 @@ function KindTag({ label, className }: { label: string; className?: string }) {
 
 // 卡片基底:白面 + 細邊 + 軟陰影,hover 微浮加深(深色主題自動取對應變數)。
 const cardBase =
-  "card-surface border border-border rounded-lg relative overflow-hidden flex flex-col shadow-sm transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
+  "card-surface border border-border rounded-lg relative min-w-0 overflow-hidden flex flex-col shadow-sm transition-all duration-DEFAULT ease-ease hover:border-border-strong hover:-translate-y-[3px] hover:shadow-md";
 
 /* ─────────────── FeaturedCard ─────────────── */
 export interface FeaturedCardProps extends BaseCardProps {
@@ -142,6 +157,7 @@ export function FeaturedCard({
   title,
   titleHref,
   titleExternal,
+  repoName,
   status,
   kind,
   cover,
@@ -171,7 +187,7 @@ export function FeaturedCard({
       )}
       <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-3">
-          <h3 className="text-xl">
+          <h3 className="text-xl min-w-0 break-words">
             <CardTitle
               title={title}
               href={titleHref}
@@ -180,8 +196,16 @@ export function FeaturedCard({
           </h3>
           {status && <StatusBadge {...status} />}
         </div>
+        {repoName && repoName !== title && (
+          <p
+            className="text-xs font-mono text-text-subtle truncate mb-3"
+            title={repoName}
+          >
+            {repoName}
+          </p>
+        )}
         {desc && (
-          <p className="text-text-muted text-sm mb-4 flex-1">{desc}</p>
+          <p className="text-text-muted text-sm mb-4 line-clamp-3">{desc}</p>
         )}
         {techStack.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-5">
@@ -201,6 +225,7 @@ export function NotableCard({
   title,
   titleHref,
   titleExternal,
+  repoName,
   status,
   kind,
   cover,
@@ -219,7 +244,7 @@ export function NotableCard({
           </div>
         )}
         <div className="flex items-start justify-between gap-3 mb-3">
-          <h3 className="text-lg">
+          <h3 className="text-lg min-w-0 break-words">
             <CardTitle
               title={title}
               href={titleHref}
@@ -228,8 +253,16 @@ export function NotableCard({
           </h3>
           {status && <StatusBadge {...status} />}
         </div>
+        {repoName && repoName !== title && (
+          <p
+            className="text-xs font-mono text-text-subtle truncate mb-3"
+            title={repoName}
+          >
+            {repoName}
+          </p>
+        )}
         {desc && (
-          <p className="text-text-muted text-sm mb-4 flex-1">{desc}</p>
+          <p className="text-text-muted text-sm mb-4 line-clamp-3">{desc}</p>
         )}
         {techStack.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-5">
@@ -247,6 +280,8 @@ export function NotableCard({
 /* ─────────────── MiniCard ─────────────── */
 export interface MiniCardProps {
   title: string;
+  repoName?: string;
+  desc?: string;
   titleHref?: string;
   titleExternal?: boolean;
   status?: { status: ProjectStatus; label: string; ariaLabel?: string };
@@ -264,8 +299,10 @@ export function MiniCard({
   title,
   titleHref,
   titleExternal,
+  repoName,
   status,
   kind,
+  desc,
   techStack = [],
   githubUrl,
   githubLabel,
@@ -286,9 +323,20 @@ export function MiniCard({
         </a>
       )}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="text-base pr-7">
+        <h3 className="text-base pr-7 min-w-0 break-words">
           <CardTitle title={title} href={titleHref} external={titleExternal} />
         </h3>
+        {repoName && repoName !== title && (
+          <p
+            className="text-xs font-mono text-text-subtle truncate mt-1"
+            title={repoName}
+          >
+            {repoName}
+          </p>
+        )}
+        {desc && (
+          <p className="text-sm text-text-muted mt-3 line-clamp-3">{desc}</p>
+        )}
         {kind && (
           <div className="mt-2">
             <KindTag label={kind} />

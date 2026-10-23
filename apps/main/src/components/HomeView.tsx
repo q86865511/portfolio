@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Footer,
-  Hero,
-  Nav,
-  Section,
-  TechBadge,
-  useLang,
-} from "@resume/ui";
+import { Footer, Hero, Nav, Section, TechBadge, useLang } from "@resume/ui";
 import {
   Boxes,
   Code2,
@@ -47,7 +40,7 @@ const skillIconClass: Record<SkillGroup["category"], string> = {
 export function HomeView() {
   const { t } = useLang();
 
-  const footerNav = navLinks.filter((l) => l.href !== "#contact");
+  const footerNav = navLinks.filter((l) => l.href !== "/#contact");
   const pdfHref = t("/resume-zh.pdf", "/resume-en.pdf");
   const contactLinks = [
     {
@@ -97,8 +90,8 @@ export function HomeView() {
     {
       icon: FolderGit2,
       value: String(projects.length),
-      labelZh: "公開專案",
-      labelEn: "Public projects",
+      labelZh: "展示專案",
+      labelEn: "Projects showcased",
       tone: "bg-brand-dim text-brand",
     },
     {
@@ -123,8 +116,10 @@ export function HomeView() {
       period: t("現在", "Now"),
       titleZh: "開放工作機會",
       titleEn: "Open to opportunities",
-      descZh: "開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6),並維運四個上線子站。",
-      descEn: "Building Cyclepact, a turn-based collection RPG in Unity 6, while running four live subsites.",
+      descZh:
+        "開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6),並維運四個上線子站。",
+      descEn:
+        "Building Cyclepact, a turn-based collection RPG in Unity 6, while running four live subsites.",
       now: true,
     },
     ...eduItems.map((e) => ({
@@ -136,15 +131,6 @@ export function HomeView() {
       now: false,
     })),
   ];
-
-  // 「本站即證據」:直接可驗證的 live demo 連結(取前四個)。
-  const proofLinks = projects
-    .filter((p) => p.liveUrl)
-    .slice(0, 4)
-    .map((p) => ({
-      label: p.repoName,
-      href: p.liveUrl as string,
-    }));
 
   return (
     <>
@@ -167,10 +153,7 @@ export function HomeView() {
               </span>
               <span className="text-text-subtle font-medium"> / </span>
               <span className="text-infra">DevOps</span>
-              <span className="text-text">
-                {" "}
-                {t("工程師", "engineer")}
-              </span>
+              <span className="text-text"> {t("工程師", "engineer")}</span>
             </>
           }
           ledeZh="CS 碩士,擁有把 AI 系統實際建構並部署到生產環境的實務經驗。從推論最佳化、容器化到 CI/CD 與雲端部署一條龍。喜歡能跑、可維護、有架構的東西。"
@@ -190,33 +173,64 @@ export function HomeView() {
         {/* 統計列:真實數字(專案數 / live demo 數 / 語言數皆由資料計算) */}
         <div className="container">
           <dl className="card-surface border border-border rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-border)]">
-              {stats.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <div
-                    key={s.labelEn}
-                    className="flex items-center gap-4 px-5 py-4"
+            {stats.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.labelEn}
+                  className="flex items-center gap-4 px-5 py-4"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`w-[44px] h-[44px] rounded-md flex items-center justify-center shrink-0 ${s.tone}`}
                   >
-                    <span
-                      aria-hidden="true"
-                      className={`w-[44px] h-[44px] rounded-md flex items-center justify-center shrink-0 ${s.tone}`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <dt className="sr-only">{t(s.labelZh, s.labelEn)}</dt>
-                      <dd className="text-2xl font-bold leading-none">
-                        {s.value}
-                      </dd>
-                      <dd className="text-sm text-text-muted mt-1">
-                        {t(s.labelZh, s.labelEn)}
-                      </dd>
-                    </div>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <dt className="sr-only">{t(s.labelZh, s.labelEn)}</dt>
+                    <dd className="text-2xl font-bold leading-none">
+                      {s.value}
+                    </dd>
+                    <dd className="text-sm text-text-muted mt-1">
+                      {t(s.labelZh, s.labelEn)}
+                    </dd>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </dl>
         </div>
+
+        {/* 先呈現可驗證的代表作,完整履歷與技能接在作品之後。 */}
+        <Section
+          id="projects"
+          title={t("代表作品", "Featured work")}
+          intro={t(
+            "從模型部署到智慧導航，看看我如何整合系統、處理工程取捨。",
+            "From model deployment to smart navigation: systems integration and engineering trade-offs in practice.",
+          )}
+        >
+          <ProjectsSection group="featured" />
+          <a
+            href="#more-projects"
+            className="link-underline inline-flex items-center min-h-[44px] mt-4 text-sm font-medium text-brand"
+          >
+            {t("瀏覽其他作品 ↓", "Explore more projects ↓")}
+          </a>
+        </Section>
+
+        {liveDemos > 0 && (
+          <Section
+            id="live-demos"
+            title={t("線上體驗", "Try it live")}
+            intro={t(
+              "直接打開實際上線的應用與遊戲，體驗完整功能。",
+              "Open the deployed apps and game to explore them firsthand.",
+            )}
+          >
+            <ProjectsSection group="live" />
+          </Section>
+        )}
 
         {/* ABOUT:左=關於我+歷程,右=本站即證據 */}
         <Section
@@ -229,105 +243,76 @@ export function HomeView() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5 items-start">
             <div className="card-surface border border-border rounded-lg shadow-sm p-6">
-                <div className="text-text-muted leading-[1.8] flex flex-col gap-4 mb-6">
-                  <p>
-                    {t(
-                      "我是周暐倫(Terry),國立中央大學資工碩士。專長橫跨三條主線:全端應用開發、把機器學習模型送上線(推論最佳化、Triton 服務、效能監控),以及讓一切自動化部署且可維運的 DevOps。",
-                      "I'm Terry (Wei-Lun) Chou, a CS Master's graduate from National Central University. My work spans three tracks: full-stack application development, shipping ML models to production (inference optimization, Triton serving, performance monitoring), and the DevOps that makes everything deploy automatically and stay operable.",
-                    )}
-                  </p>
-                  <p>
-                    {t(
-                      "我喜歡有清楚架構、能長期維護的系統,並把無障礙與工程細節視為品質的一部分 —— 這個作品集網站本身就是一個例子。",
-                      "I gravitate toward systems with clear architecture that last, and I treat accessibility and engineering details as part of quality — this portfolio site itself is one example.",
-                    )}
-                  </p>
-                </div>
+              <div className="text-text-muted leading-[1.8] flex flex-col gap-4 mb-6">
+                <p>
+                  {t(
+                    "我是周暐倫(Terry),國立中央大學資工碩士。專長橫跨三條主線:全端應用開發、把機器學習模型送上線(推論最佳化、Triton 服務、效能監控),以及讓一切自動化部署且可維運的 DevOps。",
+                    "I'm Terry (Wei-Lun) Chou, a CS Master's graduate from National Central University. My work spans three tracks: full-stack application development, shipping ML models to production (inference optimization, Triton serving, performance monitoring), and the DevOps that makes everything deploy automatically and stay operable.",
+                  )}
+                </p>
+                <p>
+                  {t(
+                    "我喜歡有清楚架構、能長期維護的系統,並把無障礙與工程細節視為品質的一部分 —— 這個作品集網站本身就是一個例子。",
+                    "I gravitate toward systems with clear architecture that last, and I treat accessibility and engineering details as part of quality — this portfolio site itself is one example.",
+                  )}
+                </p>
+              </div>
 
-                {/* 歷程時間軸:藍點軸線,學歷用真實年份 */}
-                <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-                  <GraduationCap
-                    className="h-4 w-4 text-brand"
-                    aria-hidden="true"
-                  />
-                  {t("歷程", "Journey")}
-                </h3>
-                <ol className="relative border-l border-border-strong ml-[5px] flex flex-col gap-5">
-                  {journey.map((item) => (
-                    <li key={item.period} className="pl-5 relative">
-                      <span
-                        aria-hidden="true"
-                        className={`absolute -left-[5.5px] top-[6px] w-[10px] h-[10px] rounded-full ${
-                          item.now
-                            ? "bg-success shadow-[0_0_0_3px_var(--color-success-dim)]"
-                            : "bg-brand"
-                        }`}
-                      />
-                      <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                        <span className="font-bold">
-                          {t(item.titleZh, item.titleEn)}
-                        </span>
-                        <span className="font-mono text-xs text-text-subtle">
-                          {item.period}
-                        </span>
-                      </div>
-                      <p className="text-sm text-text-muted mt-1">
-                        {t(item.descZh, item.descEn)}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
+              {/* 歷程時間軸:藍點軸線,學歷用真實年份 */}
+              <h3 className="text-base font-bold mb-4 flex items-center gap-2">
+                <GraduationCap
+                  className="h-4 w-4 text-brand"
+                  aria-hidden="true"
+                />
+                {t("歷程", "Journey")}
+              </h3>
+              <ol className="relative border-l border-border-strong ml-[5px] flex flex-col gap-5">
+                {journey.map((item) => (
+                  <li key={item.period} className="pl-5 relative">
+                    <span
+                      aria-hidden="true"
+                      className={`absolute -left-[5.5px] top-[6px] w-[10px] h-[10px] rounded-full ${
+                        item.now
+                          ? "bg-success shadow-[0_0_0_3px_var(--color-success-dim)]"
+                          : "bg-brand"
+                      }`}
+                    />
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                      <span className="font-bold">
+                        {t(item.titleZh, item.titleEn)}
+                      </span>
+                      <span className="font-mono text-xs text-text-subtle">
+                        {item.period}
+                      </span>
+                    </div>
+                    <p className="text-sm text-text-muted mt-1">
+                      {t(item.descZh, item.descEn)}
+                    </p>
+                  </li>
+                ))}
+              </ol>
             </div>
 
             <div className="card-surface border border-border rounded-lg shadow-sm p-6">
-                <h3 className="text-base font-bold mb-3 flex items-center gap-2">
-                  <ShieldCheck
-                    className="h-4 w-4 text-infra"
-                    aria-hidden="true"
-                  />
-                  {t("本站就是證據", "This site is the proof")}
-                </h3>
-                <p className="text-sm text-text-muted leading-[1.8] mb-4">
-                  {t(
-                    "這個網站自架在 Oracle Cloud ARM 上,經 Cloudflare Tunnel 零入站連線發布,CI/CD 依路徑分流自動部署 —— 部署架構本身就是 DevOps 能力的實物證明。",
-                    "This site is self-hosted on Oracle Cloud ARM, published through a zero-inbound Cloudflare Tunnel, and deployed by path-filtered CI/CD — the deployment architecture itself is working proof of the DevOps claim.",
-                  )}
-                </p>
-                <p className="text-sm font-medium mb-2">
-                  {t("馬上可驗證:", "Verify it now:")}
-                </p>
-                <ul className="flex flex-col">
-                  {proofLinks.map((l) => (
-                    <li key={l.href}>
-                      <a
-                        href={l.href}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        className="link-underline inline-flex items-center min-h-[44px] gap-2 text-sm text-text-muted hover:text-brand transition-colors duration-DEFAULT ease-ease"
-                      >
-                        <span
-                          aria-hidden="true"
-                          className="w-[6px] h-[6px] rounded-full bg-success"
-                        />
-                        {l.label} ↗
-                      </a>
-                    </li>
-                  ))}
-                  <li>
-                    <a
-                      href={profile.github}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      className="link-underline inline-flex items-center min-h-[44px] gap-2 text-sm text-text-muted hover:text-brand transition-colors duration-DEFAULT ease-ease"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="w-[6px] h-[6px] rounded-full bg-brand"
-                      />
-                      GitHub ↗
-                    </a>
-                  </li>
-                </ul>
+              <h3 className="text-base font-bold mb-3 flex items-center gap-2">
+                <ShieldCheck
+                  className="h-4 w-4 text-infra"
+                  aria-hidden="true"
+                />
+                {t("本站就是證據", "This site is the proof")}
+              </h3>
+              <p className="text-sm text-text-muted leading-[1.8] mb-4">
+                {t(
+                  "這個網站自架在 Oracle Cloud ARM 上,經 Cloudflare Tunnel 零入站連線發布,CI/CD 依路徑分流自動部署 —— 部署架構本身就是 DevOps 能力的實物證明。",
+                  "This site is self-hosted on Oracle Cloud ARM, published through a zero-inbound Cloudflare Tunnel, and deployed by path-filtered CI/CD — the deployment architecture itself is working proof of the DevOps claim.",
+                )}
+              </p>
+              <a
+                href="#live-demos"
+                className="link-underline inline-flex items-center min-h-[44px] text-sm font-medium text-brand"
+              >
+                {t("查看線上作品 ↑", "Explore live demos ↑")}
+              </a>
             </div>
           </div>
         </Section>
@@ -349,45 +334,44 @@ export function HomeView() {
                   key={group.titleEn}
                   className="card-surface border border-border rounded-lg shadow-sm p-5 h-full"
                 >
-                    <h3 className="text-lg flex items-center gap-3 mb-4 font-bold">
-                      <span
-                        aria-hidden="true"
-                        className={`w-[36px] h-[36px] rounded-md flex items-center justify-center shrink-0 ${skillIconClass[group.category]}`}
+                  <h3 className="text-lg flex items-center gap-3 mb-4 font-bold">
+                    <span
+                      aria-hidden="true"
+                      className={`w-[36px] h-[36px] rounded-md flex items-center justify-center shrink-0 ${skillIconClass[group.category]}`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {t(group.titleZh, group.titleEn)}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {group.items.map((item) => (
+                      <TechBadge
+                        key={item}
+                        category={
+                          group.category === "neutral"
+                            ? undefined
+                            : group.category
+                        }
                       >
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      {t(group.titleZh, group.titleEn)}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {group.items.map((item) => (
-                        <TechBadge
-                          key={item}
-                          category={
-                            group.category === "neutral"
-                              ? undefined
-                              : group.category
-                          }
-                        >
-                          {item}
-                        </TechBadge>
-                      ))}
-                    </div>
+                        {item}
+                      </TechBadge>
+                    ))}
+                  </div>
                 </div>
               );
             })}
           </div>
         </Section>
 
-        {/* PROJECTS */}
         <Section
-          id="projects"
-          title={t("精選專案", "Projects")}
+          id="more-projects"
+          title={t("其他作品", "More projects")}
           intro={t(
-            "依重要性分層呈現。代表作可進 showcase 詳情頁或直接玩 live demo;課程作業收在底部摺疊區。",
-            "Layered by importance. Highlights open a showcase page or a live demo; coursework is tucked into the bottom collapsible.",
+            "全端產品、遊戲與維運工具；課程專案收在底部摺疊區。",
+            "Full-stack products, games and operations tools, with coursework in the collapsible section below.",
           )}
         >
-          <ProjectsSection />
+          <ProjectsSection group="more" />
         </Section>
       </main>
 

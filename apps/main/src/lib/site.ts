@@ -52,7 +52,16 @@ export const skillGroups: SkillGroup[] = [
     titleEn: "Languages",
     icon: "languages",
     category: "neutral",
-    items: ["Python", "TypeScript/JavaScript", "Go", "Rust", "C++", "Java", "Assembly", "Verilog"],
+    items: [
+      "Python",
+      "TypeScript/JavaScript",
+      "Go",
+      "Rust",
+      "C++",
+      "Java",
+      "Assembly",
+      "Verilog",
+    ],
   },
   {
     titleZh: "前端開發",
@@ -66,14 +75,29 @@ export const skillGroups: SkillGroup[] = [
     titleEn: "Backend",
     icon: "fullstack",
     category: "neutral",
-    items: ["FastAPI", "Spring Boot", "SQLAlchemy", "PostgreSQL", "Redis", "asyncio"],
+    items: [
+      "FastAPI",
+      "Spring Boot",
+      "SQLAlchemy",
+      "PostgreSQL",
+      "Redis",
+      "asyncio",
+    ],
   },
   {
     titleZh: "AI / ML 部署",
     titleEn: "AI / ML",
     icon: "ml",
     category: "ml",
-    items: ["YOLOv8", "TensorRT", "ONNX", "Triton", "TensorFlow", "OpenCV", "MediaPipe"],
+    items: [
+      "YOLOv8",
+      "TensorRT",
+      "ONNX",
+      "Triton",
+      "TensorFlow",
+      "OpenCV",
+      "MediaPipe",
+    ],
   },
   {
     titleZh: "DevOps / 基礎設施",
@@ -101,8 +125,8 @@ export const skillGroups: SkillGroup[] = [
 
 /** 主導覽 / 頁尾連結。 */
 export const navLinks = [
-  { href: "#about", labelZh: "關於", labelEn: "About" },
-  { href: "#skills", labelZh: "技能", labelEn: "Skills" },
-  { href: "#projects", labelZh: "專案", labelEn: "Projects" },
-  { href: "#contact", labelZh: "聯絡", labelEn: "Contact" },
+  { href: "/#projects", labelZh: "專案", labelEn: "Projects" },
+  { href: "/#about", labelZh: "關於", labelEn: "About" },
+  { href: "/#skills", labelZh: "技能", labelEn: "Skills" },
+  { href: "/#contact", labelZh: "聯絡", labelEn: "Contact" },
 ];
