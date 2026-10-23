@@ -187,6 +187,8 @@ components:
 
 ## Layout
 
+首頁閱讀順序為「首屏與統計 → 代表作品 → 線上體驗 → 關於我 → 技術棧 → 其他作品 → 聯絡」;代表作保留原分層,線上體驗由真實 `liveUrl` 衍生為精簡入口卡。其他作品保留 Notable / Mini 與課程摺疊區。
+
 單欄縱向敘事:1120px 容器(`--container`)置中,兩側 24px 固定 gutter;文字段落受 68ch 行寬約束。間距走 8px 柵格(4/8/12/16/24/32/48/64/96/128px),區塊節奏 `py-8`(上下 64px),錨點捲動預留 80px(`scroll-mt-20`)配 64px 高的 sticky 導覽。
 
 Hero 在 lg 以上為 1.05fr/0.95fr 雙欄(左文字、右幾何面板,gap 48–64px),以下堆疊為單欄、CTA 按鈕全寬。斷點 640/768/1024/1280px:768px 是導覽的分水嶺(桌面橫列 vs 抽屜選單+icon 化履歷鈕)。卡片內距 24px(Mini 卡 16px),徽章群 gap 8px、按鈕群 gap 12px。
@@ -228,6 +230,8 @@ Hero 在 lg 以上為 1.05fr/0.95fr 雙欄(左文字、右幾何面板,gap 48–
 - **StatusBadge:** 999px 膠囊、12px/500 字重、前置 6px 圓點;live=綠、wip=琥珀、showcase=資訊藍,一律 -dim 底彩字。
 
 ### Cards / Containers
+
+卡片主標使用依介面語言切換的易讀名稱,repo 名以次要 mono 字呈現(過長時單行省略)。摘要由 `cardSummaryZh/cardSummaryEn` 提供,最多顯示三行;Mini 同樣有用途摘要。技術標籤由 `cardTechStack` 明確挑選,詳情頁與 PDF 的完整敘述、技術棧不受影響。
 - **Corner Style:** 16px;三個層級 Featured(封面帶或幾何色面帶＋25px 標題)/Notable(20px)/Mini(16px＋右上 GitHub 圖示)。
 - **Background:** `.card-surface` = card 白面＋頂部 1px 內光邊;封面帶下緣 1px 邊線隔開。
 - **Shadow Strategy:** 靜置 shadow-sm,hover 微浮規則(見 Elevation)。

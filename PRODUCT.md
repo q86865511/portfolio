@@ -14,11 +14,11 @@ web
 
 ## Product Purpose
 
-周暐倫（Terry Chou）的履歷入口網站＋工程師作品集：單頁式履歷（About／Skills／Projects／Education）＋專案 showcase 詳情頁＋可下載的 ATS 格式 PDF 履歷（雙語）。成功的定義是把訪客轉化為面試邀約。
+周暐倫（Terry Chou）的履歷入口網站＋工程師作品集：單頁式履歷（代表作品 → 線上體驗 → 關於與學歷 → 技術棧 → 其他作品 → 聯絡）＋專案 showcase 詳情頁＋可下載的 ATS 格式 PDF 履歷（雙語）。成功的定義是把訪客轉化為面試邀約。
 
 ## Positioning
 
-- 「作品可實際操作」：20 個專案中多個掛有可獨立訪問的 live demo 子站（soulshard.／steam.／erp.terrychou.com），能力主張可當場驗證，而非只有文字描述。
+- 「作品可實際操作」：22 個展示專案中有四個可獨立訪問的 live demo 子站（soulshard.／steam.／erp.／eat.terrychou.com），能力主張可當場驗證，而非只有文字描述。
 - 網站本身的部署架構（Oracle Cloud ARM 自架＋Cloudflare Tunnel 零入站＋path-filtered CI/CD）就是 DevOps 能力的實物證明。
 - 定位標籤（使用者確認 2026-08-11）：**維持「全端／AI-ML 部署／DevOps」三標籤並列**，主打廣度，不偏科單一敘事。
 
@@ -32,7 +32,7 @@ web
 ## Capabilities and Constraints
 
 - 技術棧：Next.js 15 + React 19 + TypeScript、Tailwind 3.4、pnpm workspaces + Turborepo（`apps/main` + `packages/ui`）。
-- 內容單一來源：個人資料在 `apps/main/src/lib/site.ts`，20 筆專案雙語資料在 `content/projects.json`——未來任何設計改動不得繞過這兩個來源另立內容。
+- 內容單一來源：個人資料在 `apps/main/src/lib/site.ts`，22 筆專案雙語資料在 `content/projects.json`——未來任何設計改動不得繞過這兩個來源另立內容。
 - 靜態匯出約束：`images.unoptimized`、`trailingSlash`、專案詳情頁 `dynamicParams=false`。
 - 多語已知限制（既存事實，非本次要解）：無 hreflang、無語系路由。
 - 未決事實：真人照片的採用與呈現方式（見 Evidence on Hand）。
@@ -40,11 +40,11 @@ web
 ## Brand Commitments
 
 - 姓名／品牌：周暐倫 · Terry (Wei-Lun) Chou，網域 terrychou.com，文字型 SVG logo「TC」。
-- 既有視覺系統已成文於 `docs/01-design-system.md` 與 `packages/ui/src/tailwind-preset.ts`＋`packages/ui/src/styles/globals.css`（深色預設、teal／violet、Major Third 字級、8px 柵格）——此為現任視覺權威的所在，是否沿用或替換由後續設計工作決定，PRODUCT.md 不裁決。
+- 現行視覺權威為 `DESIGN.md` 與 `packages/ui/src/tailwind-preset.ts`＋`packages/ui/src/styles/globals.css`（亮紙主視覺、藍／紫／綠三軸色、深藍墨深色主題、Major Third 字級、8px 柵格）；`docs/01-design-system.md` 為已被取代的舊版。
 
 ## Evidence on Hand
 
-- 20 個真實專案（`content/projects.json`）、9 張專案封面（`apps/main/public/covers/*.webp`）、OG 圖（`apps/main/public/og.png`）。
+- 22 個真實專案（`content/projects.json`）、11 張專案封面（`apps/main/public/covers/*.webp`）、OG 圖（`apps/main/public/og.png`）。
 - Live demo 子站與 GitHub repo 連結為真實可驗證資產。
 - 真人照片存在於 repo 外：`E:\OneDrive\桌面\履歷\照片.jpg`（白色背景，可能需去背；**是否使用與如何呈現交由設計判斷**——使用者交代 2026-08-11）。
 - 沒有的東西（不得虛構）：推薦語／testimonials、客戶案例、任何未在 projects.json 記載的成果數字。

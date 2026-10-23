@@ -8,9 +8,11 @@
 - 前端:Next.js 15(App Router、`output: 'export'` 靜態匯出)、React 19、TypeScript、Tailwind。
 - 共用設計系統放 `packages/ui`,各 app 透過 workspace 相依引用,**不複製貼上元件**。
 - e2e/smoke:**Playwright**(`apps/main/e2e/`),對 build 後的 `out/` 起本機 `serve` 驗證;已納入 `ci.yml`(build 後跑)。
-- PDF 履歷(`apps/main/scripts/generate-pdf.mjs`)的中文字型必須是 **glyf 靜態 TTF**(Chrome 印 PDF 對可變字型與 CFF OTF 都只出 Type3):腳本自抓釘定版本的 Noto Sans TC 並用 fontTools 實例化為 family `Resume CJK`;Linux 裝成使用者系統字型、Windows/macOS 以 @font-face 注入(Linux 的網頁字型也會變 Type3);本機需 Python 3 + `pip install fonttools`;履歷收錄與順序只看 `projects.ts` 的 `RESUME_ORDER`,不由 tier 推導。
+- PDF 履歷(`apps/main/scripts/generate-pdf.mjs`)的中文字型必須是 **glyf 靜態 TTF**(Chrome 印 PDF 對可變字型與 CFF OTF 都只出 Type3):腳本自抓釘定版本的 Noto Sans TC 並用 fontTools 實例化為 family `Resume CJK`;Linux 裝成使用者系統字型、Windows/macOS 以 @font-face 注入(Linux 的網頁字型也會變 Type3);本機需 Python 3 + `pip install fonttools`;履歷收錄與順序只看 `projects.ts` 的 `RESUME_SECTIONS`,不由 tier 推導。
 - pnpm 設定(`overrides`、`allowBuilds`、`verifyDepsBeforeRun` 等)放 **`pnpm-workspace.yaml`**——此版 pnpm 由 workspace yaml 讀取,寫在 `package.json` 的 `pnpm` 欄不會生效。
 
+- 首頁與詳情頁共用的導覽一律使用 `/#區塊`(品牌為 `/#main`),避免詳情頁落到不存在的本頁錨點。首頁優先呈現代表作品與線上體驗,其餘作品位於關於/技能之後。
+- 卡片主標取 `titleZh/titleEn`,repo 名僅為次要資訊;精簡摘要與代表技術使用 `projects.json` 的 `cardSummaryZh/cardSummaryEn`、`cardTechStack`,不得改短完整 `oneLiner` 或 `techStack` 而影響詳情頁與 ATS 履歷。
 - 私有 repo 的專案:`projects.json` 的 `githubUrl` 填空字串,卡片與詳情頁就不顯示 GitHub 按鈕;開發中的專案把 slug 加進 `projects.ts` 的 `WIP_SLUGS`,顯示「進行中」徽章。
 
 ## 目錄約定

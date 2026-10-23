@@ -8,11 +8,7 @@ import {
   type ProjectDetailNav,
 } from "@resume/ui";
 import { navLinks, profile } from "@/lib/site";
-import {
-  detailProjects,
-  getProject,
-  isWip,
-} from "@/lib/projects";
+import { detailProjects, getProject, isWip } from "@/lib/projects";
 
 export function ProjectDetailView({ slug }: { slug: string }) {
   const { t } = useLang();
@@ -27,8 +23,8 @@ export function ProjectDetailView({ slug }: { slug: string }) {
 
   const toNav = (p: typeof project): ProjectDetailNav => ({
     slug: p.slug,
-    titleZh: p.repoName,
-    titleEn: p.repoName,
+    titleZh: p.titleZh,
+    titleEn: p.titleEn,
   });
 
   const status = isWip(slug)
@@ -45,10 +41,16 @@ export function ProjectDetailView({ slug }: { slug: string }) {
         }
       : { status: "showcase" as const, label: "Showcase" };
 
-  const footerNav = navLinks.filter((l) => l.href !== "#contact");
+  const pdfHref = t("/resume-zh.pdf", "/resume-en.pdf");
+  const footerNav = navLinks.filter((l) => l.href !== "/#contact");
   const contactLinks = [
     { href: `mailto:${profile.email}`, labelZh: "Email", labelEn: "Email" },
-    { href: profile.github, labelZh: "GitHub ↗", labelEn: "GitHub ↗", external: true },
+    {
+      href: profile.github,
+      labelZh: "GitHub ↗",
+      labelEn: "GitHub ↗",
+      external: true,
+    },
     {
       href: profile.linkedin,
       labelZh: "LinkedIn ↗",
@@ -62,10 +64,10 @@ export function ProjectDetailView({ slug }: { slug: string }) {
       <a href="#main" className="skip-link">
         {t("跳至主要內容", "Skip to content")}
       </a>
-      <Nav links={navLinks} githubUrl={profile.github} brandName={profile.brand} />
+      <Nav links={navLinks} brandName={profile.brand} pdfHref={pdfHref} />
       <main id="main">
         <ProjectDetail
-          title={project.repoName}
+          title={t(project.titleZh, project.titleEn)}
           oneLiner={t(project.oneLinerZh, project.oneLinerEn)}
           description={t(project.descZh, project.descEn)}
           highlights={project.highlights.map((h) => t(h.zh, h.en))}

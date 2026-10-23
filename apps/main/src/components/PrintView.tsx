@@ -155,6 +155,7 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
           margin: "0 0 5px",
           borderBottom: "1px solid #000",
           paddingBottom: 2,
+          breakAfter: "avoid",
         }}
       >
         {title}

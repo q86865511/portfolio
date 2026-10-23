@@ -12,6 +12,7 @@ import { ChevronDown, ExternalLink } from "lucide-react";
 import {
   isWip,
   primaryLink,
+  projects,
   projectsByTier,
   type Project,
 } from "@/lib/projects";
@@ -51,7 +52,7 @@ function statusFor(
   return undefined;
 }
 
-/** 卡片動作:依連結規則組出主/次按鈕,每張都附 GitHub。 */
+/** 卡片動作:依連結規則組出主/次按鈕,有公開連結時才附 GitHub。 */
 function actionsFor(p: Project): CardAction[] {
   const actions: CardAction[] = [];
   const link = primaryLink(p);
@@ -112,42 +113,68 @@ function actionsFor(p: Project): CardAction[] {
   return actions;
 }
 
-export function ProjectsSection() {
+export function ProjectsSection({
+  group,
+}: {
+  group: "featured" | "live" | "more";
+}) {
   const { t } = useLang();
   const groups = projectsByTier();
-  /** 學術/來源標籤(依語言)。 */
   const kindOf = (p: Project) =>
     p.kindZh ? t(p.kindZh, p.kindEn ?? p.kindZh) : undefined;
+  const summaryOf = (p: Project) =>
+    t(p.cardSummaryZh ?? p.oneLinerZh, p.cardSummaryEn ?? p.oneLinerEn);
+
+  if (group === "featured") {
+    return (
+      <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
+        {groups.featured.map((p, i) => (
+          <Reveal key={p.slug} delay={i * 80} className="h-full">
+            <FeaturedCard
+              className="h-full"
+              title={t(p.titleZh, p.titleEn)}
+              repoName={p.repoName}
+              titleHref={primaryLink(p).href}
+              titleExternal={primaryLink(p).external}
+              status={statusFor(p, t)}
+              kind={kindOf(p)}
+              cover={p.cover}
+              desc={summaryOf(p)}
+              techStack={p.cardTechStack ?? p.techStack.slice(0, 5)}
+              actions={actionsFor(p)}
+              patternSeed={i}
+            />
+          </Reveal>
+        ))}
+      </div>
+    );
+  }
+
+  if (group === "live") {
+    return (
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {projects
+          .filter((p) => p.liveUrl)
+          .map((p) => (
+            <NotableCard
+              key={p.slug}
+              className="h-full"
+              title={t(p.titleZh, p.titleEn)}
+              repoName={p.repoName}
+              titleHref={p.liveUrl}
+              titleExternal
+              desc={summaryOf(p)}
+              actions={actionsFor(p).filter(
+                (action) => action.variant === "primary",
+              )}
+            />
+          ))}
+      </div>
+    );
+  }
 
   return (
     <>
-      {/* FEATURED */}
-      <TierBlock
-        name={t("Featured · 代表作", "Featured")}
-        count={groups.featured.length}
-      >
-        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
-          {groups.featured.map((p, i) => (
-            <Reveal key={p.slug} delay={i * 80} className="h-full">
-              <FeaturedCard
-                className="h-full"
-                title={p.repoName}
-                titleHref={primaryLink(p).href}
-                titleExternal={primaryLink(p).external}
-                status={statusFor(p, t)}
-                kind={kindOf(p)}
-                cover={p.cover}
-                desc={t(p.oneLinerZh, p.oneLinerEn)}
-                techStack={p.techStack.slice(0, 5)}
-                actions={actionsFor(p)}
-                patternSeed={i}
-              />
-            </Reveal>
-          ))}
-        </div>
-      </TierBlock>
-
-      {/* NOTABLE */}
       <TierBlock
         name={t("Notable · 值得一提", "Notable")}
         count={groups.notable.length}
@@ -157,14 +184,15 @@ export function ProjectsSection() {
             <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
               <NotableCard
                 className="h-full"
-                title={p.repoName}
+                title={t(p.titleZh, p.titleEn)}
+                repoName={p.repoName}
                 titleHref={primaryLink(p).href}
                 titleExternal={primaryLink(p).external}
                 status={statusFor(p, t)}
                 kind={kindOf(p)}
                 cover={p.cover}
-                desc={t(p.oneLinerZh, p.oneLinerEn)}
-                techStack={p.techStack.slice(0, 4)}
+                desc={summaryOf(p)}
+                techStack={p.cardTechStack ?? p.techStack.slice(0, 4)}
                 actions={actionsFor(p)}
               />
             </Reveal>
@@ -172,7 +200,6 @@ export function ProjectsSection() {
         </div>
       </TierBlock>
 
-      {/* MINI */}
       <TierBlock
         name={t("Mini · 小品與工具", "Mini · tools")}
         count={groups.mini.length}
@@ -184,12 +211,14 @@ export function ProjectsSection() {
               <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
                 <MiniCard
                   className="h-full"
-                  title={p.repoName}
+                  title={t(p.titleZh, p.titleEn)}
+                  repoName={p.repoName}
                   titleHref={link.href}
                   titleExternal={link.external}
                   status={statusFor(p, t)}
                   kind={kindOf(p)}
-                  techStack={p.techStack.slice(0, 4)}
+                  desc={summaryOf(p)}
+                  techStack={p.cardTechStack ?? p.techStack.slice(0, 4)}
                   githubUrl={p.githubUrl}
                   githubLabel={t(
                     `${p.repoName} GitHub(另開新視窗)`,
@@ -202,7 +231,6 @@ export function ProjectsSection() {
         </div>
       </TierBlock>
 
-      {/* ACADEMIC(摺疊) */}
       {groups.academic.length > 0 && (
         <div className="mb-0">
           <details className="card-surface border border-border rounded-lg overflow-hidden group/details">

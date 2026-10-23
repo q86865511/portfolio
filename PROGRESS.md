@@ -1,9 +1,17 @@
 # PROGRESS — 履歷入口網站
 
 ## 目前狀態
-**全套上線並自動化**:主站 https://terrychou.com、子站 https://soulshard.terrychou.com 皆上線。兩個 repo(portfolio、Soulshard-Hunter)各有獨立 self-hosted runner 與 CI/CD,push 即自動部署;對外經 Cloudflare Tunnel(零入站),主站部署後自動 purge 邊緣快取;Cloudflare Web Analytics 運作中(CWV 全綠)。文件齊備、SEO/分享優化完成。前端已套用 Engineer Dark「立體層次」美化與互動/無障礙修正、專案分層調整;履歷 PDF 改為 ATS 格式(並修掉產線誤渲染首頁的 bug、固定專案順序);子站加上「魂晶」favicon。已上線的 SteamSaleChecker 子站(steam.terrychou.com)以 Notable + showcase(卡片直接 Live)收入作品集(R3,PR #18 已 merge、自動部署中),並順手修掉 live-demo 卡片「看詳情」fallback 首頁的既有 bug。已完成上線的 ERPSystem(erp.terrychou.com)由早期 Phase-0/WIP 條目全面更新為**已完成全端 live app**(showcase + liveUrl、換新封面、移除 WIP 徽章、技能補 Spring Boot/Mantine)。2026-07-21 新增 **ServerMonitor**(Go+Wails 遊戲伺服器管理桌面工具)至 Notable(三個 Live 專案之後、ERP 後)與 PDF 履歷,封面套統一分類框架。**2026-08-12 全站視覺重設計**:捨棄 Engineer Dark,改為淺色現代招募版(藍/紫/綠三軸色系統、Schibsted Grotesk+Noto Sans TC 真字型、幾何色面簽名圖形),深色主題保留為衍生世界,詳見「已完成」。**2026-09-02 履歷 PDF 內容同步 + 中文字型修復**:PDF 改以 RESUME_ORDER 為唯一真相收錄 8 案(加入 mcpglass、重排順序、標月份、加役期、Languages 補 Go),勘誤表的錯誤數字全數改正,摘要換新版;產 PDF 改注入 fontTools 實例化的 Noto Sans TC 靜態 TTF,中文版由 1.38 MB Type3 點陣字降為 256 KB 真字型嵌入。
+**主站與四個 live demo 子站運作中**,採 Oracle Cloud ARM + Cloudflare Tunnel 與獨立 CI/CD。**2026-10-23 本輪修改已完成本機驗證、待 PR 合併部署**:修復詳情頁跨頁導覽並補雙語履歷入口,首頁改為代表作與線上體驗優先,作品卡使用易讀標題、精簡雙語摘要與明確挑選的代表技術。維持既有專案分層、22 筆內容與 PDF 的 9 案收錄順序。雙語履歷與 11 頁作品附件已同步校正智慧導航標題。
 
 ## 已完成
+- [2026-10-23] **跨頁導覽修復、內容一致性與作品呈現改善**:
+  - 主導覽、頁尾與品牌改用 `/#區塊` / `/#main`,從任一專案詳情頁可回首頁正確位置;詳情頁補上依介面語言切換的 PDF 履歷下載,標題與前後專案導覽改用 `titleZh/titleEn`。
+  - 首頁「公開專案」改為「展示專案」(包含私有 repo showcase);智慧導航中英標題改為「智慧導航系統 / Smart Navigation System」,移除未實作的燈號辨識宣稱。既有 repo 名稱與網址保留,避免破壞真實連結。
+  - 首頁順序調為首屏與統計 → 代表作品 → 線上體驗 → 關於我 → 技術棧 → 其他作品 → 聯絡;線上入口直接由所有真實 `liveUrl` 產生,保留其餘作品與課程摺疊區。
+  - `projects.json` 新增 16 案成對的 `cardSummaryZh/cardSummaryEn` 與 `cardTechStack`;三階卡片主標改用易讀名稱,repo 名為次要單行資訊,摘要最多三行,Mini 補用途描述。完整 oneLiner、描述、技術棧、成果數字、分層與 PDF 收錄順序未改。
+  - 雙語履歷重產(中文 2 頁 / 英文 3 頁),並以既有 Work 產生器唯讀輸入重產 11 頁作品附件;三份 PDF 均確認新標題與零 Type3。PrintView 加 `breakAfter: avoid`,避免區段標題單獨落在頁尾;作品附件各頁剩餘空間皆為正值(最少 6mm),Poppler 渲染目視確認。
+  - 驗證:main / UI TypeScript 檢查、lint、最終 build(23/23 靜態頁)通過;Playwright 9/9(原 smoke 3 + 新回歸 6),涵蓋跨頁導覽、品牌、頁尾、手機選單、雙語履歷入口、卡片內容、首頁順序、中英文 375/768/1280px 無水平溢出。另做內容差異核對與中英文/深淺色頁面走查。
+  - 文件同步:README 的首頁與作品呈現/測試範圍、CLAUDE 的跨頁錨點與卡片欄位約定、PRODUCT 的專案/封面數與設計權威、DESIGN 的閱讀順序與卡片內容規則。
 - [2026-10-07] 修正:大學專題描述改為實際情境(使用者確認)——ROS 2 小車模擬車輛、人跟在後面、手機導航提供大方向;手勢是「路邊有人招手」當停車信號(另有語音提示);導航的距離、轉向、路名疊在畫面上。projects.json 的一句話、描述、四條重點、挑戰(中英)改寫,技術補 ROS 2;封面改為「智慧導航系統 · ROS 2 小車 · 招手停車 · 導航疊圖」(移除未實作的「燈號辨識」與「行人」字樣),作品附件 PDF 同步重產。
 - [2026-10-07] 🆕 **作品集近況更新**:新增 **Cyclepact**(輪迴盟約,Unity 6 回合制收集 RPG,開發中,WIP 徽章)與 **FoodMap**(美食推薦地圖 eat.terrychou.com,已上線)兩筆至 Notable 最前(projects.json 22 筆);兩者皆私有 repo,`githubUrl` 留空,卡片與詳情頁改為有連結才顯示 GitHub 按鈕(`ProjectsSection.tsx`、`packages/ui` 的 `ProjectDetail.tsx`)。新封面:cyclepact 以 HTML 版型重製(原 repo 封面寫的是舊的 Godot 技術棧)、FoodMap 用上線首頁截圖。PDF 履歷只加 FoodMap(Side Projects 區,Steam 之後),摘要改「四個自架上線至今」;首頁「本站即證據」改取前四個 live 站,「現在」時間軸改寫為開發 Cyclepact 並維運四個子站。作品附件 PDF 同步重產為 10 案版(11 頁 A4,6.1 MB,無 Type3、各頁無溢出):產生器 `gen_appendix.py` 加入兩案(Cyclepact 用第一章實機截圖、FoodMap 避開地圖區塊——線上站地圖底圖目前顯示 CARTO「API KEY REQUIRED」),私有 repo 連結改顯示「私有 repo」,並補上 2026-09-03 只改了 PDF、沒改回產生器的 CamVid + BDD100K 勘誤。
 - [2026-09-03] 修正:街景專題訓練資料改為「CamVid 與 BDD100K 1:1 混合」(使用者確認;原「自製補充資料集」有誤),履歷 PDF 由 CI 重產、作品附件 PDF 重產。

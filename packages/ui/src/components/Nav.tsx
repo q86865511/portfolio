@@ -64,7 +64,7 @@ export function Nav({
     >
       <div className="container flex items-center justify-between h-16">
         <a
-          href="#main"
+          href="/#main"
           className="inline-flex items-center gap-3 min-h-[44px] font-bold"
           aria-label={brandName}
         >
