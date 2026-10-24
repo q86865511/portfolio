@@ -216,7 +216,7 @@
     transform-box: fill-box;
   }
 
-  /* ── 首屏部署架構圖文字與 Tunnel 流動虛線 ── */
+  /* ── 首屏部署架構圖文字 ── */
   .infra-title {
     font-family: var(--font-sans);
     font-size: 17px;
@@ -234,7 +234,7 @@
   }
   .infra-sub {
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: 14px;
     fill: var(--color-text-muted);
   }
   .infra-strong {
@@ -246,19 +246,6 @@
     font-size: 13px;
     fill: var(--color-text);
   }
-  .infra-flow {
-    animation: infra-flow 1.2s linear infinite;
-  }
-
-  /* ── 卡片封面 hover:輕微放大,暗示可點(reduced-motion 由 kill-switch 停用)── */
-  .cover-zoom {
-    transition: transform 500ms var(--ease);
-  }
-  .group:hover .cover-zoom,
-  .group:focus-within .cover-zoom {
-    transform: scale(1.03);
-  }
-
   /* ── 進場 reveal(JS 掛上 observer 後才隱藏,初始 HTML 恆可見)── */
   .reveal-hidden {
     opacity: 0;
@@ -282,12 +269,6 @@
   }
 }
 
-@keyframes infra-flow {
-  to {
-    stroke-dashoffset: -12;
-  }
-}
-
 /* 跨頁淡入淡出(首頁 ↔ 詳情頁,MPA View Transitions);不支援的瀏覽器照常換頁,減少動效時不啟用。 */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
@@ -306,10 +287,6 @@
   }
   .reveal-hidden {
     opacity: 1;
-    transform: none;
-  }
-  .group:hover .cover-zoom,
-  .group:focus-within .cover-zoom {
     transform: none;
   }
 }

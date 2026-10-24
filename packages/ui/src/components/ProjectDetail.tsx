@@ -50,15 +50,19 @@ export interface ProjectDetailProps {
  * 避免詳情頁出現整片文字牆。
  */
 function splitParagraphs(text: string): string[] {
-  const sentences = text.match(/[^。！？!?]+[。！？!?]+|[^。！？!?]+$/g) ?? [
-    text,
-  ];
   // 英文稿可能夾雜少量中文專有名詞,以中文字比例判斷語言。
   const cjkCount = (text.match(/[\u4e00-\u9fff]/g) ?? []).length;
   const isCjk = cjkCount > text.length * 0.2;
   const limit = isCjk ? 160 : 420;
-  // 英文以 ". " 斷句(上面的 regex 只抓中文標點與 !?)。
-  const parts = isCjk ? sentences : text.split(/(?<=\.)\s+(?=[A-Z(])/);
+  // 句尾標點連同其後的收尾引號/括號一起留在同一句(避免下一段以「」」開頭)。
+  // 英文只在 .!? + 空白 + 大寫處切,並排除 e.g. / i.e. / vs. / etc. 等縮寫。
+  const parts = isCjk
+    ? (text.match(/[^。！？!?]+[。！？!?]+[」』）)"”’]*|[^。！？!?]+$/g) ?? [
+        text,
+      ])
+    : text.split(
+        /(?<=[.!?]["”’)]?)(?<!\b(?:e\.g|i\.e|vs|etc|approx)\.)\s+(?=[A-Z(])/,
+      );
   const out: string[] = [];
   let buf = "";
   for (const part of parts) {
@@ -195,15 +199,16 @@ export function ProjectDetail(props: ProjectDetailProps) {
               <h2 id="pd-highlights" className="text-xl mb-4">
                 {t("關鍵亮點", "Highlights")}
               </h2>
-              <ol className="flex flex-col gap-3">
+              {/* 編號清單(不加卡片底):長亮點也不會變成第二片文字牆 */}
+              <ol className="flex flex-col gap-4">
                 {props.highlights.map((h, i) => (
                   <li
                     key={i}
-                    className="card-surface border border-border rounded-lg p-4 flex gap-4 text-text-muted leading-[1.7]"
+                    className="flex gap-4 text-text-muted leading-[1.75]"
                   >
                     <span
                       aria-hidden="true"
-                      className="shrink-0 w-[28px] h-[28px] rounded-md bg-brand-dim text-brand font-mono text-sm font-bold flex items-center justify-center"
+                      className="shrink-0 mt-[2px] w-[26px] h-[26px] rounded-md bg-brand-dim text-brand font-mono text-sm font-bold flex items-center justify-center"
                     >
                       {i + 1}
                     </span>

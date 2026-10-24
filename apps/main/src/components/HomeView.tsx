@@ -16,10 +16,11 @@ import {
   eduItems,
   navLinks,
   profile,
+  serviceNote,
   skillGroups,
   type SkillGroup,
 } from "@/lib/site";
-import { liveProjects, projectsByTier } from "@/lib/projects";
+import { isWip, liveHosts, liveProjects, projectsByTier } from "@/lib/projects";
 import { ProjectsSection } from "./ProjectsSection";
 
 const skillIcon: Record<SkillGroup["icon"], typeof Cpu> = {
@@ -85,10 +86,16 @@ export function HomeView() {
     },
   ];
 
-  // 統計列:全部由真實資料計算,不寫死;作品數只算代表作 + notable,不把課程作業與小工具灌進總數。
-  const liveDemos = liveProjects().length;
+  // 統計列:全部由真實資料計算,不寫死;作品數只算已完成的代表作 + notable,
+  // 不把課程作業、小工具與開發中專案灌進總數。
+  const live = liveProjects();
+  const liveDemos = live.length;
   const tiers = projectsByTier();
-  const mainWorks = tiers.featured.length + tiers.notable.length;
+  const mainWorks = [...tiers.featured, ...tiers.notable].filter(
+    (p) => !isWip(p.slug),
+  ).length;
+  const liveNamesZh = live.map((p) => p.titleZh).join("、");
+  const liveNamesEn = live.map((p) => p.titleEn).join(", ");
   const languagesCount =
     skillGroups.find((g) => g.icon === "languages")?.items.length ?? 0;
   const stats = [
@@ -121,16 +128,16 @@ export function HomeView() {
       period: t("2026 – 現在", "2026 – now"),
       titleZh: "獨立開發 · 開放工作機會",
       titleEn: "Independent builder · open to opportunities",
-      descZh: `從零打造並上線 ${liveDemos} 個網站(製造業 ERP、美食地圖、Steam 特價追蹤、魂晶獵手),目前開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6)。`,
-      descEn: `Built and shipped ${liveDemos} live sites (manufacturing ERP, food map, Steam deal tracker, Soulshard Hunter); currently building Cyclepact, a turn-based collection RPG in Unity 6.`,
+      descZh: `從零打造並上線 ${liveDemos} 個網站(${liveNamesZh}),目前開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6)。`,
+      descEn: `Built and shipped ${liveDemos} live sites (${liveNamesEn}); currently building Cyclepact, a turn-based collection RPG in Unity 6.`,
       now: true,
     },
     {
-      period: t("2025/11 – 2026/2", "Nov 2025 – Feb 2026"),
-      titleZh: "義務役",
-      titleEn: "Military service",
-      descZh: "義務役服役期滿,已退伍。",
-      descEn: "Completed mandatory military service.",
+      period: t(serviceNote.periodZh, serviceNote.periodEn),
+      titleZh: serviceNote.titleZh,
+      titleEn: serviceNote.titleEn,
+      descZh: serviceNote.descZh,
+      descEn: serviceNote.descEn,
       now: false,
     },
     ...eduItems.map((e) => ({
@@ -179,6 +186,7 @@ export function HomeView() {
           eduZh="資訊工程 碩士"
           eduEn="M.S. in CSIE"
           pdfHref={pdfHref}
+          diagramHosts={liveHosts()}
         />
 
         {/* 統計列:真實數字(專案數 / live demo 數 / 語言數皆由資料計算) */}
@@ -392,6 +400,7 @@ export function HomeView() {
         navLinks={footerNav}
         contactLinks={contactLinks}
         downloadLinks={downloadLinks}
+        year={Number(process.env.NEXT_PUBLIC_BUILD_YEAR)}
       />
     </>
   );

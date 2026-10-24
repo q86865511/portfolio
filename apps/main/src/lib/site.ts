@@ -31,10 +31,16 @@ export const eduItems = [
   },
 ] as const;
 
-/** 役期(僅 PDF 履歷的學歷段列出;首頁時間軸不顯示)。 */
+/** 役期(單一來源):PDF 學歷段用 zh/en 整句,首頁歷程時間軸用 period/title/desc。 */
 export const serviceNote = {
   zh: "兵役:義務役 2025/11 – 2026/2,已退伍",
   en: "Military service (mandatory), Nov 2025 – Feb 2026 — completed",
+  periodZh: "2025/11 – 2026/2",
+  periodEn: "Nov 2025 – Feb 2026",
+  titleZh: "義務役",
+  titleEn: "Military service",
+  descZh: "義務役服役期滿,已退伍。",
+  descEn: "Completed mandatory military service.",
 } as const;
 
 export interface SkillGroup {

@@ -11,7 +11,19 @@ const personJsonLd = {
   alternateName: [profile.nameZh, "Terry Chou"],
   url: SITE_URL,
   email: `mailto:${profile.email}`,
-  jobTitle: "Full-stack / AI-ML Deployment / DevOps Engineer",
+  // 目前求職中、無現職,故不用 jobTitle(會被當成現任職稱),改以 description + knowsAbout 描述專長。
+  description:
+    "Full-stack / AI-ML deployment / DevOps engineer, M.S. in CSIE, open to opportunities.",
+  knowsAbout: [
+    "Full-stack web development",
+    "ML model deployment",
+    "TensorRT",
+    "Triton Inference Server",
+    "DevOps",
+    "CI/CD",
+    "Docker",
+    "Cloudflare",
+  ],
   address: {
     "@type": "PostalAddress",
     addressLocality: "Taoyuan",

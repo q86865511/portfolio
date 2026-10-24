@@ -112,6 +112,7 @@ export function ProjectDetailView({ slug }: { slug: string }) {
         navLinks={footerNav}
         contactLinks={contactLinks}
         downloadLinks={downloadLinks}
+        year={Number(process.env.NEXT_PUBLIC_BUILD_YEAR)}
       />
     </>
   );

@@ -12,7 +12,8 @@
 - pnpm 設定(`overrides`、`allowBuilds`、`verifyDepsBeforeRun` 等)放 **`pnpm-workspace.yaml`**——此版 pnpm 由 workspace yaml 讀取,寫在 `package.json` 的 `pnpm` 欄不會生效。
 
 - 首頁與詳情頁共用的導覽一律使用 `/#區塊`(品牌為 `/#main`),避免詳情頁落到不存在的本頁錨點。首頁先呈現「線上作品」(`#projects`,有 `liveUrl` 者,含封面)再接「研究代表作」(`#featured`),其餘作品位於關於/技能之後且**不重複列出已上線專案**;詳情頁上一個/下一個依 `projects.ts` 的 `homeOrder()`。
-- 網址 `?lang=zh|en` 優先於 localStorage,英文版對外分享一律用 `https://terrychou.com/?lang=en`(英文 PDF 已印此網址)。
+- 線上作品順序由 `projects.ts` 的 `LIVE_ORDER` 決定;首屏架構圖的子站由 `liveUrl` 衍生,新增上線站只需改 `projects.json`(與 `LIVE_ORDER`)。
+- 網址 `?lang=zh|en` 優先於 localStorage(套用後即自網址移除),英文版對外分享一律用 `https://terrychou.com/?lang=en`(英文 PDF 已印此網址)。
 - 詳情頁社群分享圖:`public/og/<slug>.jpg` 由 `apps/main/scripts/generate-project-og.py`(Pillow)自封面裁成 1200×630;換封面後要重跑並提交,沒有對應 JPG 時退回 `og.png`。
 - 卡片主標取 `titleZh/titleEn`,repo 名僅為次要資訊;精簡摘要與代表技術使用 `projects.json` 的 `cardSummaryZh/cardSummaryEn`、`cardTechStack`,不得改短完整 `oneLiner` 或 `techStack` 而影響詳情頁與 ATS 履歷。
 - 私有 repo 的專案:`projects.json` 的 `githubUrl` 填空字串,卡片與詳情頁就不顯示 GitHub 按鈕;開發中的專案把 slug 加進 `projects.ts` 的 `WIP_SLUGS`,顯示「進行中」徽章。

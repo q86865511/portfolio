@@ -173,6 +173,13 @@ test("?lang=en 可直接開啟英文版，詳情頁依首頁順序導覽並使�
   await expect(
     page.getByRole("heading", { name: "Live products", exact: true }),
   ).toBeVisible();
+  // 參數套用後即從網址移除,使用者改回中文後重新整理不會被 ?lang=en 蓋回去。
+  await expect(page).not.toHaveURL(/lang=/);
+  await page.getByRole("button", { name: "繁", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "線上作品", exact: true }),
+  ).toBeVisible();
 
   await page.goto("/?lang=zh");
   await expect(
@@ -187,7 +194,7 @@ test("?lang=en 可直接開啟英文版，詳情頁依首頁順序導覽並使�
   expect(og.ok()).toBeTruthy();
   await expect(
     page.getByRole("navigation", { name: "專案導覽", exact: true }),
-  ).toContainText("AI 模型部署與監控平台");
+  ).toContainText("Steam 特價追蹤站");
 });
 
 test("小品預設只露 3 張可展開；首屏部署架構圖可被輔助技術讀到", async ({
@@ -212,4 +219,18 @@ test("小品預設只露 3 張可展開；首屏部署架構圖可被輔助技�
   await expect(
     page.getByText("AI-Deployment-Pipeline", { exact: true }),
   ).toBeVisible();
+});
+
+test("手機版線上作品先露兩張（ERP 在前），可展開其餘", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  const cards = page.locator("#projects article");
+  await expect(cards.first()).toContainText("製造業 ERP 系統");
+  await expect(cards.nth(0)).toBeVisible();
+  await expect(cards.nth(1)).toBeVisible();
+  await expect(cards.nth(2)).toBeHidden();
+  await page
+    .getByRole("button", { name: /顯示全部 \d+ 個線上作品/ })
+    .click();
+  await expect(cards.nth(3)).toBeVisible();
 });

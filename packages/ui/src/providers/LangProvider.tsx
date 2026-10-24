@@ -41,9 +41,13 @@ export function LangProvider({
   // 其次 localStorage,預設 zh。
   useEffect(() => {
     try {
-      const fromUrl = new URLSearchParams(window.location.search).get("lang");
+      const url = new URL(window.location.href);
+      const fromUrl = url.searchParams.get("lang");
       if (fromUrl === "zh" || fromUrl === "en") {
         setLangState(fromUrl);
+        // 套用後從網址移除,之後使用者手動切換語言就不會在重新整理/返回時被參數蓋回去。
+        url.searchParams.delete("lang");
+        window.history.replaceState(window.history.state, "", url);
         return;
       }
       const stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null;

@@ -31,6 +31,8 @@ export interface HeroProps {
   eduEn: string;
   /** 下載 PDF 履歷的連結(依當前語言)。 */
   pdfHref: string;
+  /** 首屏部署架構圖的子站主機名(依 liveUrl 衍生)。 */
+  diagramHosts?: string[];
 }
 
 export function Hero(props: HeroProps) {
@@ -133,9 +135,12 @@ export function Hero(props: HeroProps) {
 
         {/* 本站部署架構圖:首屏右半放 DevOps 主張的實物證據(取代純裝飾幾何圖形)。
             窄螢幕隱藏:手機首屏留給姓名、定位與 CTA。 */}
-        <figure className="hidden lg:block rounded-xl border border-border bg-surface-2 overflow-hidden">
-          <InfraDiagram className="block w-full h-auto" />
-        </figure>
+        <div className="hidden lg:block rounded-xl border border-border bg-surface-2 overflow-hidden">
+          <InfraDiagram
+            className="block w-full h-auto"
+            hosts={props.diagramHosts}
+          />
+        </div>
       </div>
     </section>
   );
