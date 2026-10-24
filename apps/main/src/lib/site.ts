@@ -9,8 +9,7 @@ export const profile = {
   website: "https://terrychou.com",
   locationZh: "桃園市,台灣",
   locationEn: "Taoyuan, Taiwan",
-  bioZh:
-    "A CS Master's graduate with hands-on experience building and deploying AI systems in production.",
+  bioZh: "CS 碩士,擁有把 AI 系統實際建構並部署到生產環境的實務經驗。",
   bioEn:
     "A CS Master's graduate with hands-on experience building and deploying AI systems in production.",
 } as const;

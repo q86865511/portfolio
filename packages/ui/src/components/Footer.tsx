@@ -13,6 +13,8 @@ export interface FooterProps {
   brandName?: string;
   navLinks: FooterLink[];
   contactLinks: FooterLink[];
+  /** 下載檔(履歷 PDF、作品附件),與聯絡管道分開成第二列。 */
+  downloadLinks?: FooterLink[];
   year?: number;
 }
 
@@ -20,6 +22,7 @@ export function Footer({
   brandName = "周暐倫 · Terry",
   navLinks,
   contactLinks,
+  downloadLinks = [],
   year = new Date().getFullYear(),
 }: FooterProps) {
   const { t } = useLang();
@@ -48,19 +51,22 @@ export function Footer({
               )}
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-1">
-            {contactLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                {...(link.external
-                  ? { rel: "noopener noreferrer", target: "_blank" }
-                  : {})}
-                className="link-underline text-sm font-medium inline-flex items-center min-h-[44px] text-text-muted transition-colors duration-DEFAULT ease-ease hover:text-brand"
-              >
-                {t(link.labelZh, link.labelEn)}
-              </a>
-            ))}
+          <div className="flex flex-col gap-1 lg:items-end">
+            <div className="flex flex-wrap gap-x-5 gap-y-1">
+              {contactLinks.map((link) => (
+                <FooterAnchor key={link.href} link={link} />
+              ))}
+            </div>
+            {downloadLinks.length > 0 && (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span className="text-xs font-mono uppercase tracking-[0.03em] text-text-subtle">
+                  {t("下載", "Download")}
+                </span>
+                {downloadLinks.map((link) => (
+                  <FooterAnchor key={link.href} link={link} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -93,5 +99,20 @@ export function Footer({
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterAnchor({ link }: { link: FooterLink }) {
+  const { t } = useLang();
+  return (
+    <a
+      href={link.href}
+      {...(link.external
+        ? { rel: "noopener noreferrer", target: "_blank" }
+        : {})}
+      className="link-underline text-sm font-medium inline-flex items-center min-h-[44px] text-text-muted transition-colors duration-DEFAULT ease-ease hover:text-brand"
+    >
+      {t(link.labelZh, link.labelEn)}
+    </a>
   );
 }

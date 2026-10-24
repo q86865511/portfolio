@@ -66,9 +66,11 @@ pnpm typecheck        # 型別檢查
 
 ## 首頁與作品呈現
 
-- 首頁順序:首屏與統計 → 代表作品 → 線上體驗 → 關於我 → 技術棧 → 其他作品 → 聯絡。既有專案分層與 PDF 收錄順序不變。
+- 首頁順序:首屏與統計 → 線上作品(封面卡,2×2)→ 研究代表作 → 關於我(含退伍後獨立開發與兵役的歷程)→ 技術棧 → 其他作品(不重複列出已上線專案)→ 聯絡。既有專案分層與 PDF 收錄順序不變。
+- 英文版可直接分享:`https://terrychou.com/?lang=en`(網址參數優先於 localStorage)。
+- 專案詳情頁:亮點優先 → 概述(長段落自動分段)→ 挑戰與取捨,桌機右側黏性技術棧側欄;頁首顯示專案期間;社群分享圖為各專案封面(`public/og/<slug>.jpg`,`scripts/generate-project-og.py` 產生)。
 - 導覽與品牌連結使用首頁絕對路徑錨點(如 `/#projects`),從專案詳情頁也能回到正確區塊;詳情頁提供依介面語言切換的履歷下載。
-- 作品主標使用 `titleZh/titleEn`,repo 名留作次要資訊。`content/projects.json` 的 `cardSummaryZh/cardSummaryEn` 與 `cardTechStack` 控制精簡摘要及代表技術;詳情頁與 PDF 保留完整 `oneLiner` 與 `techStack`。首頁統計稱為「展示專案」,包含私有 repo 的 showcase。
+- 作品主標使用 `titleZh/titleEn`,repo 名留作次要資訊。`content/projects.json` 的 `cardSummaryZh/cardSummaryEn` 與 `cardTechStack` 控制精簡摘要及代表技術;詳情頁與 PDF 保留完整 `oneLiner` 與 `techStack`。首頁統計為「上線網站 / 主要作品(代表作 + Notable)/ 程式語言」,不把課程作業與小工具算進作品數。
 
 ## CI/CD 與部署
 

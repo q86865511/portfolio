@@ -8,14 +8,15 @@ import {
   type ProjectDetailNav,
 } from "@resume/ui";
 import { navLinks, profile } from "@/lib/site";
-import { detailProjects, getProject, isWip } from "@/lib/projects";
+import { getProject, hasDetailPage, homeOrder, isWip } from "@/lib/projects";
 
 export function ProjectDetailView({ slug }: { slug: string }) {
   const { t } = useLang();
   const project = getProject(slug);
   if (!project) return null;
 
-  const detailList = detailProjects();
+  // 上一個/下一個依首頁呈現順序,只在有詳情頁的專案間移動。
+  const detailList = homeOrder().filter(hasDetailPage);
   const idx = detailList.findIndex((p) => p.slug === slug);
   const prevP = idx > 0 ? detailList[idx - 1] : undefined;
   const nextP =
@@ -58,6 +59,20 @@ export function ProjectDetailView({ slug }: { slug: string }) {
       external: true,
     },
   ];
+  const downloadLinks = [
+    {
+      href: "/resume-zh.pdf",
+      labelZh: "中文履歷 PDF",
+      labelEn: "Résumé PDF (Chinese)",
+      external: true,
+    },
+    {
+      href: "/resume-en.pdf",
+      labelZh: "英文履歷 PDF (English)",
+      labelEn: "Résumé PDF (English)",
+      external: true,
+    },
+  ];
 
   return (
     <>
@@ -76,6 +91,8 @@ export function ProjectDetailView({ slug }: { slug: string }) {
           githubUrl={project.githubUrl}
           liveUrl={project.liveUrl}
           cover={project.cover}
+          kind={project.kindZh ? t(project.kindZh, project.kindEn ?? project.kindZh) : undefined}
+          period={project.periodZh ? t(project.periodZh, project.periodEn ?? project.periodZh) : undefined}
           status={status}
           prev={prevP ? toNav(prevP) : undefined}
           next={nextP ? toNav(nextP) : undefined}
@@ -85,7 +102,7 @@ export function ProjectDetailView({ slug }: { slug: string }) {
         brandName={profile.brand}
         navLinks={footerNav}
         contactLinks={contactLinks}
-        year={2026}
+        downloadLinks={downloadLinks}
       />
     </>
   );

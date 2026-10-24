@@ -11,8 +11,8 @@ import {
 import { ChevronDown, ExternalLink } from "lucide-react";
 import {
   isWip,
+  liveProjects,
   primaryLink,
-  projects,
   projectsByTier,
   type Project,
 } from "@/lib/projects";
@@ -151,36 +151,40 @@ export function ProjectsSection({
   }
 
   if (group === "live") {
+    // 已上線作品是最直接的證據:封面 + 一鍵體驗 + 看詳情,首頁其他分區不再重複列出。
     return (
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {projects
-          .filter((p) => p.liveUrl)
-          .map((p) => (
+      <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
+        {liveProjects().map((p, i) => (
+          <Reveal key={p.slug} delay={(i % 2) * 70} className="h-full">
             <NotableCard
-              key={p.slug}
               className="h-full"
               title={t(p.titleZh, p.titleEn)}
               repoName={p.repoName}
-              titleHref={p.liveUrl}
-              titleExternal
+              titleHref={primaryLink(p).href}
+              titleExternal={primaryLink(p).external}
+              status={statusFor(p, t)}
+              kind={kindOf(p)}
+              cover={p.cover}
               desc={summaryOf(p)}
-              actions={actionsFor(p).filter(
-                (action) => action.variant === "primary",
-              )}
+              techStack={p.cardTechStack ?? p.techStack.slice(0, 4)}
+              actions={actionsFor(p)}
             />
-          ))}
+          </Reveal>
+        ))}
       </div>
     );
   }
+
+  const notable = groups.notable.filter((p) => !p.liveUrl);
 
   return (
     <>
       <TierBlock
         name={t("Notable · 值得一提", "Notable")}
-        count={groups.notable.length}
+        count={notable.length}
       >
         <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {groups.notable.map((p, i) => (
+          {notable.map((p, i) => (
             <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
               <NotableCard
                 className="h-full"

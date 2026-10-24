@@ -132,7 +132,8 @@ export function Hero(props: HeroProps) {
         </div>
 
         {/* 簽名幾何圖形面板:三軸色的平面構圖,雙主題自動適應 */}
-        <div className="rounded-xl border border-border bg-surface-2 overflow-hidden">
+        {/* 窄螢幕隱藏:手機首屏留給姓名、定位與 CTA,不讓裝飾圖佔掉一整屏 */}
+        <div className="hidden lg:block rounded-xl border border-border bg-surface-2 overflow-hidden">
           <HeroGraphic className="block w-full h-auto" />
         </div>
       </div>

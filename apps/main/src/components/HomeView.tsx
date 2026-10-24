@@ -19,7 +19,7 @@ import {
   skillGroups,
   type SkillGroup,
 } from "@/lib/site";
-import { projects } from "@/lib/projects";
+import { liveProjects, projectsByTier } from "@/lib/projects";
 import { ProjectsSection } from "./ProjectsSection";
 
 const skillIcon: Record<SkillGroup["icon"], typeof Cpu> = {
@@ -42,6 +42,7 @@ export function HomeView() {
 
   const footerNav = navLinks.filter((l) => l.href !== "/#contact");
   const pdfHref = t("/resume-zh.pdf", "/resume-en.pdf");
+  // 聯絡管道與下載檔分兩列,避免六個連結擠成一排。
   const contactLinks = [
     {
       href: `mailto:${profile.email}`,
@@ -60,17 +61,19 @@ export function HomeView() {
       labelEn: "LinkedIn ↗",
       external: true,
     },
+  ];
+  const downloadLinks = [
     {
       // 兩種語言的履歷都給明確入口(Nav 的按鈕仍依當前語言切換)。
       href: "/resume-zh.pdf",
-      labelZh: "下載 PDF 履歷(中文)",
+      labelZh: "中文履歷 PDF",
       labelEn: "Résumé PDF (Chinese)",
       external: true,
     },
     {
       href: "/resume-en.pdf",
       labelZh: "英文履歷 PDF (English)",
-      labelEn: "Download résumé (English)",
+      labelEn: "Résumé PDF (English)",
       external: true,
     },
     {
@@ -82,24 +85,26 @@ export function HomeView() {
     },
   ];
 
-  // 統計列:全部由真實資料計算,不寫死。
-  const liveDemos = projects.filter((p) => p.liveUrl).length;
+  // 統計列:全部由真實資料計算,不寫死;作品數只算代表作 + notable,不把課程作業與小工具灌進總數。
+  const liveDemos = liveProjects().length;
+  const tiers = projectsByTier();
+  const mainWorks = tiers.featured.length + tiers.notable.length;
   const languagesCount =
     skillGroups.find((g) => g.icon === "languages")?.items.length ?? 0;
   const stats = [
     {
-      icon: FolderGit2,
-      value: String(projects.length),
-      labelZh: "展示專案",
-      labelEn: "Projects showcased",
-      tone: "bg-brand-dim text-brand",
-    },
-    {
       icon: MonitorPlay,
       value: String(liveDemos),
-      labelZh: "Live demo 站",
-      labelEn: "Live demos",
+      labelZh: "上線網站",
+      labelEn: "Live sites",
       tone: "bg-infra-dim text-infra",
+    },
+    {
+      icon: FolderGit2,
+      value: String(mainWorks),
+      labelZh: "主要作品",
+      labelEn: "Major projects",
+      tone: "bg-brand-dim text-brand",
     },
     {
       icon: Code2,
@@ -110,17 +115,23 @@ export function HomeView() {
     },
   ];
 
-  // 歷程時間軸:學歷(真實日期)+ 現在進行式。
+  // 歷程時間軸:退伍後的獨立開發(期間取自 projects.json)+ 兵役 + 學歷(真實日期)。
   const journey = [
     {
-      period: t("現在", "Now"),
-      titleZh: "開放工作機會",
-      titleEn: "Open to opportunities",
-      descZh:
-        "開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6),並維運四個上線子站。",
-      descEn:
-        "Building Cyclepact, a turn-based collection RPG in Unity 6, while running four live subsites.",
+      period: t("2026 – 現在", "2026 – now"),
+      titleZh: "獨立開發 · 開放工作機會",
+      titleEn: "Independent builder · open to opportunities",
+      descZh: `從零打造並上線 ${liveDemos} 個網站(製造業 ERP、美食地圖、Steam 特價追蹤、魂晶獵手),目前開發回合制收集 RPG《輪迴盟約 Cyclepact》(Unity 6)。`,
+      descEn: `Built and shipped ${liveDemos} live sites (manufacturing ERP, food map, Steam deal tracker, Soulshard Hunter); currently building Cyclepact, a turn-based collection RPG in Unity 6.`,
       now: true,
+    },
+    {
+      period: t("2025/11 – 2026/2", "Nov 2025 – Feb 2026"),
+      titleZh: "義務役",
+      titleEn: "Military service",
+      descZh: "義務役服役期滿,已退伍。",
+      descEn: "Completed mandatory military service.",
+      now: false,
     },
     ...eduItems.map((e) => ({
       period: e.period,
@@ -172,17 +183,18 @@ export function HomeView() {
 
         {/* 統計列:真實數字(專案數 / live demo 數 / 語言數皆由資料計算) */}
         <div className="container">
-          <dl className="card-surface border border-border rounded-lg shadow-sm grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-border)]">
+          {/* 手機也維持三欄:數字一眼掃完,不佔掉三列高度 */}
+          <dl className="card-surface border border-border rounded-lg shadow-sm grid grid-cols-3 divide-x divide-[var(--color-border)]">
             {stats.map((s) => {
               const Icon = s.icon;
               return (
                 <div
                   key={s.labelEn}
-                  className="flex items-center gap-4 px-5 py-4"
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-4 px-3 py-3 sm:px-5 sm:py-4"
                 >
                   <span
                     aria-hidden="true"
-                    className={`w-[44px] h-[44px] rounded-md flex items-center justify-center shrink-0 ${s.tone}`}
+                    className={`hidden sm:flex w-[44px] h-[44px] rounded-md items-center justify-center shrink-0 ${s.tone}`}
                   >
                     <Icon className="h-5 w-5" />
                   </span>
@@ -191,7 +203,7 @@ export function HomeView() {
                     <dd className="text-2xl font-bold leading-none">
                       {s.value}
                     </dd>
-                    <dd className="text-sm text-text-muted mt-1">
+                    <dd className="text-xs sm:text-sm text-text-muted mt-1">
                       {t(s.labelZh, s.labelEn)}
                     </dd>
                   </div>
@@ -201,10 +213,23 @@ export function HomeView() {
           </dl>
         </div>
 
-        {/* 先呈現可驗證的代表作,完整履歷與技能接在作品之後。 */}
+        {/* 先給可當場驗證的上線作品(HR 30 秒內就能點開),研究代表作接在後面。 */}
+        {liveDemos > 0 && (
+          <Section
+            id="projects"
+            title={t("線上作品", "Live products")}
+            intro={t(
+              "已實際上線、可直接操作的應用與遊戲 —— 每一項能力都能當場驗證。",
+              "Deployed apps and a game you can use right now — every claim is verifiable on the spot.",
+            )}
+          >
+            <ProjectsSection group="live" />
+          </Section>
+        )}
+
         <Section
-          id="projects"
-          title={t("代表作品", "Featured work")}
+          id="featured"
+          title={t("研究代表作", "Research highlights")}
           intro={t(
             "從模型部署到智慧導航，看看我如何整合系統、處理工程取捨。",
             "From model deployment to smart navigation: systems integration and engineering trade-offs in practice.",
@@ -218,19 +243,6 @@ export function HomeView() {
             {t("瀏覽其他作品 ↓", "Explore more projects ↓")}
           </a>
         </Section>
-
-        {liveDemos > 0 && (
-          <Section
-            id="live-demos"
-            title={t("線上體驗", "Try it live")}
-            intro={t(
-              "直接打開實際上線的應用與遊戲，體驗完整功能。",
-              "Open the deployed apps and game to explore them firsthand.",
-            )}
-          >
-            <ProjectsSection group="live" />
-          </Section>
-        )}
 
         {/* ABOUT:左=關於我+歷程,右=本站即證據 */}
         <Section
@@ -308,7 +320,7 @@ export function HomeView() {
                 )}
               </p>
               <a
-                href="#live-demos"
+                href="#projects"
                 className="link-underline inline-flex items-center min-h-[44px] text-sm font-medium text-brand"
               >
                 {t("查看線上作品 ↑", "Explore live demos ↑")}
@@ -379,7 +391,7 @@ export function HomeView() {
         brandName={profile.brand}
         navLinks={footerNav}
         contactLinks={contactLinks}
-        year={2026}
+        downloadLinks={downloadLinks}
       />
     </>
   );

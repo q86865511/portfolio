@@ -37,9 +37,15 @@ export function LangProvider({
 }) {
   const [lang, setLangState] = useState<Lang>(initialLang);
 
-  // 首次掛載時讀 localStorage(預設 zh)
+  // 首次掛載:網址 ?lang=zh|en 優先(可分享的英文版連結,如 PDF / LinkedIn 上的 ?lang=en),
+  // 其次 localStorage,預設 zh。
   useEffect(() => {
     try {
+      const fromUrl = new URLSearchParams(window.location.search).get("lang");
+      if (fromUrl === "zh" || fromUrl === "en") {
+        setLangState(fromUrl);
+        return;
+      }
       const stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null;
       if (stored === "zh" || stored === "en") {
         setLangState(stored);
