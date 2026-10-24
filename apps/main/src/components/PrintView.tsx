@@ -65,7 +65,8 @@ export function PrintView() {
           )}
         </p>
         <p style={{ fontSize: 12, margin: "0 0 1px", color: INK }}>
-          {profile.email} | {t(profile.locationZh, profile.locationEn)} | {profile.website}
+          {profile.email} | {t(profile.locationZh, profile.locationEn)} |{" "}
+          {t(profile.website, `${profile.website}/?lang=en`)}
         </p>
         <p style={{ fontSize: 12, margin: 0, color: INK }}>
           {profile.github} | {profile.linkedin}

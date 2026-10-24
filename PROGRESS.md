@@ -4,6 +4,23 @@
 **主站與四個 live demo 子站運作中**,採 Oracle Cloud ARM + Cloudflare Tunnel 與獨立 CI/CD。**2026-10-23 本輪修改已完成本機驗證、待 PR 合併部署**:修復詳情頁跨頁導覽並補雙語履歷入口,首頁改為代表作與線上體驗優先,作品卡使用易讀標題、精簡雙語摘要與明確挑選的代表技術。維持既有專案分層、22 筆內容與 PDF 的 9 案收錄順序。雙語履歷與 11 頁作品附件已同步校正智慧導航標題。
 
 ## 已完成
+- [2026-10-24] **首屏部署架構圖 + 外部審查修正**(同 PR,另請 Fable 獨立審查後處理):
+  - **首屏**:右半由裝飾幾何圖改為 `packages/ui` 的 `InfraDiagram`「本站部署架構」(訪客 → Cloudflare → Tunnel 零入站 → Oracle ARM · Caddy → 主站與子站;GitHub Actions 部署);子站清單由 `liveUrl` 衍生(`liveHosts()`),圖上只留節點名稱,細節放 `<desc>`;移除 `HeroGraphic`。
+  - **首頁卡片**:不再顯示 repo 名(改在詳情頁頁首);Mini 預設 3 張可展開;手機線上作品先露 2 張可展開;線上作品順序改由 `projects.ts` 的 `LIVE_ORDER`(ERP → Steam → 美食地圖 → 魂晶)。
+  - **審查修正**:`?lang` 套用後以 `history.replaceState` 從網址移除(原本會蓋掉使用者之後的手動切換);`splitParagraphs` 中文句尾連收尾引號/括號、英文排除 e.g./i.e./vs./etc.(以 84 段真實文案驗證無遺失、無以標點開頭的段落);兵役時間軸改由 `site.ts` 的 `serviceNote` 衍生、上線站名由 `liveProjects()` 串出;統計「主要作品」排除 WIP(9→8);頁尾年份改由 `next.config.ts` 的 `NEXT_PUBLIC_BUILD_YEAR` 在 build 時內嵌(避免跨年 hydration 不一致);JSON-LD 改 `description` + `knowsAbout`(求職中不宜用 `jobTitle`);詳情頁亮點改為無卡片底的編號清單。
+  - **動效回歸 DESIGN.md**:拿掉封面 hover 放大與 Tunnel 常駐流動動畫(違反「微浮不放大」「不加常駐動畫」);保留 MPA View Transitions(僅 `prefers-reduced-motion: no-preference`)。DESIGN.md 的 Signature / Shapes / Motion 段同步改寫為 InfraDiagram。
+  - 驗證:typecheck / lint / build 綠;e2e 12 passed(navigation 9 + smoke 3);淺/深色、桌機/手機截圖目視確認,手機首頁全長 13,285px → 9,620px。
+- [2026-10-24] **首頁與詳情頁 UX 改版 + 小修**(使用者同意建議清單後實作):
+  - **首頁重排**:「線上作品」(4 個上線站,含封面卡 2×2)移到第一區(`#projects`),「研究代表作」(碩論、大學專題,`#featured`)接在後面;「其他作品」不再重複列出已上線專案(原本 4 站各出現兩次)。
+  - **統計列**:「22 展示專案」(含 6 個課程作業)改為「上線網站 4 / 主要作品 9(代表作 + Notable)/ 程式語言 8」;手機維持三欄、不再堆三列。
+  - **手機首屏**:< lg 隱藏裝飾幾何圖形(原本佔掉一整屏)。
+  - **歷程**:加入「2026 – 現在 獨立開發 · 開放工作機會」與「2025/11 – 2026/2 義務役」,補上原本網站看不到的退伍後時間軸。
+  - **頁尾**:聯絡(Email / GitHub / LinkedIn)與下載(中英履歷、作品附件)分兩列;移除寫死的 `year={2026}`(改用元件預設的 build 年份)。
+  - **詳情頁**:亮點(編號卡)→ 概述 → 挑戰與取捨,長段落依句號自動分段;桌機右側黏性技術棧側欄;頁首顯示 kind 與專案期間;上一個/下一個改依首頁順序(`homeOrder()`)。
+  - **英文版可分享**:`LangProvider` 支援 `?lang=zh|en`(優先於 localStorage);英文 PDF 的網址印成 `terrychou.com/?lang=en`。
+  - **SEO**:詳情頁 og:image 改用各專案封面(`public/og/<slug>.jpg`,新增 `scripts/generate-project-og.py`);首頁加 schema.org `Person` JSON-LD。
+  - **修正**:`site.ts` 的 `bioZh` 原為英文,改成中文。
+  - 驗證:typecheck / lint / build 綠;e2e 9 passed(navigation 6 + smoke 3;更新區塊順序斷言、新增 `?lang`、詳情頁導覽與 og:image 測試);桌機/手機/深色截圖目視確認。
 - [2026-10-23] **跨頁導覽修復、內容一致性與作品呈現改善**:
   - 主導覽、頁尾與品牌改用 `/#區塊` / `/#main`,從任一專案詳情頁可回首頁正確位置;詳情頁補上依介面語言切換的 PDF 履歷下載,標題與前後專案導覽改用 `titleZh/titleEn`。
   - 首頁「公開專案」改為「展示專案」(包含私有 repo showcase);智慧導航中英標題改為「智慧導航系統 / Smart Navigation System」,移除未實作的燈號辨識宣稱。既有 repo 名稱與網址保留,避免破壞真實連結。

@@ -216,6 +216,36 @@
     transform-box: fill-box;
   }
 
+  /* ── 首屏部署架構圖文字 ── */
+  .infra-title {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    font-weight: 700;
+    fill: var(--color-text);
+  }
+  .infra-small {
+    font-size: 15px;
+  }
+  .infra-label {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 600;
+    fill: var(--color-text);
+  }
+  .infra-sub {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    fill: var(--color-text-muted);
+  }
+  .infra-strong {
+    font-weight: 700;
+    fill: var(--color-infra);
+  }
+  .infra-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    fill: var(--color-text);
+  }
   /* ── 進場 reveal(JS 掛上 observer 後才隱藏,初始 HTML 恆可見)── */
   .reveal-hidden {
     opacity: 0;
@@ -236,6 +266,13 @@
   from {
     opacity: 0;
     transform: translateY(14px) scale(0.96);
+  }
+}
+
+/* 跨頁淡入淡出(首頁 ↔ 詳情頁,MPA View Transitions);不支援的瀏覽器照常換頁,減少動效時不啟用。 */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
   }
 }
 

@@ -73,31 +73,38 @@ test("手機詳情頁可下載履歷並透過選單回到首頁", async ({ page 
   ).toHaveAttribute("aria-expanded", "false");
 });
 
-test("首頁先展示代表作與線上體驗，保留其他作品入口", async ({ page }) => {
+test("首頁先展示線上作品再接研究代表作，其他作品不重複列出上線專案", async ({ page }) => {
   await page.goto("/");
   const sectionIds = await page
     .locator("main > section[id]")
     .evaluateAll((sections) => sections.map((section) => section.id));
   expect(sectionIds).toEqual([
     "projects",
-    "live-demos",
+    "featured",
     "about",
     "skills",
     "more-projects",
   ]);
-  await expect(page.locator("#projects article")).toHaveCount(2);
-  await expect(page.locator("#live-demos article")).toHaveCount(4);
+  await expect(page.locator("#projects article")).toHaveCount(4);
+  await expect(page.locator("#featured article")).toHaveCount(2);
+  await expect(page.locator("#projects img")).toHaveCount(4);
+  // 上線專案只出現在第一區,其他作品不再重複。
   await expect(
-    page.getByText("展示專案", { exact: true }).first(),
+    page
+      .locator("#more-projects")
+      .getByRole("heading", { name: "製造業 ERP 系統", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("上線網站", { exact: true }).first(),
   ).toBeAttached();
-  await expect(page.getByText("公開專案", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("展示專案", { exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: "瀏覽其他作品 ↓", exact: true }).click();
   await expect(page.locator("#more-projects")).toBeInViewport();
 });
 
 test("作品卡片呈現易讀標題、代表技術與精簡摘要", async ({ page }) => {
   await page.goto("/");
-  const featured = page.locator("#projects article").filter({
+  const featured = page.locator("#featured article").filter({
     has: page.getByRole("heading", {
       name: "AI 模型部署與監控平台",
       exact: true,
@@ -106,13 +113,14 @@ test("作品卡片呈現易讀標題、代表技術與精簡摘要", async ({ pa
   await expect(featured).toHaveCount(1);
   await expect(featured.getByText("TensorRT", { exact: true })).toBeVisible();
   await expect(featured.getByText("Triton", { exact: true })).toBeVisible();
+  // repo 名只在詳情頁顯示,首頁卡片不放(對 HR 是雜訊)。
   await expect(
     featured.getByText("AI-Deployment-Pipeline", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(featured.getByText(/自動化模型轉換、效能評測/)).toBeVisible();
   await expect(
     page
-      .locator("#projects")
+      .locator("#featured")
       .getByRole("heading", { name: "智慧導航系統", exact: true }),
   ).toBeVisible();
   const privateProject = page.locator("#more-projects article").filter({
@@ -141,7 +149,7 @@ test("重排後首頁在手機、平板及桌面皆無水平溢出", async ({ pa
     expect(overflow, `${width}px 的中文版不應水平溢出`).toBeLessThanOrEqual(2);
     await page.getByRole("button", { name: "EN", exact: true }).click();
     await expect(
-      page.getByRole("heading", { name: "Featured work", exact: true }),
+      page.getByRole("heading", { name: "Live products", exact: true }),
     ).toBeVisible();
     const englishOverflow = await page.evaluate(
       () =>
@@ -154,4 +162,75 @@ test("重排後首頁在手機、平板及桌面皆無水平溢出", async ({ pa
     ).toBeLessThanOrEqual(2);
     await page.getByRole("button", { name: "繁", exact: true }).click();
   }
+});
+
+test("?lang=en 可直接開啟英文版，詳情頁依首頁順序導覽並使用專屬分享圖", async ({
+  page,
+}) => {
+  await page.goto("/?lang=en");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Terry");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(
+    page.getByRole("heading", { name: "Live products", exact: true }),
+  ).toBeVisible();
+  // 參數套用後即從網址移除,使用者改回中文後重新整理不會被 ?lang=en 蓋回去。
+  await expect(page).not.toHaveURL(/lang=/);
+  await page.getByRole("button", { name: "繁", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "線上作品", exact: true }),
+  ).toBeVisible();
+
+  await page.goto("/?lang=zh");
+  await expect(
+    page.getByRole("heading", { name: "線上作品", exact: true }),
+  ).toBeVisible();
+
+  await page.goto("/projects/erp-system/");
+  await expect(
+    page.locator('meta[property="og:image"]'),
+  ).toHaveAttribute("content", /\/og\/erp-system\.jpg$/);
+  const og = await page.request.get("/og/erp-system.jpg");
+  expect(og.ok()).toBeTruthy();
+  await expect(
+    page.getByRole("navigation", { name: "專案導覽", exact: true }),
+  ).toContainText("Steam 特價追蹤站");
+});
+
+test("小品預設只露 3 張可展開；首屏部署架構圖可被輔助技術讀到", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await expect(
+    page.getByRole("img", { name: "本站部署架構", exact: true }),
+  ).toBeVisible();
+  const mini = page.locator("#mini-projects article");
+  await expect(mini).toHaveCount(3);
+  const toggle = page.getByRole("button", { name: /顯示全部 \d+ 個小品/ });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+  expect(await mini.count()).toBeGreaterThan(3);
+  await expect(
+    page.getByRole("button", { name: "收起", exact: true }),
+  ).toHaveAttribute("aria-expanded", "true");
+
+  await page.goto("/projects/ai-deployment-pipeline/");
+  await expect(
+    page.getByText("AI-Deployment-Pipeline", { exact: true }),
+  ).toBeVisible();
+});
+
+test("手機版線上作品先露兩張（ERP 在前），可展開其餘", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  const cards = page.locator("#projects article");
+  await expect(cards.first()).toContainText("製造業 ERP 系統");
+  await expect(cards.nth(0)).toBeVisible();
+  await expect(cards.nth(1)).toBeVisible();
+  await expect(cards.nth(2)).toBeHidden();
+  await page
+    .getByRole("button", { name: /顯示全部 \d+ 個線上作品/ })
+    .click();
+  await expect(cards.nth(3)).toBeVisible();
 });

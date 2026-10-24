@@ -105,6 +105,31 @@ export function getProject(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);
 }
 
+/**
+ * 線上作品的顯示順序:最有說服力的放前面(手機只先露前兩張)。
+ * 未列入的 liveUrl 專案仍會顯示,排在最後(依 projects.json 順序)。
+ */
+const LIVE_ORDER = [
+  "erp-system",
+  "steam-sale-checker",
+  "food-map",
+  "soulshard-hunter",
+];
+
+/** 已上線(有 liveUrl)的專案:首頁第一區「線上作品」,其餘分區不再重複列出。 */
+export function liveProjects(): Project[] {
+  const rank = (p: Project) => {
+    const i = LIVE_ORDER.indexOf(p.slug);
+    return i === -1 ? LIVE_ORDER.length : i;
+  };
+  return projects.filter((p) => p.liveUrl).sort((a, b) => rank(a) - rank(b));
+}
+
+/** liveUrl 的主機名(如 erp.terrychou.com),供首屏部署架構圖使用。 */
+export function liveHosts(): string[] {
+  return liveProjects().map((p) => new URL(p.liveUrl as string).hostname);
+}
+
 /** 依 tier 分組(保留 projects.json 內的原始順序)。 */
 export function projectsByTier(): Record<Tier, Project[]> {
   const groups: Record<Tier, Project[]> = {
@@ -128,9 +153,26 @@ export function hasDetailPage(p: Project): boolean {
   return p.presentation === "showcase" || p.presentation === "live-demo";
 }
 
-/** 會產生 /projects/[slug] 詳情頁的專案(用於 generateStaticParams / sitemap / 上一個下一個導覽)。 */
+/** 會產生 /projects/[slug] 詳情頁的專案(用於 generateStaticParams / sitemap)。 */
 export function detailProjects(): Project[] {
   return projects.filter(hasDetailPage);
+}
+
+/**
+ * 首頁呈現順序:線上作品 → 代表作 → 其他 notable → mini → academic。
+ * 詳情頁的上一個/下一個依此順序,避免從旗艦作品直接跳到小工具。
+ */
+export function homeOrder(): Project[] {
+  const live = liveProjects();
+  const groups = projectsByTier();
+  const notLive = (p: Project) => !p.liveUrl;
+  return [
+    ...live,
+    ...groups.featured.filter(notLive),
+    ...groups.notable.filter(notLive),
+    ...groups.mini.filter(notLive),
+    ...groups.academic.filter(notLive),
+  ];
 }
 
 /**

@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, ExternalLink, Github } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  ExternalLink,
+  Github,
+  Tag,
+} from "lucide-react";
 import { type ReactNode } from "react";
 import { useLang } from "../providers/LangProvider";
 import { Button } from "./Button";
@@ -26,17 +33,54 @@ export interface ProjectDetailProps {
   /** 封面圖路徑(16:9);提供時於頁首下方顯示。 */
   cover?: string;
   status?: { status: ProjectStatus; label: string; ariaLabel?: string };
+  /** 學術/來源標籤(如 碩士論文)。 */
+  kind?: string;
+  /** 專案期間(如 2026/6 – 至今)。 */
+  period?: string;
+  /** repo 名稱(首頁卡片不顯示,技術讀者在詳情頁對照用)。 */
+  repoName?: string;
   /** 上一個 / 下一個專案(主站 /projects/[slug])。 */
   prev?: ProjectDetailNav;
   next?: ProjectDetailNav;
   children?: ReactNode;
 }
 
+/**
+ * 長段落依句號切成數段(只改排版、不改字):約每 160 字(英文約 420 字元)換一段,
+ * 避免詳情頁出現整片文字牆。
+ */
+function splitParagraphs(text: string): string[] {
+  // 英文稿可能夾雜少量中文專有名詞,以中文字比例判斷語言。
+  const cjkCount = (text.match(/[\u4e00-\u9fff]/g) ?? []).length;
+  const isCjk = cjkCount > text.length * 0.2;
+  const limit = isCjk ? 160 : 420;
+  // 句尾標點連同其後的收尾引號/括號一起留在同一句(避免下一段以「」」開頭)。
+  // 英文只在 .!? + 空白 + 大寫處切,並排除 e.g. / i.e. / vs. / etc. 等縮寫。
+  const parts = isCjk
+    ? (text.match(/[^。！？!?]+[。！？!?]+[」』）)"”’]*|[^。！？!?]+$/g) ?? [
+        text,
+      ])
+    : text.split(
+        /(?<=[.!?]["”’)]?)(?<!\b(?:e\.g|i\.e|vs|etc|approx)\.)\s+(?=[A-Z(])/,
+      );
+  const out: string[] = [];
+  let buf = "";
+  for (const part of parts) {
+    if (buf && buf.length + part.length > limit) {
+      out.push(buf.trim());
+      buf = "";
+    }
+    buf += isCjk ? part : `${part} `;
+  }
+  if (buf.trim()) out.push(buf.trim());
+  return out;
+}
+
 export function ProjectDetail(props: ProjectDetailProps) {
   const { t } = useLang();
 
   return (
-    <article className="container py-9 max-w-measure">
+    <article className="container py-9 max-w-[1120px]">
       {/* 麵包屑 + 返回 */}
       <nav
         aria-label={t("麵包屑", "Breadcrumb")}
@@ -55,13 +99,16 @@ export function ProjectDetail(props: ProjectDetailProps) {
 
       {/* 頁首 */}
       <header className="mb-7">
-        {/* 簽名幾何回聲:與首頁 HeroGraphic 同一套三軸色面語言 */}
+        {/* 簽名幾何回聲:三軸色面語言(藍/紫/綠) */}
         <svg
           aria-hidden="true"
           viewBox="0 0 96 24"
           className="h-[20px] w-auto mb-4"
         >
-          <path d="M0 24 A24 24 0 0 1 24 0 L24 24 Z" fill="var(--color-accent)" />
+          <path
+            d="M0 24 A24 24 0 0 1 24 0 L24 24 Z"
+            fill="var(--color-accent)"
+          />
           <circle cx="48" cy="12" r="12" fill="var(--color-brand)" />
           <path d="M48 0 A12 12 0 0 1 48 24 Z" fill="var(--color-text)" />
           <path d="M72 24 A12 12 0 0 1 96 24 Z" fill="var(--color-infra)" />
@@ -70,7 +117,39 @@ export function ProjectDetail(props: ProjectDetailProps) {
           <h1 style={{ fontSize: "clamp(31px,5vw,39px)" }}>{props.title}</h1>
           {props.status && <StatusBadge {...props.status} />}
         </div>
-        <p className="text-lg text-text-muted mb-5">{props.oneLiner}</p>
+        <p className="text-lg text-text-muted mb-4 max-w-measure">
+          {props.oneLiner}
+        </p>
+        {(props.kind || props.period || props.repoName) && (
+          <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-text-muted mb-5">
+            {props.kind && (
+              <li className="inline-flex items-center gap-2">
+                <Tag className="h-4 w-4 text-text-subtle" aria-hidden="true" />
+                {props.kind}
+              </li>
+            )}
+            {props.period && (
+              <li className="inline-flex items-center gap-2">
+                <CalendarDays
+                  className="h-4 w-4 text-text-subtle"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">{t("期間:", "Period: ")}</span>
+                <span className="font-mono">{props.period}</span>
+              </li>
+            )}
+            {props.repoName && (
+              <li className="inline-flex items-center gap-2">
+                <Github
+                  className="h-4 w-4 text-text-subtle"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">Repository:</span>
+                <span className="font-mono">{props.repoName}</span>
+              </li>
+            )}
+          </ul>
+        )}
         <div className="flex flex-wrap gap-3">
           {props.githubUrl && (
             <Button
@@ -107,64 +186,83 @@ export function ProjectDetail(props: ProjectDetailProps) {
           alt=""
           width={1408}
           height={792}
-          className="block w-full rounded-lg border border-border mb-7"
+          className="block w-full rounded-lg border border-border shadow-sm mb-8"
         />
       )}
 
-      {/* 概述 */}
-      <section className="mb-7" aria-labelledby="pd-overview">
-        <h2 id="pd-overview" className="text-xl mb-3">
-          {t("專案概述", "Overview")}
-        </h2>
-        <p className="text-text-muted leading-[1.8]">{props.description}</p>
-      </section>
+      {/* 桌機雙欄:左=亮點→概述→取捨(先給結論再給細節),右=黏性側欄技術棧 */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-8 lg:gap-9 items-start">
+        <div className="min-w-0 max-w-measure">
+          {/* TL;DR 亮點 */}
+          {props.highlights.length > 0 && (
+            <section className="mb-8" aria-labelledby="pd-highlights">
+              <h2 id="pd-highlights" className="text-xl mb-4">
+                {t("關鍵亮點", "Highlights")}
+              </h2>
+              {/* 編號清單(不加卡片底):長亮點也不會變成第二片文字牆 */}
+              <ol className="flex flex-col gap-4">
+                {props.highlights.map((h, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-4 text-text-muted leading-[1.75]"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 mt-[2px] w-[26px] h-[26px] rounded-md bg-brand-dim text-brand font-mono text-sm font-bold flex items-center justify-center"
+                    >
+                      {i + 1}
+                    </span>
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
 
-      {/* TL;DR 亮點 */}
-      {props.highlights.length > 0 && (
-        <section className="mb-7" aria-labelledby="pd-highlights">
-          <h2 id="pd-highlights" className="text-xl mb-3">
-            {t("關鍵亮點", "Highlights")}
-          </h2>
-          <ul className="flex flex-col gap-3">
-            {props.highlights.map((h, i) => (
-              <li
-                key={i}
-                className="flex gap-3 text-text-muted leading-[1.7]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-[10px] shrink-0 w-[6px] h-[6px] rounded-full bg-brand"
-                />
-                <span>{h}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {/* 概述 */}
+          <section className="mb-8" aria-labelledby="pd-overview">
+            <h2 id="pd-overview" className="text-xl mb-3">
+              {t("專案概述", "Overview")}
+            </h2>
+            <div className="flex flex-col gap-4 text-text-muted leading-[1.85]">
+              {splitParagraphs(props.description).map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          </section>
 
-      {/* 技術棧 */}
-      {props.techStack.length > 0 && (
-        <section className="mb-7" aria-labelledby="pd-stack">
-          <h2 id="pd-stack" className="text-xl mb-3">
-            {t("技術棧", "Tech stack")}
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {props.techStack.map((tech) => (
-              <TechBadge key={tech}>{tech}</TechBadge>
-            ))}
-          </div>
-        </section>
-      )}
+          {/* 挑戰與取捨 */}
+          {props.challenges && (
+            <section className="mb-8" aria-labelledby="pd-challenges">
+              <h2 id="pd-challenges" className="text-xl mb-3">
+                {t("挑戰與取捨", "Challenges & trade-offs")}
+              </h2>
+              <div className="border-l-2 border-accent pl-5 flex flex-col gap-4 text-text-muted leading-[1.85]">
+                {splitParagraphs(props.challenges).map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
 
-      {/* 挑戰與取捨 */}
-      {props.challenges && (
-        <section className="mb-7" aria-labelledby="pd-challenges">
-          <h2 id="pd-challenges" className="text-xl mb-3">
-            {t("挑戰與取捨", "Challenges & trade-offs")}
-          </h2>
-          <p className="text-text-muted leading-[1.8]">{props.challenges}</p>
-        </section>
-      )}
+        {/* 側欄:技術棧(桌機黏在視窗內,讀長文時隨時可對照) */}
+        {props.techStack.length > 0 && (
+          <aside
+            aria-labelledby="pd-stack"
+            className="card-surface border border-border rounded-lg shadow-sm p-5 lg:sticky lg:top-24"
+          >
+            <h2 id="pd-stack" className="text-base mb-3">
+              {t("技術棧", "Tech stack")}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {props.techStack.map((tech) => (
+                <TechBadge key={tech}>{tech}</TechBadge>
+              ))}
+            </div>
+          </aside>
+        )}
+      </div>
 
       {props.children}
 

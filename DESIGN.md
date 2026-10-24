@@ -187,7 +187,7 @@ components:
 
 ## Layout
 
-首頁閱讀順序為「首屏與統計 → 代表作品 → 線上體驗 → 關於我 → 技術棧 → 其他作品 → 聯絡」;代表作保留原分層,線上體驗由真實 `liveUrl` 衍生為精簡入口卡。其他作品保留 Notable / Mini 與課程摺疊區。
+首頁閱讀順序為「首屏與統計 → 線上作品 → 研究代表作 → 關於我 → 技術棧 → 其他作品 → 聯絡」;線上作品由真實 `liveUrl` 衍生,用含封面的 Notable 卡排 2×2(最強證據給最大版面;順序由 `projects.ts` 的 `LIVE_ORDER` 決定,ERP 在前),手機先露 2 張、其餘按鈕展開;其他作品不再重複列出。卡片 hover 只用微浮規則,封面不放大。窄螢幕(< lg)隱藏首屏幾何圖形,統計列手機也維持三欄。詳情頁桌機為「內文 + 黏性技術棧側欄」雙欄,長段落依句號自動分段(只改排版不改字)。其他作品保留 Notable / Mini 與課程摺疊區。
 
 單欄縱向敘事:1120px 容器(`--container`)置中,兩側 24px 固定 gutter;文字段落受 68ch 行寬約束。間距走 8px 柵格(4/8/12/16/24/32/48/64/96/128px),區塊節奏 `py-8`(上下 64px),錨點捲動預留 80px(`scroll-mt-20`)配 64px 高的 sticky 導覽。
 
@@ -212,7 +212,7 @@ Hero 在 lg 以上為 1.05fr/0.95fr 雙欄(左文字、右幾何面板,gap 48–
 
 圓角矩形的世界,四級圓角各司其職:6px(焦點環圓角)、10px(按鈕、徽章、TC 字標、選單項)、16px(卡片)、24px(Hero 幾何面板);999px 膠囊只給狀態徽章。邊框一律 1px 細線。
 
-簽名形狀語言是**幾何圓面**:實心圓、四分之一圓(`A` 弧線 path)、半圓、圓的墨色切片,加上小半徑點陣(工程網格的密碼)。這套形狀只出現在 HeroGraphic 與卡片 PlanesBand,構圖可由 seed 輪換三軸色,但元素詞彙(圓面＋墨切片＋點陣)不變。封面圖固定 16:9。
+簽名形狀語言是**幾何圓面**:實心圓、四分之一圓(`A` 弧線 path)、半圓、圓的墨色切片,加上小半徑點陣(工程網格的密碼)。這套形狀只出現在卡片 PlanesBand 與詳情頁頁首的小型幾何回聲(首屏已改為 InfraDiagram 部署架構圖),構圖可由 seed 輪換三軸色,但元素詞彙(圓面＋墨切片＋點陣)不變。封面圖固定 16:9。
 
 ## Components
 
@@ -246,15 +246,15 @@ Hero 在 lg 以上為 1.05fr/0.95fr 雙欄(左文字、右幾何面板,gap 48–
 - 左側 TC 字標(32px 墨底方塊、白色粗體字)＋全名;連結 14px/500 muted 字,hover 轉主文字色＋底線(link-underline)。
 - 行動版:履歷下載收成 icon 鈕留在首屏,選單為下拉抽屜(鎖捲動、Esc 關閉、44px 項高)。
 
-### Signature: HeroGraphic 與 PlanesBand
-三軸色幾何圓面構圖。HeroGraphic(560×420 viewBox,24px 圓角面板、surface-2 底):藍主圓＋墨色右半切片為核心,紫四分之一圓、綠半圓、墨小半圓、藍點、5×4 點陣依序進場(90ms stagger、700ms `hg-plane-in`:淡入＋上移 14px＋scale .96→1)。PlanesBand 是卡片版縮影(112px 高),以 seed 輪換三軸色分配。色彩全走 `var(--color-*)`,雙主題自動換裝。
+### Signature: InfraDiagram 與 PlanesBand
+首屏右半是 InfraDiagram「本站部署架構」圖(560 寬 viewBox,高度依子站數自動延伸;24px 圓角面板、surface-2 底;`< lg` 隱藏):訪客 → Cloudflare 邊緣(藍)→ 綠色虛線 Tunnel(零入站)→ 墨框 Oracle ARM · Caddy 內的主站(藍)與各子站(綠)chips,左側紫色 GitHub Actions。子站清單由 `projects.json` 的 `liveUrl` 衍生,不寫死。圖上只留節點名稱,細節放 `<desc>`(`role="img"` + `aria-labelledby/aria-describedby`)。四個節點群依序進場(90ms stagger、700ms `hg-plane-in`),**無常駐動畫**。PlanesBand 是卡片版三軸色幾何(112px 高),以 seed 輪換三軸色分配。色彩全走 `var(--color-*)`,雙主題自動換裝。
 
 ### Motion(附於受影響元件)
 - **時序 token:** ease `cubic-bezier(.2,.7,.2,1)`;120ms(fast)/200ms(預設)/320ms(slow)。
 - **捲動 reveal:** 600ms 淡入＋上移 16px,stagger 由 `--reveal-delay` 控制;**初始 HTML 恆可見**——JS 掛上 observer 才隱藏未入視口元素,無 JS/爬蟲/列印直接看到最終態,首屏內元素不做進場。
 - **reduced-motion:** 全域 kill-switch,一律停在最終態。
 
-**一次編排規則。** 全站只有一個編排性動畫時刻(Hero 幾何進場);其餘動效皆為 200ms 級的狀態反饋。不加常駐動畫、不加視差。
+**一次編排規則。** 全站只有一個編排性動畫時刻(首屏架構圖進場);首頁 ↔ 詳情頁的 MPA View Transitions 淡入淡出屬瀏覽器原生換頁效果,只在 `prefers-reduced-motion: no-preference` 下啟用;其餘動效皆為 200ms 級的狀態反饋。不加常駐動畫、不加視差。
 
 ## Do's and Don'ts
 
