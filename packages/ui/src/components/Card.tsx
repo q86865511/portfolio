@@ -75,7 +75,7 @@ function CoverImage({ src }: { src: string }) {
         loading="lazy"
         width={1200}
         height={675}
-        className="block w-full aspect-video object-cover"
+        className="cover-zoom block w-full aspect-video object-cover"
       />
     </div>
   );

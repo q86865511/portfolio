@@ -9,6 +9,7 @@ import {
   type CardAction,
 } from "@resume/ui";
 import { ChevronDown, ExternalLink } from "lucide-react";
+import { useState } from "react";
 import {
   isWip,
   liveProjects,
@@ -16,6 +17,9 @@ import {
   projectsByTier,
   type Project,
 } from "@/lib/projects";
+
+/** Mini 區預設顯示張數(一列)。 */
+const MINI_PREVIEW = 3;
 
 /** 專案狀態徽章。 */
 function statusFor(
@@ -119,6 +123,7 @@ export function ProjectsSection({
   group: "featured" | "live" | "more";
 }) {
   const { t } = useLang();
+  const [showAllMini, setShowAllMini] = useState(false);
   const groups = projectsByTier();
   const kindOf = (p: Project) =>
     p.kindZh ? t(p.kindZh, p.kindEn ?? p.kindZh) : undefined;
@@ -133,7 +138,6 @@ export function ProjectsSection({
             <FeaturedCard
               className="h-full"
               title={t(p.titleZh, p.titleEn)}
-              repoName={p.repoName}
               titleHref={primaryLink(p).href}
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
@@ -159,7 +163,6 @@ export function ProjectsSection({
             <NotableCard
               className="h-full"
               title={t(p.titleZh, p.titleEn)}
-              repoName={p.repoName}
               titleHref={primaryLink(p).href}
               titleExternal={primaryLink(p).external}
               status={statusFor(p, t)}
@@ -189,7 +192,6 @@ export function ProjectsSection({
               <NotableCard
                 className="h-full"
                 title={t(p.titleZh, p.titleEn)}
-                repoName={p.repoName}
                 titleHref={primaryLink(p).href}
                 titleExternal={primaryLink(p).external}
                 status={statusFor(p, t)}
@@ -208,31 +210,56 @@ export function ProjectsSection({
         name={t("Mini · 小品與工具", "Mini · tools")}
         count={groups.mini.length}
       >
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.mini.map((p, i) => {
-            const link = primaryLink(p);
-            return (
-              <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
-                <MiniCard
-                  className="h-full"
-                  title={t(p.titleZh, p.titleEn)}
-                  repoName={p.repoName}
-                  titleHref={link.href}
-                  titleExternal={link.external}
-                  status={statusFor(p, t)}
-                  kind={kindOf(p)}
-                  desc={summaryOf(p)}
-                  techStack={p.cardTechStack ?? p.techStack.slice(0, 4)}
-                  githubUrl={p.githubUrl}
-                  githubLabel={t(
-                    `${p.repoName} GitHub(另開新視窗)`,
-                    `${p.repoName} GitHub (opens in new tab)`,
-                  )}
-                />
-              </Reveal>
-            );
-          })}
+        {/* 小品預設只露 3 張(一列),其餘收起:避免頁尾越捲越像在堆數量 */}
+        <div
+          id="mini-projects"
+          className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {(showAllMini ? groups.mini : groups.mini.slice(0, MINI_PREVIEW)).map(
+            (p, i) => {
+              const link = primaryLink(p);
+              return (
+                <Reveal key={p.slug} delay={(i % 3) * 70} className="h-full">
+                  <MiniCard
+                    className="h-full"
+                    title={t(p.titleZh, p.titleEn)}
+                    titleHref={link.href}
+                    titleExternal={link.external}
+                    status={statusFor(p, t)}
+                    kind={kindOf(p)}
+                    desc={summaryOf(p)}
+                    techStack={p.cardTechStack ?? p.techStack.slice(0, 4)}
+                    githubUrl={p.githubUrl}
+                    githubLabel={t(
+                      `${p.repoName} GitHub(另開新視窗)`,
+                      `${p.repoName} GitHub (opens in new tab)`,
+                    )}
+                  />
+                </Reveal>
+              );
+            },
+          )}
         </div>
+        {groups.mini.length > MINI_PREVIEW && (
+          <button
+            type="button"
+            aria-expanded={showAllMini}
+            aria-controls="mini-projects"
+            onClick={() => setShowAllMini((v) => !v)}
+            className="mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-md border border-border bg-surface text-sm font-medium text-text-muted hover:text-brand hover:border-brand transition-colors duration-DEFAULT ease-ease"
+          >
+            {showAllMini
+              ? t("收起", "Show less")
+              : t(
+                  `顯示全部 ${groups.mini.length} 個小品`,
+                  `Show all ${groups.mini.length} tools`,
+                )}
+            <ChevronDown
+              className={`h-4 w-4 transition-transform duration-DEFAULT ease-ease ${showAllMini ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
+          </button>
+        )}
       </TierBlock>
 
       {groups.academic.length > 0 && (

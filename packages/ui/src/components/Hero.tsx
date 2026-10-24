@@ -11,7 +11,7 @@ import {
 import { type ReactNode } from "react";
 import { useLang } from "../providers/LangProvider";
 import { Button } from "./Button";
-import { HeroGraphic } from "./HeroGraphic";
+import { InfraDiagram } from "./InfraDiagram";
 
 export interface HeroProps {
   name: string;
@@ -131,11 +131,11 @@ export function Hero(props: HeroProps) {
           </div>
         </div>
 
-        {/* 簽名幾何圖形面板:三軸色的平面構圖,雙主題自動適應 */}
-        {/* 窄螢幕隱藏:手機首屏留給姓名、定位與 CTA,不讓裝飾圖佔掉一整屏 */}
-        <div className="hidden lg:block rounded-xl border border-border bg-surface-2 overflow-hidden">
-          <HeroGraphic className="block w-full h-auto" />
-        </div>
+        {/* 本站部署架構圖:首屏右半放 DevOps 主張的實物證據(取代純裝飾幾何圖形)。
+            窄螢幕隱藏:手機首屏留給姓名、定位與 CTA。 */}
+        <figure className="hidden lg:block rounded-xl border border-border bg-surface-2 overflow-hidden">
+          <InfraDiagram className="block w-full h-auto" />
+        </figure>
       </div>
     </section>
   );

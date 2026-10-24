@@ -113,9 +113,10 @@ test("作品卡片呈現易讀標題、代表技術與精簡摘要", async ({ pa
   await expect(featured).toHaveCount(1);
   await expect(featured.getByText("TensorRT", { exact: true })).toBeVisible();
   await expect(featured.getByText("Triton", { exact: true })).toBeVisible();
+  // repo 名只在詳情頁顯示,首頁卡片不放(對 HR 是雜訊)。
   await expect(
     featured.getByText("AI-Deployment-Pipeline", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(featured.getByText(/自動化模型轉換、效能評測/)).toBeVisible();
   await expect(
     page
@@ -187,4 +188,28 @@ test("?lang=en 可直接開啟英文版，詳情頁依首頁順序導覽並使�
   await expect(
     page.getByRole("navigation", { name: "專案導覽", exact: true }),
   ).toContainText("AI 模型部署與監控平台");
+});
+
+test("小品預設只露 3 張可展開；首屏部署架構圖可被輔助技術讀到", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  await expect(
+    page.getByRole("img", { name: "本站部署架構", exact: true }),
+  ).toBeVisible();
+  const mini = page.locator("#mini-projects article");
+  await expect(mini).toHaveCount(3);
+  const toggle = page.getByRole("button", { name: /顯示全部 \d+ 個小品/ });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
+  expect(await mini.count()).toBeGreaterThan(3);
+  await expect(
+    page.getByRole("button", { name: "收起", exact: true }),
+  ).toHaveAttribute("aria-expanded", "true");
+
+  await page.goto("/projects/ai-deployment-pipeline/");
+  await expect(
+    page.getByText("AI-Deployment-Pipeline", { exact: true }),
+  ).toBeVisible();
 });

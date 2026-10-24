@@ -91,8 +91,17 @@ export function ProjectDetailView({ slug }: { slug: string }) {
           githubUrl={project.githubUrl}
           liveUrl={project.liveUrl}
           cover={project.cover}
-          kind={project.kindZh ? t(project.kindZh, project.kindEn ?? project.kindZh) : undefined}
-          period={project.periodZh ? t(project.periodZh, project.periodEn ?? project.periodZh) : undefined}
+          kind={
+            project.kindZh
+              ? t(project.kindZh, project.kindEn ?? project.kindZh)
+              : undefined
+          }
+          period={
+            project.periodZh
+              ? t(project.periodZh, project.periodEn ?? project.periodZh)
+              : undefined
+          }
+          repoName={project.repoName}
           status={status}
           prev={prevP ? toNav(prevP) : undefined}
           next={nextP ? toNav(nextP) : undefined}
