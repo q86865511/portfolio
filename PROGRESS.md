@@ -4,6 +4,11 @@
 **主站與四個 live demo 子站運作中**,採 Oracle Cloud ARM + Cloudflare Tunnel 與獨立 CI/CD。**2026-10-23 本輪修改已完成本機驗證、待 PR 合併部署**:修復詳情頁跨頁導覽並補雙語履歷入口,首頁改為代表作與線上體驗優先,作品卡使用易讀標題、精簡雙語摘要與明確挑選的代表技術。維持既有專案分層、22 筆內容與 PDF 的 9 案收錄順序。雙語履歷與 11 頁作品附件已同步校正智慧導航標題。
 
 ## 已完成
+- [2026-11-24] **履歷與作品附件:白話改寫＋黃色螢光筆重點**(使用者指定樣式 A「黃色螢光筆」、改原始碼):
+  - `projects.json` 九個履歷專案的 `oneLinerZh/En` 與前 3–4 條 highlights 改白話(術語換成做了什麼、為什麼),事實與數字不變,仍守面試手冊勘誤口徑(Triton 不在量測路徑、批次預設 1/2/4/8/16、每組上限 10 次)。
+  - 新增可選欄位 `resumeMarks: {zh,en}`:要畫螢光筆的詞句,必須逐字出現在 oneLiner 或印出的 highlights;`PrintView` 的 `assertMarksFound` 找不到就 throw(build 時炸,避免重點無聲消失)。摘要改白話並以 `SUMMARY_MARKS` 標三處。網站其他頁面不顯示螢光筆。
+  - 作品附件產生器(repo 外 `Work\00-通用素材\作品附件-產生器\gen_appendix.py`)同步套螢光筆,規模欄術語改白話,頁尾改 2026-11;`public/portfolio-appendix.pdf` 已重產(11 頁、無溢出、無 Type3)。
+  - 驗證:typecheck / lint / build 綠;本機產 PDF 中文 2 頁、英文 3 頁,截圖目視確認。
 - [2026-11-24] **修正退伍月份 2026/2 → 2026/3**:`site.ts` 的 `serviceNote`(PDF 學歷段與首頁歷程時間軸共用)中英四處;使用者 2026-11-03 確認實際為 3 月退伍,原值是誤記。
 - [2026-10-24] **首屏部署架構圖 + 外部審查修正**(同 PR,另請 Fable 獨立審查後處理):
   - **首屏**:右半由裝飾幾何圖改為 `packages/ui` 的 `InfraDiagram`「本站部署架構」(訪客 → Cloudflare → Tunnel 零入站 → Oracle ARM · Caddy → 主站與子站;GitHub Actions 部署);子站清單由 `liveUrl` 衍生(`liveHosts()`),圖上只留節點名稱,細節放 `<desc>`;移除 `HeroGraphic`。

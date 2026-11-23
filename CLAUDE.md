@@ -16,6 +16,7 @@
 - 網址 `?lang=zh|en` 優先於 localStorage(套用後即自網址移除),英文版對外分享一律用 `https://terrychou.com/?lang=en`(英文 PDF 已印此網址)。
 - 詳情頁社群分享圖:`public/og/<slug>.jpg` 由 `apps/main/scripts/generate-project-og.py`(Pillow)自封面裁成 1200×630;換封面後要重跑並提交,沒有對應 JPG 時退回 `og.png`。
 - 卡片主標取 `titleZh/titleEn`,repo 名僅為次要資訊;精簡摘要與代表技術使用 `projects.json` 的 `cardSummaryZh/cardSummaryEn`、`cardTechStack`,不得改短完整 `oneLiner` 或 `techStack` 而影響詳情頁與 ATS 履歷。
+- PDF 履歷與作品附件的黃色螢光筆重點:`projects.json` 的 `resumeMarks: {zh, en}`(摘要在 `PrintView.tsx` 的 `SUMMARY_MARKS`);詞句必須逐字出現在 oneLiner 或 PDF 實際印出的 highlights,否則 build 直接失敗。改 oneLiner/highlights 措辭時要同步改對應的 marks。網站頁面不顯示螢光筆。
 - 私有 repo 的專案:`projects.json` 的 `githubUrl` 填空字串,卡片與詳情頁就不顯示 GitHub 按鈕;開發中的專案把 slug 加進 `projects.ts` 的 `WIP_SLUGS`,顯示「進行中」徽章。
 
 ## 目錄約定

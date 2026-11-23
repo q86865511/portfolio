@@ -20,6 +20,65 @@ const FONT =
 // 極簡純黑:全黑文字、白底、無色塊/圖示/分欄,最大化 ATS 過件率。
 const INK = "#000";
 
+// 摘要的螢光筆詞句(必須逐字出現在下方 SUMMARY 對應語言的字串中)。
+const SUMMARY_MARKS = {
+  zh: ["把 AI 模型真正送上線", "四個自己架站上線、任何人都能打開來看", "把設計取捨寫成文件、用測試守住品質"],
+  en: [
+    "getting AI models into production",
+    "four are self-hosted and live for anyone to visit",
+    "write down design trade-offs and protect quality with tests",
+  ],
+};
+
+const SUMMARY = {
+  zh: "國立中央大學資訊工程碩士(2025/6 畢業,義務役已退伍)。專長是把 AI 模型真正送上線:碩士論文做了一套 YOLOv8 部署平台,能自動把模型轉成更快的 TensorRT 格式、量測速度與準確度,並用 Prometheus/Grafana 監控 GPU 資源。退伍後獨立完成多個作品,其中四個自己架站上線、任何人都能打開來看(製造業 ERP、Steam 特價追蹤、美食推薦地圖、瀏覽器遊戲),也用 Rust、Go 寫了維運工具(AI 工具流量監視器、遊戲伺服器管理平台)。習慣把設計取捨寫成文件、用測試守住品質。",
+  en: "M.S. in Computer Science & Information Engineering, National Central University (Jun 2025; military service completed). I specialize in getting AI models into production: my thesis built a YOLOv8 deployment platform that automatically converts models to the faster TensorRT format, measures speed and accuracy, and monitors GPU resources with Prometheus/Grafana. Since then I have built several projects on my own; four are self-hosted and live for anyone to visit (a manufacturing ERP, a Steam deals tracker, a restaurant-picker map, a browser game), plus Rust and Go ops tools (an AI-tool traffic monitor and a game-server manager). I write down design trade-offs and protect quality with tests.",
+};
+
+/**
+ * 把 text 中每個 phrase 的第一次出現包成 <mark>。phrases 由長到短處理,與已標範圍重疊者略過(長者優先)。
+ * 找不到的 phrase 在此靜默略過——phrase 可能屬於同案另一段文字,是否整體找不到由 assertMarksFound 檢查。
+ */
+export function markPhrases(text: string, phrases: readonly string[]): React.ReactNode {
+  const ranges: Array<[number, number]> = [];
+  for (const ph of [...phrases].sort((a, b) => b.length - a.length)) {
+    if (!ph) continue;
+    const start = text.indexOf(ph);
+    if (start === -1) continue;
+    const end = start + ph.length;
+    if (ranges.some(([s, e]) => start < e && end > s)) continue;
+    ranges.push([start, end]);
+  }
+  if (ranges.length === 0) return text;
+  ranges.sort((a, b) => a[0] - b[0]);
+  const parts: React.ReactNode[] = [];
+  let pos = 0;
+  ranges.forEach(([s, e], i) => {
+    if (s > pos) parts.push(text.slice(pos, s));
+    parts.push(<mark key={i} className="hl">{text.slice(s, e)}</mark>);
+    pos = e;
+  });
+  if (pos < text.length) parts.push(text.slice(pos));
+  return <>{parts}</>;
+}
+
+/** 螢光筆詞句在 texts 中一個都沒出現就 throw(靜默失效會讓重點默默消失;風格同 resumeSections 的 slug 檢查)。 */
+export function assertMarksFound(
+  slug: string,
+  lang: Lang,
+  phrases: readonly string[],
+  texts: readonly string[],
+): void {
+  for (const ph of phrases) {
+    if (!texts.some((tx) => tx.includes(ph)))
+      throw new Error(`螢光筆詞句在 ${slug} (${lang}) 的印出文字中找不到:"${ph}"`);
+  }
+}
+
+function projectTexts(p: Project, lang: Lang): string[] {
+  return [lang === "zh" ? p.oneLinerZh : p.oneLinerEn, ...resumeHighlights(p).map((h) => h[lang])];
+}
+
 export function PrintView() {
   // 純文字 A4 履歷(ATS 格式):預設淺色,支援 ?lang=zh|en
   const [lang, setLang] = useState<Lang>("zh");
@@ -38,6 +97,14 @@ export function PrintView() {
 
   const t = <T,>(zh: T, en: T): T => pick(lang, zh, en);
   const sections = resumeSections();
+
+  // 兩種語言都檢查(不論目前顯示哪種),讓 build 階段就能抓到失效的詞句。
+  for (const l of ["zh", "en"] as const) {
+    assertMarksFound("summary", l, SUMMARY_MARKS[l], [SUMMARY[l]]);
+    for (const s of sections)
+      for (const p of s.projects)
+        assertMarksFound(p.slug, l, p.resumeMarks?.[l] ?? [], projectTexts(p, l));
+  }
 
   return (
     <div
@@ -76,10 +143,7 @@ export function PrintView() {
       {/* 摘要 */}
       <Block title={t("摘要", "Summary")}>
         <p style={{ margin: 0 }}>
-          {t(
-            "國立中央大學資訊工程碩士(2025/6 畢業,義務役已退伍)。專長是把 AI 模型送上生產環境:碩士論文打造 YOLOv8 端到端部署與監控平台(PT→ONNX→TensorRT 自動優化、多批次 × 多精度評測、Triton 模型上架管理、Prometheus/Grafana 監控)。退伍後獨立完成多個作品,四個自架上線至今(製造業 ERP、Steam 特價追蹤站、美食推薦地圖、瀏覽器遊戲),並以 Rust/Go 打造維運工具(MCP 流量觀測代理、遊戲伺服器管控平台)。重視技術取捨紀錄與測試品質。",
-            "M.S. in Computer Science & Information Engineering, National Central University (Jun 2025; military service completed). I take AI models to production: my thesis built an end-to-end YOLOv8 deployment and monitoring platform (automated PT→ONNX→TensorRT optimization, multi-batch × multi-precision benchmarking, Triton model management, Prometheus/Grafana monitoring). Since then I have shipped several independent projects, four of them self-hosted and live (a manufacturing ERP, a Steam deals tracker, a restaurant-picker map, a browser game), plus Rust/Go ops tooling (an MCP traffic observability proxy, a game-server management platform). I document trade-offs and guard quality with tests.",
-          )}
+          {markPhrases(SUMMARY[lang], SUMMARY_MARKS[lang])}
         </p>
       </Block>
 
@@ -119,13 +183,15 @@ export function PrintView() {
                   </span>
                 ) : null}
               </p>
-              <p style={{ margin: "0 0 2px" }}>{t(p.oneLinerZh, p.oneLinerEn)}</p>
+              <p style={{ margin: "0 0 2px" }}>
+                {markPhrases(t(p.oneLinerZh, p.oneLinerEn), p.resumeMarks?.[lang] ?? [])}
+              </p>
               <p style={{ margin: "0 0 2px" }}>
                 <b>{t("技術", "Tech")}:</b> {p.techStack.join(", ")}
               </p>
               <ul style={{ margin: 0, paddingLeft: 18 }}>
                 {resumeHighlights(p).map((h, i) => (
-                  <li key={i}>{t(h.zh, h.en)}</li>
+                  <li key={i}>{markPhrases(h[lang], p.resumeMarks?.[lang] ?? [])}</li>
                 ))}
               </ul>
             </div>
@@ -137,6 +203,14 @@ export function PrintView() {
         @media print {
           @page { size: A4; margin: 12mm; }
           .print-root { padding: 0 !important; max-width: none !important; }
+        }
+        /* 螢光筆:只是背景,文字層不變;需 printBackground 才會印出 */
+        mark.hl {
+          background: linear-gradient(transparent 52%, #FFE27A 52%);
+          color: inherit;
+          padding: 0 1px;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
       `}</style>
     </div>
