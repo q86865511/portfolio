@@ -3,6 +3,7 @@
   "projects": [
     {
       "slug": "ai-deployment-pipeline",
+      "resumeMarks": {"zh": ["自動把它轉成更快的 TensorRT 格式", "讓「換了設定快了多少、準確度有沒有變」有數字可看"], "en": ["automatically converts it to the faster TensorRT format", "so the speed and accuracy of each setting become hard numbers"]},
       "repoName": "AI-Deployment-Pipeline",
       "kindZh": "碩士論文",
       "kindEn": "Master's thesis",
@@ -13,8 +14,8 @@
       "cardSummaryZh": "自動化模型轉換、效能評測與上架管理，串接 GPU 監控的端到端 AI 部署平台。",
       "cardSummaryEn": "An AI deployment platform for automated model conversion, benchmarking, lifecycle management and GPU monitoring.",
       "cardTechStack": ["YOLOv8", "ONNX", "TensorRT", "Triton", "FastAPI"],
-      "oneLinerZh": "為 YOLOv8 系列模型打造的端到端部署平台:自動化 PT→ONNX→TensorRT 優化、多批次多精度效能評測;以 Triton 完成模型上架與生命週期管理,效能量測走本機 Ultralytics 路徑,並以 Prometheus/Grafana 即時監控。",
-      "oneLinerEn": "An end-to-end deployment platform for YOLOv8 models: automated PT→ONNX→TensorRT optimization and multi-batch/multi-precision benchmarking; Triton handles model deployment and lifecycle management, while benchmarking runs through a local Ultralytics path, with real-time Prometheus/Grafana monitoring.",
+      "oneLinerZh": "碩士論文:為 YOLOv8 物件偵測模型做的一站式部署平台。上傳模型後,平台自動把它轉成更快的 TensorRT 格式、在不同精度與批次設定下量測速度和準確度,並用 Prometheus/Grafana 即時監看 GPU 資源;模型上架交給 NVIDIA Triton 管理。",
+      "oneLinerEn": "Master's thesis: a one-stop deployment platform for YOLOv8 object-detection models. After a model is uploaded, the platform automatically converts it to the faster TensorRT format, measures speed and accuracy across precision and batch settings, and monitors GPU resources live with Prometheus/Grafana; NVIDIA Triton manages putting models online.",
       "descZh": "本專案是一套針對 YOLOv8 系列模型的 AI 部署與效能監控平台,涵蓋模型上傳、格式轉換、自動化評測到模型上架與監控的完整流程。後端以 FastAPI 非同步服務組織,透過 ultralytics 與 trtexec 把 PyTorch 模型自動轉為 ONNX 與 TensorRT 引擎(支援 FP32/FP16),並交由 NVIDIA Triton Inference Server 以 explicit 模式動態掛載/卸載部署。自動化管線會針對多種批次大小(預設 1/2/4/8/16)與精度組合反覆推論測量(每組上限 10 次),同時記錄 mAP50/mAP50-95 準確度與延遲、FPS、GPU 使用率、VRAM 等效能指標。前端為 React + Ant Design 介面,提供互動式圖表與 PDF/Excel 報告匯出;系統層則以 Prometheus + node/GPU exporter 蒐集指標、Grafana 視覺化,全部以 Docker Compose 編排為單一可啟動的 GPU 容器堆疊。",
       "descEn": "An AI deployment and performance-monitoring platform built around the YOLOv8 model family, spanning the full path from model upload and format conversion through automated benchmarking to model registration and monitoring. The FastAPI async backend uses ultralytics and trtexec to convert PyTorch models into ONNX and TensorRT engines (FP32/FP16), then deploys them on NVIDIA Triton Inference Server in explicit mode with dynamic load/unload. An automated pipeline runs repeated inference across batch sizes (1/2/4/8/16 by default) and precision combinations (up to 10 runs each), capturing both accuracy (mAP50 / mAP50-95) and performance metrics (latency, FPS, GPU utilization, VRAM). The React + Ant Design frontend offers interactive charts and PDF/Excel report export, while a Prometheus + node/GPU-exporter + Grafana stack provides real-time system observability — all orchestrated as a single GPU-enabled Docker Compose stack.",
       "techStack": [
@@ -37,16 +38,16 @@
       "cover": "/covers/ai-deployment-pipeline.webp",
       "highlights": [
         {
-          "zh": "自動化模型優化管線:以 ultralytics 與 trtexec 完成 PT→ONNX→TensorRT 轉換,並對 FP32/FP16 × 多組批次大小(預設 1/2/4/8/16)各做多次重複推論(每組上限 10 次),同時量測 mAP50/mAP50-95 準確度與延遲、FPS、GPU 使用率、VRAM,並輸出平均值與標準差以評估穩定性。",
-          "en": "An automated optimization pipeline that converts PT→ONNX→TensorRT via ultralytics and trtexec, then runs repeated inferences (up to 10 per configuration) across FP32/FP16 × batch sizes (1/2/4/8/16 by default), measuring both mAP50/mAP50-95 accuracy and latency, FPS, GPU utilization, and VRAM — reporting mean and standard deviation to gauge stability."
+          "zh": "自動化優化與評測:把模型依序轉成 ONNX、TensorRT,再對 FP32/FP16 兩種精度 × 多種批次大小(預設 1/2/4/8/16)各重複推論數次(每組最多 10 次),同時記錄準確度(mAP)、延遲、FPS、GPU 使用率與顯示卡記憶體,輸出平均值與標準差,讓「換了設定快了多少、準確度有沒有變」有數字可看。",
+          "en": "Automated optimization and benchmarking: converts the model to ONNX and then TensorRT, runs repeated inferences (up to 10 per setting) for FP32/FP16 × several batch sizes (1/2/4/8/16 by default), and records accuracy (mAP), latency, FPS, GPU utilization and GPU memory with mean and standard deviation, so the speed and accuracy of each setting become hard numbers."
         },
         {
-          "zh": "以 NVIDIA Triton Inference Server(explicit model-control 模式)管理模型上架、動態掛載/卸載與即時推論統計,效能量測則走後端容器內的 Ultralytics in-process 路徑;結果分析頁可多維度比較不同精度與批次配置,並匯出 PDF/Excel 報告作為選型與硬體規劃依據。",
-          "en": "NVIDIA Triton Inference Server (explicit model-control mode) handles model registration, dynamic load/unload and live inference stats, while benchmarking runs through an in-process Ultralytics path inside the backend container; the analysis page compares precision and batch configurations across multiple dimensions and exports PDF/Excel reports to inform model selection and hardware planning."
+          "zh": "用 NVIDIA Triton 管理模型上架與動態載入/卸載;效能數字則由後端直接推論量測,不經過 Triton。分析頁可並排比較不同設定,並匯出 PDF/Excel 報告,當作挑選模型和規劃硬體的依據。",
+          "en": "NVIDIA Triton manages putting models online and loading/unloading them on demand, while performance numbers are measured by running inference directly in the backend, not through Triton. An analysis page compares settings side by side and exports PDF/Excel reports to guide model choice and hardware planning."
         },
         {
-          "zh": "設計清晰分層的服務架構:FastAPI 非同步後端(轉換/推論/評測/Triton 各自獨立 service 與 router)+ React/Ant Design 前端 + NVIDIA 推論堆疊,職責邊界明確,易於擴充與除錯。",
-          "en": "A cleanly layered service architecture: an async FastAPI backend (separate services and routers for conversion, inference, benchmarking, and Triton) plus a React/Ant Design frontend and the NVIDIA inference stack, with clear responsibility boundaries that keep it extensible and debuggable."
+          "zh": "分層清楚的服務架構:FastAPI 非同步後端把轉換、推論、評測、Triton 拆成各自獨立的模組,搭配 React 前端,出問題時容易定位,要加功能也容易擴充。",
+          "en": "A cleanly layered service: the async FastAPI backend splits conversion, inference, benchmarking and Triton into separate modules, with a React front end, so it is easy to debug and easy to extend."
         },
         {
           "zh": "完整可觀測性堆疊:Prometheus 搭配 node-exporter 與 nvidia-gpu-exporter 蒐集 CPU/記憶體/GPU 負載/VRAM 指標,Grafana 5 秒刷新視覺化儀表板,整套系統以 Docker Compose 一鍵編排成 GPU 容器堆疊。",
@@ -160,6 +161,7 @@
     },
     {
       "slug": "food-map",
+      "resumeMarks": {"zh": ["依類型、城市、人數和場合幫你挑一家", "AI 只能從站主的名單裡挑"], "en": ["picks one for you by cuisine, city, party size and occasion", "the AI may only pick from the owner's list"]},
       "repoName": "FoodMap",
       "periodZh": "2026/8",
       "periodEn": "2026/8",
@@ -168,8 +170,8 @@
       "cardSummaryZh": "依城市、類型與聚餐場合，從個人美食名單挑選餐廳並標示地圖位置。",
       "cardSummaryEn": "Pick a restaurant from a personal shortlist by city, cuisine and occasion, then find it on a map.",
       "cardTechStack": ["React", "Express", "SQLite", "Leaflet"],
-      "oneLinerZh": "自建並已上線的個人美食名單網站:只收站主吃過或想吃的店,依類型、城市、人數與場合幫你挑一家,並在地圖上標出位置。",
-      "oneLinerEn": "A self-built, live personal restaurant list: it only includes places the owner has eaten at or wants to try, picks one for you by cuisine, city, party size and occasion, and pins them on a map.",
+      "oneLinerZh": "自己架設並已上線的個人美食名單網站:只收站主吃過或想吃的店,依類型、城市、人數和場合幫你挑一家,並標在地圖上。",
+      "oneLinerEn": "A self-built, self-hosted, live personal restaurant list: it only includes places the owner has eaten at or wants to try, picks one for you by cuisine, city, party size and occasion, and pins them on a map.",
       "descZh": "一個「站主親自吃過才掛上牆」的個人美食名單網站,目前收錄 157 家店。訪客回答幾個問題(想吃哪一類、在哪個城市、幾個人、什麼場合),由規則式推薦從名單中挑店,也能直接瀏覽名單或在 Leaflet 地圖上看位置。後端是 Node.js 22 加 Express 5,資料用 Node 內建的 SQLite;前端是 Vite 加 React 19 的單頁應用,build 後由 Express 一起服務。分類存在資料表裡,新增分類不必改程式;價位同時保存原文與解析後的數字,顯示用原文、篩選排序用數字。訪客可註冊後收藏、評分與記錄造訪,店家資料只有站主能改。設定 Gemini API 金鑰時會多出「直接用問的」輸入框,但 AI 只能從站主名單挑選,失敗就退回規則式推薦。部署為 Docker 容器,經 Caddy 與 Cloudflare Tunnel 上線,push 後由 GitHub Actions 自動部署並做健康檢查。",
       "descEn": "A personal restaurant list where a place only goes on the wall once the owner has eaten there; it currently holds 157 restaurants. Visitors answer a few questions (cuisine, city, party size, occasion) and a rule-based recommender picks from the list, or they can browse the list directly and see locations on a Leaflet map. The back end is Node.js 22 with Express 5 on Node's built-in SQLite; the front end is a Vite + React 19 single-page app served by Express after the build. Categories live in a table, so adding one needs no code change; prices are stored both as the original text and as parsed numbers, with text for display and numbers for filtering and sorting. Visitors can sign up to favourite, rate and log visits, while only the owner can edit restaurant data. With a Gemini API key configured, an \"ask directly\" box appears, but the AI may only pick from the owner's list and falls back to the rule-based recommender on failure. It ships as a Docker container behind Caddy and a Cloudflare Tunnel, with GitHub Actions deploying on push and running a health check.",
       "techStack": [
@@ -190,8 +192,8 @@
       "liveUrl": "https://eat.terrychou.com",
       "highlights": [
         {
-          "zh": "規則式推薦為主、AI 為選配:依類型、城市、人數與場合篩選並排序;設定 Gemini 金鑰才開放自然語言提問,且 AI 只能從站主名單挑選、回傳結構化結果,失敗時退回規則式並標明來源。",
-          "en": "Rule-based recommendations first, AI optional: filtering and ranking by cuisine, city, party size and occasion; natural-language questions only appear with a Gemini key, the AI may only pick from the owner's list and must return structured results, and failures fall back to the rule-based recommender with the source labelled."
+          "zh": "以規則推薦為主、AI 為輔:先依類型、城市、人數和場合篩選排序;設定 Gemini 金鑰後才開放用自然語言提問,而且 AI 只能從站主的名單裡挑、照固定格式回答,失敗時自動改回規則推薦並標明來源。",
+          "en": "Rules first, AI optional: filter and rank by cuisine, city, party size and occasion; natural-language questions appear only when a Gemini key is set, the AI may only pick from the owner's list in a fixed format, and on failure it falls back to rule-based picks with the source labelled."
         },
         {
           "zh": "資料模型為擴充與篩選設計:分類存在資料表,新增分類不改程式;價位同時存原文與解析後的數字,畫面顯示原文、篩選排序用數字。",
@@ -215,6 +217,7 @@
     },
     {
       "slug": "soulshard-hunter",
+      "resumeMarks": {"zh": ["不用遊戲引擎、執行時不依賴任何套件", "所有像素圖都由程式即時畫出"], "en": ["uses no engine and no runtime packages", "every sprite is drawn by code on the fly"]},
       "repoName": "Soulshard-Hunter",
       "periodZh": "2026/4 – 至今",
       "periodEn": "2026/4 – present",
@@ -223,8 +226,8 @@
       "cardSummaryZh": "原生 Canvas 像素生存遊戲，程式生成美術與音效，支援單人及即時連線合作。",
       "cardSummaryEn": "A native Canvas survival game with procedural art and audio, supporting solo play and real-time co-op.",
       "cardTechStack": ["JavaScript", "WebSocket", "Fastify", "PostgreSQL"],
-      "oneLinerZh": "用原生 HTML5 Canvas、零建置、零 npm 執行期相依打造的像素風 roguelike 生存遊戲(對外版本 V2.0):sprite 100% 程式即時生成,63 敵人 / 43 武器 / 27 角色 / 10 生態系的內容規模,並可選配雲端帳號與 1~3 人即時連線合作。",
-      "oneLinerEn": "A pixel-art roguelike survival game built on raw HTML5 Canvas with zero build step and no npm runtime dependencies (public release V2.0): 100% procedurally generated sprites, 63 enemies / 43 weapons / 27 characters / 10 biomes, plus optional cloud accounts and 1–3 player real-time co-op.",
+      "oneLinerZh": "從零開發的像素風生存遊戲(對外版本 V2.0),打開瀏覽器就能玩。遊戲本體不用遊戲引擎、執行時不依賴任何套件,所有像素圖都由程式即時畫出;內容有 63 種敵人、43 種武器、27 個角色、10 種場景,還能註冊帳號並 1~3 人連線合作。",
+      "oneLinerEn": "A pixel-art survival game built from scratch (public release V2.0), played right in the browser. The game itself uses no engine and no runtime packages, and every sprite is drawn by code on the fly; it has 63 enemies, 43 weapons, 27 characters and 10 biomes, plus optional accounts and 1–3 player online co-op.",
       "descZh": "Vampire-Survivors-like 的瀏覽器生存遊戲,以純 ES Modules + HTML5 Canvas 自製引擎(120 Hz 固定步模擬、相機/世界座標系、程序化像素繪圖 API、WebAudio 合成),不含任何外部圖片素材與第三方前端框架。內容完全資料驅動並經統一註冊表整合,規模達 63 敵人 / 27 角色 / 43 武器 / 10 生態系,大量內容透過自製 multi-agent workflow(生成 → 對抗式審查 → 自動整合、故障隔離)量產。採離線優先:雲端與多人皆為選配,未登入或連不上自動退回本機存檔。選配後端為 Node + Fastify + PostgreSQL,提供帳號、跨裝置雲端存檔、伺服器權威排行榜,以及主機權威中繼(host-authoritative relay)的即時合作。",
       "descEn": "A Vampire-Survivors-like browser survival game running on a hand-rolled engine of pure ES Modules + HTML5 Canvas — a 120 Hz fixed-step simulation, a camera/world coordinate system, a procedural pixel-drawing API, and WebAudio synthesis — with no external image assets and no third-party frontend framework. Content is fully data-driven through a single registry (63 enemies / 27 characters / 43 weapons / 10 biomes), much of it mass-produced via a custom multi-agent workflow (generate → adversarial review → auto-integrate with fault isolation). It is offline-first: cloud and multiplayer are optional, and the game silently falls back to local saves when logged out or disconnected. The optional backend (Node + Fastify + PostgreSQL) provides accounts, cross-device cloud saves, a server-authoritative leaderboard, and host-authoritative relay real-time co-op.",
       "techStack": [
@@ -243,16 +246,16 @@
       "liveUrl": "https://soulshard.terrychou.com",
       "highlights": [
         {
-          "zh": "從零自製遊戲引擎:120 Hz 固定步主迴圈降低輸入延遲、空間網格取代 O(n²) 鄰近查詢(260 敵人上限仍穩定)、自寫相機與世界↔螢幕座標轉換、純程式繪製的像素 sprite 系統(rasterise 後快取),連音效都以 WebAudio 即時合成。",
-          "en": "A from-scratch game engine: a 120 Hz fixed-step main loop for low input latency, a uniform spatial grid replacing O(n²) neighbour queries (stable at the 260-enemy cap), a hand-written camera and world-to-screen transform, a code-only pixel sprite system (rasterised then cached), and even sound effects synthesized live via WebAudio."
+          "zh": "自己寫遊戲引擎:固定每秒 120 次更新讓操作更跟手;用空間分格取代「每個敵人都和所有敵人比對」,同時 260 隻敵人仍然順暢;相機、座標轉換、像素圖繪製都自己寫,連音效都是程式即時合成。",
+          "en": "A home-made game engine: a fixed 120 updates per second keeps controls responsive; a spatial grid replaces checking every enemy against every other, staying smooth with 260 enemies on screen; the camera, coordinate transforms and pixel-art drawing are all hand-written, and even sound effects are synthesized live in code."
         },
         {
-          "zh": "伺服器權威排行榜:後端依 kills/stage/time/difficulty/reaper 重算分數並忽略客戶端宣稱值,搭配逐欄位上限與「依存活時間推算的合理性閘門」反作弊(如擊殺數受時間上限約束、無盡模式不可能觸發破關或死神),從源頭杜絕分數灌水;客戶端另有誠信閘門——啟用輔助模式或動用開發者面板的對局一律不上傳。",
-          "en": "Server-authoritative leaderboard: the backend recomputes each score from kills/stage/time/difficulty/reaper and ignores the client's claimed value, backed by per-field caps and time-derived plausibility gates (e.g. kills bounded by elapsed time, endless runs can never trigger a clear or the Reaper) — making score inflation impossible by construction; an integrity gate on the client also refuses to upload any run that used assist mode or the developer panel."
+          "zh": "防作弊排行榜:分數一律由伺服器依擊殺數、關卡、存活時間等重新計算,不採信玩家送來的分數,並檢查數值是否合理(例如擊殺數不可能超過時間允許的上限);用過輔助模式或開發者面板的對局一律不上傳。",
+          "en": "Cheat-proof leaderboard: the server recalculates every score from kills, stage, survival time and more, ignoring the score the player sends, and checks that values are plausible (e.g. kills can't exceed what the elapsed time allows); runs that used assist mode or the developer panel are never uploaded."
         },
         {
-          "zh": "主機權威中繼的 1~3 人即時合作:開房玩家瀏覽器跑權威模擬並以 ~18Hz 廣播量化後的世界快照,Node 伺服器只當房間/中繼不跑模擬;單一 protocol.js 同時擁有編碼與解碼以防漂移,並對未信任的 host 資料做夾擠防範記憶體攻擊。單機路徑完全不受影響。",
-          "en": "Host-authoritative relay co-op for 1–3 players: the host's browser runs the authoritative simulation and broadcasts quantised world snapshots at ~18 Hz, while the Node server acts purely as room/relay and never simulates. A single protocol.js owns both encode and decode to prevent drift, and clamps untrusted host data to guard against memory attacks — the single-player path is left entirely unchanged."
+          "zh": "1~3 人連線合作:由開房玩家的瀏覽器負責遊戲運算,每秒約 18 次把壓縮過的世界狀態廣播出去,伺服器只負責開房和轉送;收發資料的格式集中在同一個檔案定義,避免兩端不一致,並檢查收到的資料防止惡意灌爆記憶體。單人模式完全不受影響。",
+          "en": "1–3 player co-op: the host player's browser runs the game and broadcasts a compressed world state about 18 times a second, while the server only manages rooms and relays data; message encoding and decoding live in one file so both sides never drift, and incoming data is bounds-checked against memory abuse. Single-player is entirely unaffected."
         },
         {
           "zh": "自製 multi-agent 內容生產流水線:以「生成 → 對抗式審查 → 自動整合」量產敵人/武器/角色/美術,整合工具掃描 gen 目錄重建索引、保留既有 pack 並做故障隔離,讓單機在零建置、零 npm 執行期相依的前提下仍堆出 63 敵人、43 武器、27 角色、10 生態系的內容規模。",
@@ -272,6 +275,7 @@
     },
     {
       "slug": "steam-sale-checker",
+      "resumeMarks": {"zh": ["降價時由 Discord 機器人通知", "老實標示為「本站追蹤以來最低」"], "en": ["get notified by a Discord bot when prices drop", "honestly labelled 'lowest since tracking began'"]},
       "repoName": "SteamSaleChecker",
       "periodZh": "2026/6",
       "periodEn": "2026/6",
@@ -280,8 +284,8 @@
       "cardSummaryZh": "Steam 特價榜、價格歷史與願望清單，搭配 Discord 登入及目標價通知。",
       "cardSummaryEn": "Track Steam deals, price history and wishlists, with Discord sign-in and target-price alerts.",
       "cardTechStack": ["Astro", "Fastify", "SQLite", "Discord OAuth"],
-      "oneLinerZh": "自建並已上線的 Steam 特價追蹤站——SteamDB 風的特價榜 + 自建價格歷史 + Discord 降價通知:免登入即可瀏覽特價與免費遊戲,Discord 登入後解鎖跨裝置願望清單與目標價提醒。",
-      "oneLinerEn": "A self-built, live-deployed Steam deals tracker — a SteamDB-style sale board with its own price history and Discord price alerts: browse deals and free games without an account, or log in with Discord to unlock a cross-device wishlist and target-price alerts.",
+      "oneLinerZh": "自己架設並已上線的 Steam 特價追蹤網站:不用登入就能看特價榜和免費遊戲;用 Discord 登入後,可以建立跨裝置的願望清單、設定目標價格,降價時由 Discord 機器人通知。",
+      "oneLinerEn": "A self-built, self-hosted, live Steam deals site: browse sales and free games without logging in; log in with Discord to keep a wishlist across devices, set target prices, and get notified by a Discord bot when prices drop.",
       "descZh": "一套自建的 Steam 特價追蹤站,定位在「SteamDB 風的特價榜 + 自建價格歷史 + Discord 通知」。後端 worker(Node + TypeScript、cron 約每 30 分)在 server 端呼叫 Steam 官方商店端點(featuredcategories / appdetails / 特價搜尋,免金鑰、台灣區 cc=tw)與 GamerPower(永久入庫的免費遊戲/DLC),把每輪台幣價寫進 SQLite 累積成「本站追蹤以來」的價格走勢與史低(observed low),再烤成 deals / free / meta 三份靜態 JSON;可選配 IsThereAnyDeal API 以真實台幣史低校正冷啟動初值。前端是 Astro 靜態站(深色電競風、繁中/英 i18n、深淺主題、PWA),提供可排序列表與卡片雙檢視、列內價格走勢 sparkline、Steam 評價、特價即時倒數、即將結束與免費領取專區,以及每款的商品詳細頁(自建歷史走勢圖)。登入子系統採 Discord OAuth:收藏跨裝置同步(未登入用 localStorage、登入後合併)、每款可設目標價,創本站新低或跌破目標時由 Discord bot 在你的頻道 @你或私訊提醒,並有 per-user 通知偏好(降價/免費/每日每週摘要/只收特定類型/頻道 vs DM)。所有第三方呼叫都在 server 端完成,公開瀏覽永遠只吃靜態 JSON,不暴露任何金鑰。",
       "descEn": "A self-built Steam deals site positioned as \"a SteamDB-style sale board + its own price history + Discord alerts\". A backend worker (Node + TypeScript, cron roughly every 30 min) calls Steam's official store endpoints server-side (featuredcategories / appdetails / sale search — no API key, Taiwan region cc=tw) and GamerPower (permanently-claimable free games/DLC), writes each pass's TWD price into SQLite to accumulate a \"since we started tracking\" price trend and observed low, then bakes three static JSON files (deals / free / meta); an optional IsThereAnyDeal API can seed a real TWD all-time low for cold starts. The front end is an Astro static site (dark esports theme, zh-TW/en i18n, light/dark theme, PWA) with a sortable list and card view, per-row price sparklines, Steam review scores, live sale countdowns, an \"ending soon\" and a free-to-keep section, and a per-game detail page with a self-built history chart. The login subsystem uses Discord OAuth: favourites sync across devices (localStorage when logged out, merged on login), each game can carry a target price, and a Discord bot @-mentions or DMs you when a favourite hits a new tracked low or crosses its target — all governed by per-user notification preferences (price-drop / free / daily-weekly digest / genre filter / channel vs DM). Every third-party call happens server-side, so public browsing only ever reads static JSON and never exposes a key.",
       "techStack": [
@@ -303,16 +307,16 @@
       "liveUrl": "https://steam.terrychou.com",
       "highlights": [
         {
-          "zh": "自建價格歷史而非串接第三方:worker 每輪把抓到的台幣價寫進 SQLite,累積成「本站追蹤以來」的走勢與史低(observed low),並誠實標示為『追蹤以來最低』而非冒充 SteamDB/ITAD runtime;另可選配 ITAD API Key 以真實台幣史低校正冷啟動初值,只改 game_stats、不污染累積曲線。",
-          "en": "Its own price history instead of scraping a third party: each worker pass writes the TWD price into SQLite, accumulating a \"since tracking\" trend and observed low, honestly labelled \"lowest since tracked\" rather than impersonating SteamDB/ITAD runtime; an optional ITAD API key only seeds the cold-start all-time low and never pollutes the accumulated curve."
+          "zh": "自己累積價格歷史,而不是直接抓別人的資料:每次抓價都把台幣價格存進資料庫,累積出走勢與最低價,並老實標示為「本站追蹤以來最低」,不假裝是完整的歷史最低價;可選擇用 ITAD 的資料補足剛上線時的起始值,但不會混進累積的走勢。",
+          "en": "Its own price history rather than copying someone else's: every price check stores the TWD price, building a trend and a low that are honestly labelled 'lowest since tracking began' instead of passing as an all-time low; ITAD data can optionally seed the starting value at launch without mixing into the tracked curve."
         },
         {
-          "zh": "「server 端抓取、前端純靜態 JSON」的架構:對 Steam / GamerPower / ITAD 的呼叫全在 worker 完成,烤成 deals / free / meta 給前端 fetch,公開瀏覽零金鑰外洩、免重 build;npm-workspaces monorepo 切成 shared 純函式+型別 / worker / Astro web / api,純邏輯以 vitest TDD(全專案 374 個測試)。",
-          "en": "A \"fetch on the server, ship static JSON to the client\" architecture: every call to Steam / GamerPower / ITAD runs in the worker and is baked into deals / free / meta for the front end to fetch, so public browsing leaks no keys and needs no rebuild; the npm-workspaces monorepo splits into shared pure functions+types / worker / Astro web / api, with the pure logic on vitest TDD (374 tests)."
+          "zh": "伺服器端負責抓資料、網頁只讀現成的 JSON:所有對外 API 呼叫都在後端完成,一般瀏覽完全碰不到金鑰,資料更新也不用重新建置網站;核心邏輯先寫測試再實作,全專案 374 個測試。",
+          "en": "The server fetches and the web page only reads ready-made JSON: every external API call happens on the back end, so browsing never exposes a key and data updates need no rebuild; core logic is written test-first, with 374 tests across the project."
         },
         {
-          "zh": "可登入的通知子系統:Discord OAuth 登入後願望清單跨裝置同步(未登入 localStorage、登入即合併)、每款可設目標價;worker 偵測「收藏且創本站新低/跌破目標」時,由 Discord bot 依 per-user 偏好以頻道 @你或私訊 DM 發送,含個人免費遊戲通知與每日/每週特價摘要;另可一鍵從公開 Steam 願望單(貼 SteamID64 或個人檔網址、免金鑰)匯入收藏。",
-          "en": "A login-gated notification subsystem: after Discord OAuth the wishlist syncs across devices (localStorage when logged out, merged on login) and each game can carry a target price; when the worker detects a favourited game hitting a new tracked low or crossing its target, the bot delivers per-user — channel @-mention or DM — alongside personal free-game alerts and daily/weekly digests; favourites can be bulk-imported from a public Steam wishlist (SteamID64 or profile URL, no key)."
+          "zh": "登入後的通知功能:願望清單跨裝置同步(未登入時存在瀏覽器、登入後自動合併),每款遊戲可設目標價;收藏的遊戲創本站新低或跌破目標價時,Discord 機器人依個人偏好在頻道標記你或私訊通知,也有免費遊戲通知和每日/每週特價摘要;可一鍵匯入公開的 Steam 願望清單。",
+          "en": "Notifications after login: the wishlist syncs across devices (kept in the browser when logged out, merged on login) and each game can have a target price; when a saved game hits a new tracked low or drops below its target, the Discord bot pings you in a channel or by DM as you prefer, plus free-game alerts and daily/weekly digests; a public Steam wishlist can be imported in one click."
         },
         {
           "zh": "完整自架部署:api(Fastify + better-sqlite3 + secure-session)與 worker 以 Docker Compose 跑在 Oracle ARM 主機,Caddy 同站代理 /api、/auth 並服務 Astro 靜態檔,外接 Cloudflare Tunnel 上線到 steam.terrychou.com;push 到 main 由 GitHub Actions 經 SSH 自動 git reset + compose 重建 + health check,祕密放主機 .env 不進 CI,與既有 soulshard 子站共存。",
@@ -328,6 +332,7 @@
     },
     {
       "slug": "erp-system",
+      "resumeMarks": {"zh": ["從零打造、已上線可實際瀏覽", "帳不平就寫不進資料庫"], "en": ["built from scratch and live for anyone to explore", "the database refuses any entry that doesn't balance"]},
       "repoName": "ERPSystem",
       "periodZh": "2026/6 – 至今",
       "periodEn": "2026/6 – present",
@@ -341,8 +346,8 @@
         "React 19",
         "Testcontainers"
       ],
-      "oneLinerZh": "從零打造、已上線可實機體驗的全端製造業 ERP,涵蓋採購、生產、銷售、付款到人資的完整營運流程;核心是手寫的複式記帳總帳引擎——所有業務動作一律以借貸平衡的分錄入帳,帳永不半套、不平不可寫入。",
-      "oneLinerEn": "A from-scratch, live-deployed full-stack manufacturing ERP covering the complete procure–make–sell–pay–HR flow; at its core is a hand-written double-entry general ledger — every business action posts as a balanced journal entry, so the books are never half-posted and an unbalanced entry cannot be committed.",
+      "oneLinerZh": "從零打造、已上線可實際瀏覽的製造業 ERP,涵蓋採購、生產、銷售、付款到人資。核心是自己寫的會計記帳引擎:每一筆業務都自動產生借貸平衡的分錄,帳不平就寫不進資料庫。",
+      "oneLinerEn": "A manufacturing ERP built from scratch and live for anyone to explore, covering purchasing, production, sales, payments and HR. At its core is a hand-written accounting engine: every business action automatically produces a balanced journal entry, and the database refuses any entry that doesn't balance.",
       "descZh": "以 Java 21 + Spring Boot 4 + PostgreSQL 16(後端)與 React 19 + Mantine 9 + Vite + TypeScript(前端)打造、已上線可實機體驗的全端製造業 ERP。核心是一套手寫複式記帳總帳:進貨、生產、出貨、付款等業務動作,都與其文件、庫存異動在同一筆 DB 交易內過帳成借貸平衡分錄,並把關鍵不變式下放到資料庫約束——強制 debit=credit、已過帳分錄不可修改或刪除。整體採模組化單體(modular monolith),後端 13 個模組(總帳、主檔、庫存、採購到付款、訂單到收款、製造、付款、報表、人資、IAM、稽核、AI 助手)邊界由 ArchUnit 在 CI 機械化強制,模組間只能透過各自的 published port 互動;金額後端以自訂 Money 值物件(BigDecimal、scale 4、HALF_UP)、前端以 BigInt 精確處理,全程不用 float。前端涵蓋全部 13 個功能模組(儀表板、主檔、採購到付款、訂單到收款、製造、庫存、總帳、報表、稽核、人力資源、付款、AI 助手、列印),買→做→賣全流程皆可操作:人資含員工/部門/職位主檔 + 考勤/請假(核准工作流)/工時,以及薪資試算並過一張平衡分錄到總帳(Dr 薪資費用 / Cr 淨薪+代扣稅+勞健保);並以 @mantine/charts 呈現財會分析(營收/毛利趨勢、現金流、預算差異、KPI 環比)、庫存逐品項熱度 treemap、供應商準時率與工單排程 Gantt;儀表板以『對帳健康檢查』為 hero(全域試算表平衡、庫存/AP/AR 子帳對到 GL 控制科目、過渡科目歸零)。會計深度上另做了年度結帳(損益結轉保留盈餘、期間 hard-close)與分錄沖正(不可變帳本以鏡像沖正分錄更正,而非改帳)。資料層由 springdoc-openapi 產生型別安全的 TypeScript client(自動注入 JWT、401 靜默 refresh),認證採 JWT + 持久化使用者/角色(bcrypt,5 角色 ADMIN/ACCOUNTANT/WAREHOUSE/SALES/HR + 唯讀 guest),可觀測性以 Micrometer / Prometheus / Grafana 呈現。UI 為自建的『墨青帳房(Ink Ledger)』設計系統:墨青主色 + 宣紙暖石灰、朱印 SealBadge 審核章(已核准雙框圓章/已過帳墨印/待審灰框)、自架 Noto Serif TC 襯線標題(216 分片、零 CDN),並以 52 條 WCAG AA 對比單元測試把關,支援深/淺色即時切換、雙語(中/英)、列印/PDF 報表與 13 步手刻新手導覽。此外整合了 ERP Copilot——Claude 驅動的 agent loop AI 助手:自然語言查庫存/AR/KPI 等(12 個工具、SSE 串流聊天),寫入動作走 human-in-the-loop 確認卡(使用者按下才執行),工具以使用者自己的 JWT 回打自家 REST(權限上限=本人),所有 AI 動作進 append-only 稽核軌跡;另附 TypeScript stdio MCP server,讓 Claude Desktop / Claude Code 直連 ERP(Copilot 於線上 demo 預設關閉,本機以 API key 開啟即可完整體驗)。測試為後端 135 單元 + 239 個 Testcontainers 整合測試(對真實 PostgreSQL)共 374 全綠(JaCoCo 覆蓋率 77%)、前端 246 個 Vitest 測試,加上 ArchUnit 邊界與對帳/年結/薪資過帳驗收、Playwright smoke,CI 另含 CodeQL / Trivy / JaCoCo。一行 docker compose 指令即可把 postgres + 自動 seed 的後端 + 前端整套拉起,並已部署為線上 live demo(唯讀 guest 可直接體驗)。",
       "descEn": "A full-stack, live-deployed manufacturing ERP built on Java 21 + Spring Boot 4 + PostgreSQL 16 (backend) and React 19 + Mantine 9 + Vite + TypeScript (frontend). Its core is a hand-written double-entry general ledger: goods receipt, production, shipment and payment each post a balanced journal entry within the same DB transaction as their document and inventory change, with key invariants pushed into database constraints — enforcing debit=credit and making posted entries immutable. It is a modular monolith whose 13 backend modules (ledger, master data, inventory, procure-to-pay, order-to-cash, manufacturing, payments, reporting, HR, IAM, audit, AI assistant) have boundaries mechanically enforced by ArchUnit in CI (modules interact only through each other's published ports); money is exact end to end — a custom Money value object (BigDecimal, scale 4, HALF_UP) on the backend and BigInt on the frontend, never floating point. The frontend covers all 13 feature modules (dashboard, master data, procure-to-pay, order-to-cash, manufacturing, inventory, ledger, reporting, audit, HR, payments, AI assistant, printing) with the full buy→make→sell flow operable: HR carries employee/department/position master data + attendance/leave (approval workflow)/timesheets, plus payroll that computes pay and posts one balanced entry to the GL (Dr salaries expense / Cr net pay + tax withheld + insurance); @mantine/charts dashboards show finance analytics (revenue/gross-margin trend, cash flow, budget variance, KPI deltas), a per-item inventory heat treemap, supplier on-time rate and a work-order schedule Gantt; and the dashboard leads with a reconciliation health check (global trial balance balanced, inventory/AP/AR subledgers tied to their GL control accounts, clearing accounts zeroed). Accounting depth extends to year-end close (net income rolled to retained earnings, periods hard-closed) and journal reversal (the immutable ledger is corrected with mirror-image reversing entries, never by editing). The data layer is a type-safe TypeScript client generated from the springdoc-openapi spec (auto-injected JWT, silent 401 refresh); auth is JWT with persisted users/roles (bcrypt, 5 roles ADMIN/ACCOUNTANT/WAREHOUSE/SALES/HR + a read-only guest); observability runs on Micrometer / Prometheus / Grafana. The UI is a hand-built \"Ink Ledger\" design system: an ink-teal primary over warm paper tones, a vermilion SealBadge approval stamp (double-ring seal for approved / ink stamp for posted / grey frame for pending), self-hosted, subsetted Noto Serif TC headings (216 slices, zero CDN), all guarded by 52 WCAG AA contrast unit tests, with instant dark/light switching, a bilingual (zh/en) UI, print/PDF reports and a hand-rolled 13-step onboarding tour. It also integrates ERP Copilot — a Claude-driven agent-loop assistant: natural-language queries over inventory/AR/KPIs (12 tools, SSE-streamed chat), with every write routed through a human-in-the-loop confirmation card (executed only when the user approves), tools calling back into the app's own REST with the user's own JWT (privilege capped at that user), and all AI actions written to an append-only audit trail; a companion TypeScript stdio MCP server lets Claude Desktop / Claude Code connect straight to the ERP (Copilot is disabled by default on the live demo; run it locally with an API key for the full experience). Testing is 135 backend unit + 239 Testcontainers integration tests against real PostgreSQL (374 total, JaCoCo 77% coverage) and 246 frontend Vitest tests, plus ArchUnit boundaries, reconciliation/year-end/payroll-posting acceptance checks and Playwright smoke, with CodeQL / Trivy / JaCoCo in CI. A single docker compose command brings up postgres + an auto-seeded backend + the frontend, and it is deployed as a live demo (a read-only guest can try it directly).",
       "techStack": [
@@ -375,16 +380,16 @@
       "liveUrl": "https://erp.terrychou.com",
       "highlights": [
         {
-          "zh": "手寫複式記帳總帳引擎:進貨、生產、出貨、付款等業務動作,與其單據、庫存異動在同一筆資料庫交易內原子過帳成借貸平衡分錄;debit=credit 與「已過帳不可修改/刪除」更下放為資料庫約束,從資料層根本杜絕半套帳與不平帳。",
-          "en": "Hand-written double-entry ledger engine: goods receipt, production, shipment and payment each post atomically — the document, its inventory change and a balanced journal entry land in one database transaction; debit=credit and posted-entry immutability are enforced as database constraints, ruling out half-posted or unbalanced books at the data layer."
+          "zh": "記帳引擎:進貨、生產、出貨、付款時,單據、庫存變動和會計分錄在同一個資料庫交易裡一起完成,要成功就全部成功;「借貸必須相等」「已入帳不能改或刪」直接寫成資料庫規則,從資料庫層面杜絕只記一半或借貸不平的帳。",
+          "en": "The accounting engine: when goods are received, produced, shipped or paid for, the document, the inventory change and the journal entry are saved together in one database transaction, all or nothing; 'debits must equal credits' and 'posted entries can't be edited or deleted' are database rules, so half-posted or unbalanced books can't happen."
         },
         {
-          "zh": "模組化單體 + 機械化架構驗證:13 個後端模組(總帳、庫存、採購到付款、訂單到收款、製造、人資等)只能透過彼此的 published port 互動;邊界由 ArchUnit 在 CI 強制——違規 import 他模組內部或直接動其資料表就會讓建置失敗,邊界是測試而非口頭約定,設計取捨記錄於 ADR-0001。",
-          "en": "Modular monolith with mechanically verified architecture: the 13 backend modules (ledger, inventory, procure-to-pay, order-to-cash, manufacturing, HR, …) interact only through each other's published ports; ArchUnit enforces the boundaries in CI — importing another module's internals or touching its tables fails the build — so boundaries are tests, not conventions, with the trade-offs recorded in ADR-0001."
+          "zh": "模組化架構:13 個後端模組(總帳、庫存、採購、訂單、製造、人資等)只能透過公開介面互相呼叫;這條規則由 ArchUnit 在 CI 自動檢查,違規就建置失敗,不是靠口頭約定。設計取捨寫成文件(ADR)。",
+          "en": "Modular design: 13 backend modules (ledger, inventory, purchasing, orders, manufacturing, HR, ...) may only call each other through public interfaces; ArchUnit checks this in CI and fails the build on any violation, so the rule is enforced by tests, not by convention. Design trade-offs are recorded in an ADR."
         },
         {
-          "zh": "金額正確性與真實整合測試:自訂 Money 值物件(BigDecimal、scale 4、HALF_UP,全程不用 float/double);以 JUnit 5 + Testcontainers 對真實 PostgreSQL 16 跑整合測試(非 mock)——後端 135 單元 + 239 整合共 374 全綠、前端另有 246 個 Vitest 測試(JaCoCo 覆蓋率 77%),借貸平衡、不可竄改等不變式以實際資料庫約束驗證。",
-          "en": "Money correctness with real integration tests: a custom Money value object (BigDecimal, scale 4, HALF_UP — never float/double); JUnit 5 + Testcontainers run integration tests against a real PostgreSQL 16 (not mocks) — 135 backend unit + 239 integration, 374 green in total, plus 246 Vitest tests on the frontend (JaCoCo coverage 77%) — verifying invariants like balanced-and-immutable against the actual database constraints."
+          "zh": "金額計算與測試:金額一律用精確小數(BigDecimal)計算,不用會有誤差的浮點數;用 Testcontainers 對真的 PostgreSQL 跑整合測試而不是假資料庫,後端 374 個、前端 246 個測試全部通過,後端覆蓋率 77%。",
+          "en": "Money and testing: all amounts use exact decimals (BigDecimal), never error-prone floating point; integration tests run against a real PostgreSQL via Testcontainers instead of a fake database, with 374 backend and 246 frontend tests all passing and 77% backend coverage."
         },
         {
           "zh": "全端交付並上線,並延伸到 AI 與設計系統:後端 13 個模組與前端 13 個功能模組全數完成,買→做→賣全流程可操作,儀表板以『對帳健康檢查』即時證明帳對得平(子帳==GL 控制科目、過渡科目歸零)。在此之上整合 ERP Copilot——Claude 驅動的 agent loop(12 工具、SSE 串流),寫入動作走 human-in-the-loop 確認卡、以使用者自己的 JWT 回打自家 REST、所有動作進稽核軌跡,另附 stdio MCP server 讓 Claude Desktop/Code 直連;UI 為自建『墨青帳房(Ink Ledger)』設計系統(墨青主色 + 朱印審核章 + 自架襯線字型,52 條 WCAG AA 對比測試把關、深/淺色切換)。一行 docker compose 即可起整套,並已部署為唯讀 guest 可直接體驗的線上 demo。",
@@ -400,6 +405,7 @@
     },
     {
       "slug": "server-monitor",
+      "resumeMarks": {"zh": ["要支援新遊戲只要加一份設定範本", "都在同一個視窗完成"], "en": ["Supporting a new game takes just one config template", "all happen in one window"]},
       "repoName": "ServerMonitor",
       "periodZh": "2026/7",
       "periodEn": "2026/7",
@@ -408,8 +414,8 @@
       "cardSummaryZh": "整合遊戲伺服器建立、監控、備份與告警，支援 Docker、Windows 及遠端節點。",
       "cardSummaryEn": "Create, monitor and back up game servers across Docker, Windows and remote nodes, with integrated alerts.",
       "cardTechStack": ["Go", "Wails", "Svelte", "Docker"],
-      "oneLinerZh": "可擴充的遊戲專用伺服器管理與監控桌面工具——範本驅動(新增遊戲=一份 TOML 檔)、Docker/原生 Windows 雙執行後端、多節點遠端管理,在單一 GUI 內涵蓋建立、監控、指令、備份、自動重啟到告警的完整營運循環。",
-      "oneLinerEn": "An extensible desktop manager for game dedicated servers — template-driven (a new game = one TOML file), dual Docker / native-Windows runtimes, and multi-node remote management, covering the full ops loop from provisioning and monitoring to backups, auto-restart, and alerts in one GUI.",
+      "oneLinerZh": "遊戲伺服器的管理與監控桌面工具(Go + Wails)。要支援新遊戲只要加一份設定範本;伺服器可跑在 Docker 或直接跑在 Windows 上,也能管理多台遠端主機。建立、監控、下指令、備份、當機自動重啟到告警,都在同一個視窗完成。",
+      "oneLinerEn": "A desktop tool for managing and monitoring game servers (Go + Wails). Supporting a new game takes just one config template; servers can run in Docker or directly on Windows, across multiple remote machines. Setup, monitoring, commands, backups, auto-restart after crashes and alerts all happen in one window.",
       "descZh": "以 Go + Wails v2 + Svelte 5(TypeScript)打造的 Windows 桌面工具,管理 Minecraft、Palworld 等 Steam dedicated server。核心設計是「遊戲是資料,不是程式碼」:每個遊戲由一份宣告式 TOML 範本描述(埠宣告與衝突鍵、型別化參數、機密、RCON/REST 指令協定 tagged union、健康探針、生命週期 hook、模組包政策),支援新遊戲不動核心程式。伺服器可跑 Docker 容器,也可跑原生 Windows 子行程——JRE、五種 Minecraft loader 伺服器檔案、SteamCMD 全自動下載供應,資源上限以 Windows Job Objects 強制;兩後端藏在同一 RuntimeBackend 介面後,備份格式相同、兩後端皆可讀。管理核心即使對本機也經 HTTP 與節點代理溝通,遠端 Linux 節點跑單一執行檔 agent(自簽 TLS + SHA-256 指紋 TOFU 釘選)。GUI 提供總覽儀表板、15 秒聚合持久化 36 小時的指標時序圖、背壓安全 fanout 的即時 log 主控台、RCON 與 Basic Auth REST 指令主控台、排程備份/還原、Discord 告警(時間窗抑制/遲滯/去重)、Modrinth 與 CurseForge 模組包安裝、Docker 資源與實例檔案管理。機密(RCON 密碼、節點 token、API 金鑰)一律存 OS 金鑰庫不落明文;所有由使用者輸入拼接的宿主路徑必經三層路徑拘束防禦。",
       "descEn": "A Windows desktop tool built with Go + Wails v2 + Svelte 5 (TypeScript) for running Minecraft, Palworld, and other Steam dedicated servers. The core design is \"games are data, not code\": each game is described by a declarative TOML template (port claims with conflict keys, typed parameters, secrets, RCON/REST command protocols as a tagged union, health probes, lifecycle hooks, and modpack policy), so supporting a new game never touches the core. Servers run either in Docker containers or as native Windows child processes — the JRE, five Minecraft loader lines, and SteamCMD are auto-provisioned, with resource caps enforced via Windows Job Objects; both backends sit behind one RuntimeBackend interface with a backup format shared by both backends. The management core talks to node agents over HTTP even on localhost, and remote Linux nodes run a single-binary agent secured by self-signed TLS with SHA-256 fingerprint TOFU pinning. The GUI offers an overview dashboard, 15-second-aggregated metric time series persisted for 36 hours, a backpressure-safe live log console, RCON and Basic-Auth REST command consoles, scheduled backup/restore, Discord alerts (window suppression / hysteresis / dedup), Modrinth and CurseForge modpack installation, and Docker resource & instance file management. Secrets (RCON passwords, node tokens, API keys) live exclusively in the OS keyring, and every host path assembled from user input passes a three-layer path-confinement guard.",
       "techStack": ["Go", "Wails", "Svelte", "TypeScript", "Docker", "SQLite"],
@@ -418,16 +424,16 @@
       "cover": "/covers/server-monitor.webp",
       "highlights": [
         {
-          "zh": "範本驅動的擴充性:帶版本的 TOML schema 宣告變體/loader、埠衝突鍵、參數、機密、RCON/REST 指令協定、健康探針與生命週期 hook,新增遊戲=加一份範本檔;內建範本以 go:embed 嵌入執行檔,自訂範本熱載入並經驗證拒載。",
-          "en": "Template-driven extensibility: a versioned TOML schema declares variants/loaders, port conflict keys, parameters, secrets, RCON/REST command protocols, health probes, and lifecycle hooks — adding a game means adding one template file; built-in templates are embedded via go:embed, user templates hot-load with validation and rejection events."
+          "zh": "範本化設計:每款遊戲的變體與模組載入器、埠號、參數、密碼、指令協定、健康檢查都寫在一份 TOML 範本裡,新增遊戲不用改程式;內建範本直接打包進執行檔,自訂範本可即時載入,格式錯誤會被拒絕。",
+          "en": "Template-driven: each game's variants and mod loaders, ports, parameters, secrets, command protocol and health checks live in one TOML template, so adding a game needs no code change; built-in templates ship inside the executable, and custom templates load live, with invalid ones rejected."
         },
         {
-          "zh": "同一 RuntimeBackend 介面下的雙執行後端:Docker 容器,或全自動供應(Adoptium JRE、五種 Minecraft loader、SteamCMD)的原生 Windows 行程,以 Job Objects 強制資源上限,agent 側將 OOM 與一般 crash 分流回報;備份為停機一致 tar 快照+checksum,格式在 docker/native 兩後端間互通,agent 重啟自動收養仍在跑的行程。",
-          "en": "Dual runtime backends behind one RuntimeBackend interface: Docker containers, or native Windows processes with fully automated provisioning (Adoptium JRE, five Minecraft loader lines, SteamCMD), Job-Objects-enforced resource caps, with the agent reporting OOM kills separately from generic crashes; backups are stop-consistent tar snapshots with checksums in a format shared by both backends, and a restarted agent re-adopts still-running processes."
+          "zh": "兩種執行方式共用同一套介面:Docker 容器,或在 Windows 上自動安裝 Java、五種 Minecraft 模組載入器與 SteamCMD 後直接執行,並限制資源用量;能分辨「記憶體不足被終止」和一般當機。備份會先停機再打包並附檢查碼,兩種執行方式的備份可以互通。",
+          "en": "Two ways to run, one interface: Docker containers, or native Windows processes with Java, five Minecraft mod loaders and SteamCMD installed automatically and resources capped; it tells out-of-memory kills apart from ordinary crashes. Backups stop the server first, then archive with a checksum, and work across both run modes."
         },
         {
-          "zh": "天生多節點:核心對本機也走 HTTP 節點代理,遠端 Linux 節點只需一個靜態執行檔——首啟自動生成持久 token 與自簽 TLS 憑證,GUI 以 SHA-256 指紋 TOFU 釘選,憑證被換直接拒連;節點 token 一律入 OS 金鑰庫。",
-          "en": "Multi-node by construction: the core reaches every backend through an HTTP node agent even locally, and a remote Linux node needs only one static binary — it auto-generates a persistent token and self-signed TLS certificate on first start, pinned in the GUI by SHA-256 fingerprint (TOFU) so a swapped certificate is refused outright; node tokens live in the OS keyring."
+          "zh": "原生支援多台主機:遠端 Linux 主機只要放一個執行檔,第一次啟動就自動產生連線金鑰和加密憑證;桌面端記住憑證指紋,憑證被換掉就拒絕連線,金鑰存在作業系統的安全儲存區。",
+          "en": "Multi-machine from day one: a remote Linux host needs just one executable, which generates its own access token and encryption certificate on first start; the desktop app remembers the certificate fingerprint and refuses to connect if it changes, and tokens are kept in the OS keyring."
         },
         {
           "zh": "路徑拘束是硬規則:任何由實例 UUID、備份 id 或使用者相對路徑拼出的宿主路徑,必經三層防禦(clean → filepath.Rel within-root → 逐段 Lstat 拒 symlink/junction),封死路徑遍歷與連結穿越——含 EvalSymlinks 不解析的 Windows junction。",
@@ -443,6 +449,7 @@
     },
     {
       "slug": "usage-monitor",
+      "resumeMarks": {"zh": ["工作列圖示本身就是雙圈量表", "拿不到時才改用本機估算並清楚標示"], "en": ["the tray icon itself is a two-ring gauge", "local estimates are used only when those are unavailable, clearly labelled"]},
       "repoName": "UsageMonitor",
       "periodZh": "2026/7",
       "periodEn": "2026/7",
@@ -451,8 +458,8 @@
       "cardSummaryZh": "常駐系統匣的 AI CLI 用量監控，提供額度預警與本機估算，資料留在本機。",
       "cardSummaryEn": "A local-first tray monitor for AI CLI usage, with quota alerts and clearly labelled fallback estimates.",
       "cardTechStack": ["Rust", "Tauri 2", "React", "SQLite"],
-      "oneLinerZh": "以 Tauri 2(Rust + React)打造、常駐 Windows 系統匣的 AI CLI 用量儀表——同時監控 Claude Code 與 Codex CLI 的 5 小時/週視窗額度,托盤圖示本身就是雙環量表;官方數字優先、資料源失效時優雅退化為明確標示的本機估算,跨門檻主動通知、燒速異常預警,100% 本機處理零遙測。",
-      "oneLinerEn": "A Tauri 2 (Rust + React) Windows system-tray dashboard for AI CLI usage — it watches both Claude Code's and Codex CLI's 5-hour/weekly rate-limit windows, with the tray icon itself as a dual-ring gauge; official numbers first, degrading gracefully to clearly-labelled local estimates when a source fails, with proactive threshold alerts and burn-rate warnings — 100% local, zero telemetry.",
+      "oneLinerZh": "常駐 Windows 工作列的 AI 工具用量儀表(Tauri 2:Rust + React)。同時監看 Claude Code 和 Codex 兩套 AI 程式工具的 5 小時/每週額度,工作列圖示本身就是雙圈量表;快用完或用量暴衝時主動通知。優先顯示官方數字,拿不到時才改用本機估算並清楚標示;所有資料只在本機處理。",
+      "oneLinerEn": "A Windows tray gauge for AI tool usage (Tauri 2: Rust + React). It tracks both Claude Code's and Codex's 5-hour and weekly quotas, and the tray icon itself is a two-ring gauge; it alerts you when you are running out or usage spikes. Official numbers come first, and local estimates are used only when those are unavailable, clearly labelled; all data stays on your machine.",
       "descZh": "一個以 Tauri 2 打造、常駐 Windows 系統匣的 AI CLI 用量監控工具(安裝檔約 4.7MB)。訂閱制 AI CLI 的額度藏在 /usage、/status 指令裡,燒完才發現就太遲了——這個工具把 Claude Code 與 Codex CLI 兩家的 5 小時/週視窗用量放進眼角餘光。資料以官方數字優先:Codex 直接解析 session 檔內伺服器端 rate_limits 事件、Claude 走 OAuth 用量端點,都是帳號級準確百分比而非本機猜測;token 過期或 API 限流時自動退回本機統計並明確標示「估算值」,絕不謊報。平常它只是托盤角落一枚由 tiny-skia 動態繪製的雙環圖示(內環 Claude、外環 Codex,≥80% 轉黃、≥95% 轉紅),左鍵點開是三頁籤面板:儀表板(圓環量表、重置倒數、今日 token/成本分項、每家獨立刷新)、歷史(SQLite 落地 90 天,7/30 天用量折線)、設定(人話句子式通知規則、SMTP Email、資料來源、維護工具)。通知規則引擎支援用量門檻、額度回滿與燒速異常(依 usedPercent 斜率預估「將在 N 分鐘內打滿」,抓得住失控的 agent 迴圈)三類規則,同一視窗每條只觸發一次、武裝狀態跨重啟持久化不補發;Email 通道自設 SMTP(STARTTLS/隱式 TLS),內建寄測試信與防風暴閘門(失敗退避+每小時上限)。後端是 Rust:notify 監看兩個資料目錄(2 秒 debounce+60 秒兜底輪詢),Claude 對話紀錄以 offset 增量續讀、message.id 去重、mtime 剪枝,幾百 MB 歷史也不拖慢啟動;官方端點由 HTTP 狀態分類的狀態機把關(401 才是真過期、429 尊重 Retry-After 退避、暫時性失敗沿用最後成功值並標示更新時間),CLI 憑證失效立即提醒重新登入。架構上前端只做呈現,統一資料模型 UsageSnapshot 是唯一的擴充接縫——新增一家 AI CLI 等於實作一個 provider 模組。133 項 Rust 測試涵蓋解析器、掃描剪枝、通知引擎(含武裝持久化與保活判定)、OAuth 狀態分類、Email 閘門、歷史 DB 與托盤繪製,fixture 為自製樣本、測試不打真實網路。100% 本機處理:憑證只讀不寫、token 不落日誌、無任何遙測。",
       "descEn": "A Tauri 2 tool that lives in the Windows system tray and monitors AI CLI usage (installer ~4.7MB). Subscription AI CLIs hide their quota behind /usage and /status commands, and by the time you notice it's burned it's too late — this tool keeps both Claude Code's and Codex CLI's 5-hour/weekly window usage in the corner of your eye. Official numbers come first: Codex is parsed from the server-side rate_limits events inside its session files and Claude from the OAuth usage endpoint — account-level accurate percentages, not local guesses; when a token expires or the API rate-limits, it falls back to local stats explicitly labelled as estimates, never fabricating a number. Most of the time it is just a dual-ring tray icon drawn live by tiny-skia (inner ring Claude, outer Codex; amber at ≥80%, red at ≥95%); a left click opens a three-tab panel: dashboard (ring gauges, reset countdowns, today's token/cost breakdown, per-provider refresh), history (a 90-day SQLite time series with 7/30-day trend lines) and settings (plain-sentence notification rules, SMTP email, data sources, maintenance tools). The notification rule engine supports three rule kinds — usage thresholds, window-reset ('quota is back') and burn-rate anomaly (a usedPercent-slope forecast of 'full in N minutes' that catches runaway agent loops); each rule fires once per window, with armed state persisted across restarts so relaunching never re-sends; the email channel takes your own SMTP (STARTTLS or implicit TLS) with a built-in test send and an anti-storm gate (failure backoff + hourly cap). The backend is Rust: notify watches both data directories (2-second debounce + 60-second fallback polling); Claude transcripts are resumed incrementally by offset with message.id dedup and mtime pruning, so hundreds of MB of history never slow startup; the official endpoint sits behind an HTTP-status-classified state machine (only 401 means truly expired, 429 honours Retry-After backoff, transient failures keep the last good value with an 'updated N min ago' label), and a failed CLI credential triggers an immediate re-login reminder. Architecturally the frontend is presentation-only and the unified UsageSnapshot model is the single extension seam — supporting another AI CLI means implementing one provider module. 133 Rust tests cover the parsers, scan pruning, the notification engine (including armed-state persistence and keep-alive), OAuth status classification, the email gate, the history DB and tray drawing, on self-made fixtures with no real network calls. Processing is 100% local: credentials are read-only, tokens never reach logs, zero telemetry.",
       "techStack": [
@@ -470,16 +477,16 @@
       "cover": "/covers/usage-monitor.webp",
       "highlights": [
         {
-          "zh": "官方數字優先的穩健資料狀態機:Codex 直接解析 session 檔內伺服器端 rate_limits 事件、Claude 走 OAuth 用量端點,都是帳號級準確百分比而非本機猜測;失敗一律以 HTTP 狀態分類(401 才是真過期)、429 尊重 Retry-After 退避、暫時性失敗沿用最後成功值並標示「更新於 N 分前」,只有真失效才退回本機統計且明標「估算值」——資料源不可用就優雅退化,絕不謊報。",
-          "en": "Official numbers first, behind a robust data state machine: Codex is parsed from server-side rate_limits events in its session files and Claude from the OAuth usage endpoint — account-level percentages, not local guesses; failures are classified by HTTP status (only 401 means truly expired), 429 honours Retry-After backoff, transient failures keep the last good value labelled 'updated N min ago', and only a real credential failure falls back to local stats explicitly marked as estimates — graceful degradation, never a fabricated number."
+          "zh": "「寧可標示估算,也不顯示錯的數字」:Codex 讀取它自己紀錄檔裡的官方額度資料、Claude 呼叫官方用量查詢,都是帳號層級的準確百分比;查詢失敗時依錯誤類型處理(憑證過期、被限流、暫時失敗各不相同),暫時失敗就沿用上次的數字並標示「更新於 N 分前」,真的拿不到才改用本機估算並標明「估算值」。",
+          "en": "Label an estimate rather than show a wrong number: Codex's official quota data is read from its own log files and Claude's from the official usage endpoint, both exact account-level percentages; failures are handled by type (expired credentials, rate limiting, temporary errors), a temporary failure keeps the last value labelled 'updated N min ago', and only a real failure falls back to a local estimate marked as such."
         },
         {
-          "zh": "檔案監看+增量解析,幾百 MB 歷史也不拖慢啟動:notify 監看兩個資料目錄(2 秒 debounce+60 秒兜底輪詢);Claude 對話紀錄以 offset 續讀、message.id 去重、mtime 剪枝與游標修剪,只重讀有變動的檔尾;設定變更(含資料目錄路徑)熱重載即時生效,每家資料源各有獨立的手動刷新。",
-          "en": "File watching plus incremental parsing, so hundreds of MB of history never slow startup: notify watches both data directories (2-second debounce + 60-second fallback polling); Claude transcripts are resumed by offset with message.id dedup, mtime pruning and cursor trimming, so only changed file tails are re-read; settings changes (including data-directory paths) hot-reload instantly, and each provider has its own manual refresh."
+          "zh": "幾百 MB 的歷史紀錄也不拖慢啟動:監看資料夾變化,只重讀檔案新增的部分,並自動去除重複;設定改了立即生效,不用重開程式。",
+          "en": "Hundreds of MB of history don't slow startup: it watches the data folders and re-reads only what's new in each file, removing duplicates; settings changes take effect immediately without a restart."
         },
         {
-          "zh": "純函式通知規則引擎:用量門檻、額度回滿、燒速異常(依 usedPercent 斜率預估「將在 N 分鐘內打滿」,抓得住失控的 agent 迴圈)三類規則,通道可選 Windows toast/SMTP Email/兩者;同一視窗每條規則只觸發一次、resets_at 重置後重新武裝,武裝狀態跨重啟持久化、重開 app 不補發;Email 走獨立發送執行緒,內建防風暴閘門(失敗退避+每小時上限)與寄測試信。",
-          "en": "A pure-function notification rule engine: three rule kinds — usage thresholds, window-reset ('quota is back'), and burn-rate anomaly (a usedPercent-slope forecast of 'full in N minutes' that catches runaway agent loops) — each deliverable via Windows toast, SMTP email or both; every rule fires once per window and re-arms after resets_at, with armed state persisted across restarts so relaunching never re-sends; email runs on its own sender thread behind an anti-storm gate (failure backoff + hourly cap) with a built-in test send."
+          "zh": "三種通知規則:用量到門檻、額度恢復、用量暴衝(依用量上升速度預估「N 分鐘內會用完」,可抓到失控的 AI 自動迴圈),可用 Windows 通知或 Email 發送;同一週期每條規則只通知一次,重開程式也不會重複寄,Email 失敗後會暫緩寄送,並有每小時上限。",
+          "en": "Three notification rules: hitting a usage threshold, quota reset, and usage spikes (forecasting 'full in N minutes' from how fast usage climbs, which catches runaway AI loops), sent by Windows notification or email; each rule fires once per period, restarting the app never re-sends, and email backs off after failures and has an hourly cap."
         },
         {
           "zh": "托盤即儀表+隱私與品質:tiny-skia 動態繪製雙環托盤圖示(內環 Claude、外環 Codex,≥80% 轉黃、≥95% 轉紅,量化去重、必要時才重繪);SQLite 落地 90 天用量時間序列,供 7/30 天折線;100% 本機處理——憑證只讀不寫、token 不落日誌、無任何遙測;133 項 Rust 測試涵蓋解析器、掃描剪枝、通知引擎(含武裝持久化與保活判定)、OAuth 狀態分類、Email 閘門、歷史 DB 與托盤繪製,fixture 自製、不打真實網路。",
@@ -495,6 +502,7 @@
     },
     {
       "slug": "mcpglass",
+      "resumeMarks": {"zh": ["抓出工具說明被偷改或密碼金鑰外洩", "自身出錯時一律放行、絕不卡住使用者"], "en": ["catches tool descriptions being secretly altered or secrets leaking out", "If it fails itself, traffic still passes through untouched"]},
       "repoName": "Mcpglass",
       "periodZh": "2026/7",
       "periodEn": "2026/7",
@@ -503,8 +511,8 @@
       "cardSummaryZh": "本機 MCP 流量觀測與安全代理，支援請求錄製、重放、工具變更與密鑰外洩偵測。",
       "cardSummaryEn": "A local MCP observability and security proxy for recording, replay, tool-change detection and secret-leak detection.",
       "cardTechStack": ["Rust", "Tokio", "axum", "SQLite"],
-      "oneLinerZh": "MCP 流量的 Wireshark＋防火牆——單一 Rust binary 透明代理,坐在 AI client(Claude Code/Cursor…)與 MCP server 之間(stdio 與 Streamable HTTP 皆支援):錄下每一幀 JSON-RPC、偵測工具描述被偷改的 rug-pull 與外流密鑰、估算工具 schema 的 context 成本,還能重放請求與注入故障;fail-open 鐵律保證代理自身故障絕不阻斷流量,資料 100% 留本機(單一 SQLite 檔 + 僅綁 loopback 的儀表板)、零遙測;Apache-2.0 開源,CI 於 GitHub Actions。",
-      "oneLinerEn": "Wireshark + firewall for MCP traffic — a transparent proxy in a single Rust binary between any AI client (Claude Code, Cursor, ...) and your MCP servers, over both stdio and Streamable HTTP: it records every JSON-RPC frame, catches rug-pulls (silently rewritten tool descriptions) and leaking secrets, prices what each server's tool schemas cost in context, and can replay requests or inject faults; a fail-open iron law guarantees the proxy's own failures never block traffic, and all data stays 100% local (one SQLite file + a loopback-only dashboard) with zero telemetry; Apache-2.0, CI on GitHub Actions.",
+      "oneLinerZh": "給 AI 工具用的「流量監視器＋防火牆」(開源,Rust 單一執行檔)。它夾在 AI 程式助手(如 Claude Code、Cursor)和它呼叫的外部工具(MCP server)之間,記錄每一次往來,抓出工具說明被偷改或密碼金鑰外洩,也能重播請求、模擬故障。自身出錯時一律放行、絕不卡住使用者;所有資料只存在本機。",
+      "oneLinerEn": "A traffic monitor and firewall for AI tools (open source, a single Rust binary). It sits between an AI coding assistant (such as Claude Code or Cursor) and the external tools it calls (MCP servers), records every exchange, catches tool descriptions being secretly altered or secrets leaking out, and can replay requests or simulate failures. If it fails itself, traffic still passes through untouched; all data stays on the local machine.",
       "descZh": "開源(Apache-2.0)的 MCP(Model Context Protocol)觀測與安全代理。動機:官方 MCP Inspector 是旁路測試工具,看不到真實 client↔server 對話;MCP server 可以在你核准後偷改工具描述(rug-pull);而每個 server 的工具 schema 吃掉多少 context window 無人知曉。mcpglass attach 一鍵改寫 Claude Code/Claude Desktop/Cursor 的設定檔(原子寫入+時間戳備份+detach 可還原),stdio server 包進 wrap 透明代理、url server 改指本機 gateway;兩種 transport(stdio 與 Streamable HTTP,對齊 spec 2025-06-18,SSE 逐 chunk 直通並旁路切分記錄)共用同一條 tap→SQLite→dashboard 管線。儀表板是 axum + rust-embed 內嵌的 React:session 時間軸、payload 檢視器、per-method latency,與 Security/Context/Inject 三個專屬分頁。安全層預設 monitor 只觀察告警,enforce 為 opt-in 且以協定內 -32001 合法拒絕、絕不粗暴斷線:tool 指紋(自實作 canonical-JSON SHA-256,以 server 啟動指令為跨 session 身分)抓 rug-pull 與 A→B→A 震盪,secret 偵測內建 AWS/GitHub/OpenAI/Anthropic 等 pattern 並支援自訂 regex。除錯工具箱:context bloat 估算(fat tool 排名與裁剪建議)、帶外 replay(重 spawn server/重 initialize 新 session,絕不落庫)、故障注入(delay/error/drop/truncate,可設機率與觸發上限,用於測試 client/server 韌性)。207 項 Rust 測試(含 bytes 完全一致的 passthrough 整合測試)、clippy -D warnings、Ubuntu+Windows 雙 OS CI;並誠實揭露:SQLite 存原始流量全文(含流經的密鑰)——這是流量記錄器的本質,資料不出本機,遮罩只做在稽核視圖。",
       "descEn": "An open-source (Apache-2.0) observability and security proxy for MCP (Model Context Protocol). The itch: the official MCP Inspector is a side-channel test harness that can't see the real client-server conversation; an MCP server can silently rewrite a tool description after you approved it (a rug-pull); and nobody knows how much context window each server's tool schemas eat. mcpglass attach rewrites Claude Code / Claude Desktop / Cursor configs in one command (atomic writes, timestamped backups, detach restores): stdio servers get wrapped by a transparent proxy, url servers get repointed at a local gateway; both transports (stdio and Streamable HTTP per spec 2025-06-18, with SSE streamed through chunk-by-chunk and split for recording on the side) share one tap → SQLite → dashboard pipeline. The dashboard is an axum server with a rust-embed'ed React frontend: session timelines, a payload inspector, per-method latency, and dedicated Security / Context / Inject tabs. The security layer defaults to monitor (observe and flag only); enforce is opt-in and refuses calls with a legal in-protocol -32001 JSON-RPC error instead of severing the connection: tool fingerprints (hand-rolled canonical-JSON SHA-256, keyed to the server's launch command as its cross-session identity) catch rug-pulls including A-B-A oscillations, and secret detection ships AWS/GitHub/OpenAI/Anthropic patterns plus custom regexes. The debugging toolbox adds context-bloat estimation (fattest-tool ranking and trim hints), out-of-band replay (re-spawns the server or re-initializes a fresh HTTP session; never recorded), and fault injection (delay/error/drop/truncate with probabilities and trigger caps) for resilience testing. 207 Rust tests (including a byte-exact passthrough integration test), clippy -D warnings, and Ubuntu+Windows CI; with honest disclosure: the SQLite file stores full raw traffic verbatim (secrets included) — that is the nature of a traffic recorder, the data never leaves the machine, and masking applies to the audit view only.",
       "techStack": [
@@ -521,16 +529,16 @@
       "cover": "/covers/mcpglass.webp",
       "highlights": [
         {
-          "zh": "fail-open 鐵律架構:代理自身任何錯誤(解析失敗、DB 寫入失敗、policy panic)都不得阻斷或延遲 client↔server 流量——s2c 方向是「先轉發、後記錄」的旁路 tap,c2s 方向是同步純函式決策;記錄通道 try_send 不施加背壓、channel 滿時日誌節流避免故障態的同步 I/O 回壓 wire,底線由 bytes 完全一致的 passthrough 整合測試守住。",
-          "en": "A fail-open iron law: no failure inside the proxy (parse errors, DB write failures, a panicking policy engine) may ever block or delay client-server traffic — server-to-client is a forward-first side-channel tap, client-to-server a synchronous pure-function decision; the recording channel uses non-blocking try_send with log throttling when full so a failing state never back-pressures the wire, and the floor is held by a byte-exact passthrough integration test."
+          "zh": "「自己壞掉也不擋路」的設計:代理程式內部任何錯誤(解析失敗、資料庫寫入失敗等)都不能阻斷或拖慢正常通訊;回應一律先轉送、再在背景記錄,記錄管道滿了就捨棄記錄而不是讓通訊等待。這條底線由「通過代理前後位元組完全相同」的整合測試把關。",
+          "en": "Built to never get in the way: no internal error (a parse failure, a database write failure, ...) may block or slow normal traffic; responses are forwarded first and recorded in the background, and if the recording queue is full, records are dropped rather than making traffic wait. An integration test checks that bytes pass through exactly unchanged."
         },
         {
-          "zh": "MCP 供應鏈安全:tools/list 回應以自實作的 canonical-JSON key 排序 SHA-256 指紋,綁 server 啟動指令為跨 session 身分,抓「核准後偷改工具描述」的 rug-pull(含 A→B→A 震盪偵測);secret 外流偵測內建八家密鑰 pattern;預設 monitor 不阻擋,enforce 命中時合成協定內 -32001 錯誤回 client——是合法拒絕,不是斷線。",
-          "en": "MCP supply-chain security: tools/list responses are fingerprinted with a hand-rolled canonical-JSON key-sorted SHA-256, keyed to the server's launch command as its cross-session identity, catching post-approval rug-pulls (including A-B-A oscillations); secret-leak detection ships eight built-in credential patterns; monitor mode never blocks, and an enforce hit answers the client with a synthesized in-protocol -32001 error — a legal refusal, not a dropped connection."
+          "zh": "防範供應鏈攻擊:替每個外部工具的說明內容算出指紋,工具在你核准後被偷偷改寫就會被抓到;內建八種常見密碼金鑰格式的外洩偵測。預設只監看不阻擋,開啟阻擋模式時回傳正規的錯誤訊息,而不是直接斷線。",
+          "en": "Supply-chain protection: each tool's description is fingerprinted, so a tool that is quietly rewritten after you approved it gets caught; eight common secret formats are checked for leaks. By default it only watches; in blocking mode it returns a proper protocol error instead of cutting the connection."
         },
         {
-          "zh": "兩種 transport、一條管線:stdio wrap 與 Streamable HTTP gateway(SSE 逐 chunk 直通+旁路切分、非 SSE 回應緩衝上限、Origin+Host 雙重 loopback 驗證防 DNS rebinding/CSRF-to-localhost)共用同一 tap/storage/指紋管線;attach 一鍵改寫三家 client 設定檔,原子寫入+備份+冪等+detach 精確還原,url server 的原始 upstream 記在 gateway.toml 作唯一真相。",
-          "en": "Two transports, one pipeline: the stdio wrap and the Streamable HTTP gateway (SSE streamed through chunk-by-chunk with side-channel splitting, capped buffering for non-SSE responses, and dual Origin+Host loopback validation against DNS rebinding / CSRF-to-localhost) share the same tap/storage/fingerprint pipeline; attach rewrites all three clients' configs with atomic writes, backups, idempotency and exact detach restoration, recording each url server's original upstream in gateway.toml as the single source of truth."
+          "zh": "支援兩種連線方式(本機 stdio 與 HTTP),共用同一套記錄與指紋流程;HTTP 模式只接受本機來源,防止惡意網頁攻擊本機服務。一個指令就能幫三種 AI 工具改好設定檔,改之前自動備份,也能完整還原。",
+          "en": "Supports both connection types (local stdio and HTTP) through one shared recording and fingerprinting pipeline; HTTP mode accepts local origins only, blocking malicious web pages from attacking local services. One command rewrites the config of three AI tools, with automatic backups and exact restore."
         },
         {
           "zh": "從觀測到干預的完整除錯工具箱:context bloat 分析估算每個 server 的工具 schema 吃掉多少 token(fat tool 排名+裁剪建議,誠實標示為啟發式估算);帶外 replay 重放任一歷史請求(重 spawn/重 initialize,唯讀開庫、絕不落庫);故障注入以 TOML 規則對活流量模擬 delay/error/drop/truncate(機率+觸發上限),注入層自身仍 fail-open;三者都有對應的儀表板分頁,demo 與 README GIF 皆由 repo 內腳本全自動重現。",
@@ -546,6 +554,7 @@
     },
     {
       "slug": "smart-pedestrian-navigation",
+      "resumeMarks": {"zh": ["找出前方能走的路面", "看到路邊有人招手會發出停車提示"], "en": ["find the drivable road ahead", "gives a stop alert when someone waves from the roadside"]},
       "repoName": "Smart-Pedestrian-Navigation-via-Scene-Analysis-and-Traffic-Light-Detection",
       "kindZh": "大學專題",
       "kindEn": "Undergrad capstone",
@@ -562,8 +571,8 @@
         "MediaPipe",
         "Android (Java)"
       ],
-      "oneLinerZh": "大學專題:用 ROS 2 小車模擬車輛、手機當導航,以街景語意分割找出前方可行駛的區域、以手勢辨識偵測路邊有人招手並當作停車信號,再把導航的轉向、距離與路名疊加在畫面上。",
-      "oneLinerEn": "A capstone in which a ROS 2 rover stands in for a car and a phone acts as the navigator: street-scene segmentation finds the drivable area ahead, gesture recognition treats someone waving at the roadside as a stop signal, and the navigation's turn, distance and road name are overlaid on the camera view.",
+      "oneLinerZh": "大學專題:用 ROS 2 小車扮演車輛、手機負責導航。小車用影像辨識找出前方能走的路面,看到路邊有人招手會發出停車提示,並把導航的轉彎方向、距離和路名直接疊在畫面上。",
+      "oneLinerEn": "Capstone project: a ROS 2 rover plays the car and a phone handles navigation. The rover uses image recognition to find the drivable road ahead, gives a stop alert when someone waves from the roadside, and overlays the turn direction, distance and road name on the camera view.",
       "descZh": "畢業專題。情境是用一台 ROS 2 小車模擬車輛,人跟在小車後面當作坐在車上,手機上的導航 App 負責提供大方向。系統把三條獨立的技術線以檔案與 Socket 鬆耦合串成原型管線:以 FC-DenseNet103 在 TensorFlow 1.x 上做街景語意分割,以 MediaPipe 做手勢辨識,並透過 Java NIO Socket 從 Android 導航 App(改自 FancyNavi / HERE SDK)接收路線資訊。主程式逐幀擷取小車鏡頭的畫面,跑完分割推論後以 BFS 連通域分析判斷前方可行駛的區域,並把導航的距離、轉向角、路名與箭頭疊加回畫面;偵測到路邊有人招手(Stop 手勢)時視為停車信號,並搭配語音提示。整體偏研究與概念驗證,模型訓練與資料前處理皆可重現。",
       "descEn": "A university capstone. The scenario: a ROS 2 rover stands in for a car, a person follows behind as if riding in it, and a navigation app on a phone supplies the overall route. The system stitches three independent technology tracks into a prototype pipeline, loosely coupled through files and a socket: street-scene semantic segmentation with FC-DenseNet103 on TensorFlow 1.x, hand-gesture recognition with MediaPipe, and route data received from an Android navigation app (adapted from FancyNavi / HERE SDK) over a Java NIO socket. The main loop grabs frames from the rover's camera, runs segmentation inference, uses a BFS connected-component analysis to find the drivable area ahead, and overlays the navigation distance, turn angle, road name and a direction arrow back onto the frame; when someone at the roadside waves (a 'Stop' gesture), it is treated as a stop signal and accompanied by a voice alert. It is a research / proof-of-concept build with reproducible model training and dataset preprocessing.",
       "techStack": [
@@ -585,20 +594,20 @@
       "cover": "/covers/smart-pedestrian-navigation.webp",
       "highlights": [
         {
-          "zh": "以 FC-DenseNet103 在 TensorFlow 1.x 上訓練街景語意分割,採 CamVid 與 BDD100K 1:1 混合,只使用兩邊共有的類別(剛好涵蓋導航需要的類別);附帶 label 顏色轉換工具,讓兩套資料的標註對齊。",
-          "en": "Trained FC-DenseNet103 on TensorFlow 1.x for street-scene segmentation on a 1:1 mix of CamVid and BDD100K, using only the classes the two datasets share (which happen to cover everything navigation needs); a label-recoloring tool aligns the two datasets' annotations."
+          "zh": "訓練街景辨識模型(FC-DenseNet103):把 CamVid 和 BDD100K 兩套公開資料 1:1 混合,只留兩邊都有的類別(剛好就是導航需要的),並寫了小工具把兩套資料的標註顏色統一。",
+          "en": "Trained a street-scene segmentation model (FC-DenseNet103) on a 1:1 mix of the public CamVid and BDD100K datasets, keeping only the classes both share (exactly the ones navigation needs), plus a small tool that unifies the two datasets' label colors."
         },
         {
-          "zh": "在分割結果上以 BFS 連通域分析計算路面區塊的形心與面積,判斷小車前方可行駛的區域,並把手機導航的距離、轉向角、路名與導引箭頭即時疊加回畫面,而不是只輸出一張遮罩。",
-          "en": "On top of the segmentation mask, a BFS connected-component pass computes the centroid and area of road regions to find the drivable area ahead of the rover, and the phone's navigation distance, turn angle, road name and a guidance arrow are overlaid on the live frame rather than emitting a bare mask."
+          "zh": "從辨識結果算出路面區塊的位置與大小,判斷小車前方哪裡能走;再把手機導航的距離、轉向、路名和箭頭即時畫回畫面,讓結果一眼看得懂,而不只是一張黑白遮罩。",
+          "en": "Computed the position and size of road regions from the segmentation result to decide where the rover can drive, then drew the phone's distance, turn, road name and an arrow back onto the live view, readable at a glance instead of a bare black-and-white mask."
         },
         {
-          "zh": "用 MediaPipe Hands 加上 keypoint / point-history 分類器辨識路邊有人招手的「Stop」手勢,連續觸發時視為停車信號,並以語音(gTTS 預生成、playsound 播放)提示。",
-          "en": "MediaPipe Hands plus keypoint and point-history classifiers recognize a roadside 'Stop' wave; sustained detection is treated as a stop signal and announced with a voice alert (gTTS-generated audio played via playsound)."
+          "zh": "用 MediaPipe 偵測手部關鍵點,辨識路邊有人招手的「停」手勢;連續偵測到才視為停車信號,並用語音提示。",
+          "en": "Used MediaPipe hand keypoints to recognize a roadside 'stop' wave; only sustained detection counts as a stop signal, announced by a voice prompt."
         },
         {
-          "zh": "跨裝置整合:手機端導航 App(改自 FancyNavi,基於 HERE SDK)提供大方向,透過自寫的 Java NIO 非阻塞 Socket 伺服器把路線資訊傳給小車端;TCP 是位元組串流,接收端為每條連線保留緩衝、只解碼完整的一行,避免中文路名被切半而解碼失敗。",
-          "en": "Cross-device integration: the phone's navigation app (adapted from FancyNavi on the HERE SDK) supplies the route, and a hand-written non-blocking Java NIO socket server passes it to the rover side; because TCP is a byte stream, the receiver keeps a buffer per connection and only decodes complete lines, so Chinese road names are never split mid-character."
+          "zh": "兩台裝置的串接:手機導航 App(改自開源的 FancyNavi)把路線傳給小車,傳輸用自己寫的 Java 非阻塞 Socket 伺服器;接收端等收到完整一行才解讀,避免中文路名被切成兩半而變亂碼。",
+          "en": "Connected the two devices: the phone's navigation app (adapted from open-source FancyNavi) sends the route to the rover through a hand-written non-blocking Java socket server; the receiver only decodes complete lines, so Chinese road names are never cut in half and garbled."
         }
       ],
       "challengesZh": "最大的取捨是把三套來源各異的開源元件(語意分割套件、Android 導航 App、MediaPipe 手勢專案)整合成單一即時迴圈,且要在 TensorFlow 1.x 的舊式 session/placeholder API 下維持可用的幀率——做法是每隔固定幀數才送一次分割推論。可行駛區域的判斷沒有額外標註,而是用像素級 BFS 連通域分析在分割輸出上即時計算,簡單但對分割品質與雜訊敏感。跨裝置通訊的難點在介面:TCP 是位元組串流,一則訊息可能被切成兩段,中文路名被切半就會解碼失敗,所以接收端改用 Java NIO 自己切幀,只解碼完整的一行。需要誠實說明的限制:標題雖含「燈號辨識」,但整合後的執行管線中燈號分類只以註解預留、尚未接上,實際完成的是「可行駛區域判斷 + 招手停車信號與語音提示」;系統是 ROS 2 小車加 Android 的研究原型,綁定 TF1.x 與本機鏡頭及 socket,無法直接在瀏覽器執行。",

@@ -43,6 +43,8 @@ export interface Project {
   /** 專案期間(如 2026/4 – 2026/6;進行中寫「至今」/ present),目前只在 PDF 履歷顯示,可選。 */
   periodZh?: string;
   periodEn?: string;
+  /** PDF 履歷/作品附件的螢光筆詞句;必須逐字出現在該案 oneLiner 或印出的 highlights 中,網站頁面不顯示。 */
+  resumeMarks?: { zh: string[]; en: string[] };
 }
 
 interface RawProject extends Omit<Project, "highlights"> {
