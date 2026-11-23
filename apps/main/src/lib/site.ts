@@ -33,10 +33,10 @@ export const eduItems = [
 
 /** 役期(單一來源):PDF 學歷段用 zh/en 整句,首頁歷程時間軸用 period/title/desc。 */
 export const serviceNote = {
-  zh: "兵役:義務役 2025/11 – 2026/2,已退伍",
-  en: "Military service (mandatory), Nov 2025 – Feb 2026 — completed",
-  periodZh: "2025/11 – 2026/2",
-  periodEn: "Nov 2025 – Feb 2026",
+  zh: "兵役:義務役 2025/11 – 2026/3,已退伍",
+  en: "Military service (mandatory), Nov 2025 – Mar 2026 — completed",
+  periodZh: "2025/11 – 2026/3",
+  periodEn: "Nov 2025 – Mar 2026",
   titleZh: "義務役",
   titleEn: "Military service",
   descZh: "義務役服役期滿,已退伍。",
